@@ -22,9 +22,9 @@ export default function index() {
             <Card
                 Content={
                     <>
-                        <div className="flex flex-wrap items-center justify-around gap-5">
+                        <div className="flex flex-wrap items-center justify-around gap-5 my-10">
                             <Card
-                                CustomCss={"flex justify-center items-center flex-col max-w-lg mx-auto min-h-[400px]"}
+                                CustomCss={"flex justify-center items-center flex-col max-w-lg mx-auto min-h-[400px] min-w-[500px]"}
                                 Content={
                                     <>
                                         <div className='flex items-center justify-center w-20 h-20 mb-3 bg-gray-100 rounded-full dark:bg-gray-800'>
@@ -59,7 +59,7 @@ export default function index() {
 
 
                             <Card
-                                CustomCss={"flex justify-center items-center flex-col max-w-lg mx-auto min-h-[400px]"}
+                                CustomCss={"flex justify-center items-center flex-col max-w-lg mx-auto min-h-[400px] min-w-[500px]"}
                                 Content={
                                     <>
                                         <div className='flex items-center justify-center w-20 h-20 mb-3 bg-gray-100 rounded-full dark:bg-gray-800'>
@@ -90,6 +90,48 @@ export default function index() {
                                     </>
                                 }
                             />
+                        </div>
+
+
+                        <div className="flex flex-wrap items-center justify-around gap-5 my-10">
+                            <Card
+                                CustomCss={"flex justify-center items-center flex-col max-w-lg mx-auto min-h-[400px] min-w-[500px]"}
+                                Content={
+                                    <>
+                                        <div className='flex items-center justify-center w-20 h-20 mb-3 bg-gray-100 rounded-full dark:bg-gray-800'>
+
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`size-10 dark:fill-white dark:border-white`}>
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                                            </svg>
+
+
+                                        </div>
+
+                                        <h2 className="mb-2 text-xl font-semibold text-center text-gray-800 dark:text-white">
+                                            Role & Permissions
+                                        </h2>
+
+                                        <p className="mb-6 leading-relaxed text-center text-gray-600 dark:text-white">
+                                            Manage your application Role Permissions
+                                        </p>
+
+                                        <LinkButton
+                                            URL={route("settings.roles.index")}
+                                            Text={"Manage Role Permissions"}
+                                            CustomClass="w-full md:w-[280px] "
+                                            Icon={
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                                                </svg>
+
+                                            }
+                                        />
+                                    </>
+                                }
+                            />
+
+
+
                         </div>
 
                     </>

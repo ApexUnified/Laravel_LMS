@@ -18,7 +18,7 @@ registerPlugin(
     FilePondPluginImageExifOrientation,
     FilePondPluginFileValidateSize
 );
-export default function FileUploaderInput({ Multiple = false, InputName, CustomCss, Id, Required = false, Label, Error, onUpdate, DefaultFile }) {
+export default function FileUploaderInput({ Multiple = false, InputName, CustomCss, imagePathName, Id, Required = false, Label, Error, onUpdate, DefaultFile }) {
 
     const { asset } = usePage().props;
 
@@ -26,7 +26,7 @@ export default function FileUploaderInput({ Multiple = false, InputName, CustomC
         DefaultFile
             ? [
                 {
-                    source: `${asset}assets/images/Logo/${DefaultFile}`,
+                    source: `${asset}assets/images/${imagePathName}/${DefaultFile}`,
                     options: { type: 'remote' },
                 },
             ]

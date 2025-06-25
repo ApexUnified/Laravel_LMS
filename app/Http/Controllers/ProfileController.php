@@ -11,7 +11,10 @@ class ProfileController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $user->append('avatar');
+
+        $user = collect($user)->merge([
+            'profile' => ! empty($user->profile) ? asset('assets/images/user/'.$user->profile) : null,
+        ]);
 
         return Inertia::render('Profile/index', compact('user'));
     }
@@ -20,7 +23,7 @@ class ProfileController extends Controller
     {
         $validated_req = $request->validate([
             'name' => 'required',
-            'email' => 'required|email|unique:users,email,' . $request->user()->id,
+            'email' => 'required|email|unique:users,email,'.$request->user()->id,
         ]);
 
         $user = Auth::user();
@@ -65,6 +68,7 @@ class ProfileController extends Controller
 
         if ($user->delete()) {
             Auth::logout();
+
             return redirect()->route('login')->with('success', 'Account Permanently deleted successfully');
         } else {
             return redirect()->route('profile.index')->withErrors(request()->all())->with('error', 'Failed to delete account');

@@ -131,6 +131,7 @@ export default function index({ generalSetting }) {
 
                                             }}
                                             Multiple={false}
+                                            imagePathName={"Logo"}
                                             DefaultFile={generalSetting?.app_main_logo_dark}
                                         />
 
@@ -147,6 +148,7 @@ export default function index({ generalSetting }) {
 
                                             }}
                                             Multiple={false}
+                                            imagePathName={"Logo"}
                                             DefaultFile={generalSetting?.app_main_logo_light}
                                         />
 
@@ -172,6 +174,7 @@ export default function index({ generalSetting }) {
 
                                             }}
                                             Multiple={false}
+                                            imagePathName={"Logo"}
                                             DefaultFile={generalSetting?.app_favicon}
 
                                         />

@@ -1,12 +1,12 @@
-import Card from '@/Components/Card';
-import LinkButton from '@/Components/LinkButton';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import BreadCrumb from '@/Components/BreadCrumb'
-import { Head, Link, router, useForm, usePage } from '@inertiajs/react'
-import Table from '@/Components/Table';
-import { Label } from '@headlessui/react';
+import Card from '@/Components/Card'
+import LinkButton from '@/Components/LinkButton'
+import Table from '@/Components/Table'
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
+import { Head, useForm, usePage } from '@inertiajs/react'
+import React from 'react'
 
-export default function index({ categories }) {
+export default function index({ users }) {
 
 
     // Bulk Delete Form Data
@@ -22,22 +22,24 @@ export default function index({ categories }) {
     })
 
     const columns = [
-        { key: 'name', label: 'Category Name' },
+        { key: 'profile', label: 'Profile' },
+        { key: 'name', label: 'Name' },
+        { key: 'email', label: 'Email' },
+        { key: 'role_name', label: 'Role Name' },
         { key: 'added_at', label: 'Created At' },
     ];
-
-
 
     return (
         <>
             <AuthenticatedLayout>
-                <Head title="Category" />
+
+                <Head title='Users' />
 
                 <BreadCrumb
-                    header={"Category"}
+                    header={"Users"}
                     parent={"Dashboard"}
                     parent_link={route("dashboard")}
-                    child={"Category"}
+                    child={"Users"}
                 />
 
                 <Card
@@ -45,8 +47,8 @@ export default function index({ categories }) {
                         <>
                             <div className="flex flex-wrap justify-end my-3">
                                 <LinkButton
-                                    Text={"Create Category"}
-                                    URL={route("category.create")}
+                                    Text={"Create User"}
+                                    URL={route("users.create")}
                                     Icon={
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -64,11 +66,11 @@ export default function index({ categories }) {
                                 resetSingleSelectedId={resetSingleSelectedId}
                                 BulkDeleteMethod={BulkDelete}
                                 SingleDeleteMethod={SingleDelete}
-                                EditRoute={"category.edit"}
-                                BulkDeleteRoute={"category.deletebyselection"}
-                                SearchRoute={"category.index"}
-                                SingleDeleteRoute={"category.destroy"}
-                                items={categories}
+                                EditRoute={"users.edit"}
+                                BulkDeleteRoute={"users.destroybyselection"}
+                                SearchRoute={"users.index"}
+                                SingleDeleteRoute={"users.destroy"}
+                                items={users}
                                 props={props}
                                 columns={columns}
                             />
@@ -78,14 +80,7 @@ export default function index({ categories }) {
 
 
 
-
-
-
-
-
-            </AuthenticatedLayout >
+            </AuthenticatedLayout>
         </>
-    );
-
+    )
 }
-

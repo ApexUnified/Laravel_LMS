@@ -10,11 +10,12 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable // implements MustVerifyEmail
+class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, HasRoles, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -38,6 +39,8 @@ class User extends Authenticatable // implements MustVerifyEmail
         'remember_token',
     ];
 
+    protected $appends = ['avatar', 'role_id'];
+
     /**
      * Get the attributes that should be cast.
      *
@@ -49,6 +52,11 @@ class User extends Authenticatable // implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function getRoleIdAttribute()
+    {
+        return ! blank($this->roles) ? $this?->roles?->pluck('id')?->implode('') : null;
     }
 
     public function getAvatarAttribute()

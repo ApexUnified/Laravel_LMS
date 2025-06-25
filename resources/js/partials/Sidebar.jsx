@@ -118,41 +118,41 @@ export default function Sidebar({
                                 </li>
 
 
+
+
+
+
                                 <li>
                                     <a
                                         onClick={() => {
-                                            if (selected === "Categories") {
+                                            if (selected === "Users") {
                                                 setSelected(null);
                                             } else {
-                                                setSelected("Categories");
+                                                setSelected("Users");
                                             }
                                         }}
 
-                                        className={`menu-item group cursor-pointer ${(route().current().includes("category.") || selected === "Categories") ? "menu-item-active" : "menu-item-inactive"}  `}
+                                        className={`menu-item group cursor-pointer ${(route().current().includes("users.") || selected === "Users") ? "menu-item-active" : "menu-item-inactive"}  `}
 
                                     >
 
 
 
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6Z" />
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`size-6`}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
                                         </svg>
 
 
 
-
                                         <span className={`menu-item-text ${sidebarToggle ? 'lg:hidden' : ''}`}>
-                                            Categories
+                                            Users
                                         </span>
-
-
 
 
 
                                         <svg
                                             className={`menu-item-arrow absolute right-2.5 top-1/2 -translate-y-1/2 stroke-current
-                                            ${route().current().includes("category.") || selected === "Categories" && " menu-item-arrow-active"} ${sidebarToggle ? 'lg:hidden' : ''}`}
+                                            ${route().current().includes("users.") || selected === "Users" && " menu-item-arrow-active"} ${sidebarToggle ? 'lg:hidden' : ''}`}
                                             width="20"
                                             height="20"
                                             viewBox="0 0 20 20"
@@ -170,27 +170,27 @@ export default function Sidebar({
                                     </a>
 
                                     <div
-                                        className={`overflow-hidden transform translate ${selected === "Categories" ? "block" : "hidden"}`}
+                                        className={`overflow-hidden transform translate ${selected === "Users" ? "block" : "hidden"}`}
                                     >
                                         <ul
                                             className={`flex flex-col gap-1 mt-2 menu-dropdown pl-9 ${sidebarToggle ? 'lg:hidden' : 'flex'} `}
                                         >
                                             <li>
                                                 <Link
-                                                    href={route("category.index")}
-                                                    className={`menu-dropdown-item group ${route().current() === "category.index" ? "menu-dropdown-item-active" : "menu-dropdown-item-inactive"}`}
+                                                    href={route("users.index")}
+                                                    className={`menu-dropdown-item group ${route().current() === "users.index" ? "menu-dropdown-item-active" : "menu-dropdown-item-inactive"}`}
 
                                                 >
-                                                    Category List
+                                                    Users List
                                                 </Link>
                                             </li>
                                             <li>
                                                 <Link
-                                                    href={route("category.create")}
-                                                    className={`menu-dropdown-item group ${route().current() === "category.create" ? "menu-dropdown-item-active" : "menu-dropdown-item-inactive"}`}
+                                                    href={route("users.create")}
+                                                    className={`menu-dropdown-item group ${route().current() === "users.create" ? "menu-dropdown-item-active" : "menu-dropdown-item-inactive"}`}
 
                                                 >
-                                                    Create Category
+                                                    Create User
                                                 </Link>
                                             </li>
                                         </ul>
@@ -198,89 +198,6 @@ export default function Sidebar({
 
                                 </li>
 
-
-
-                                <li>
-                                    <a
-                                        onClick={() => {
-                                            if (selected === "demoDropdown") {
-                                                setSelected(null);
-                                            } else {
-                                                setSelected("demoDropdown");
-                                            }
-                                        }}
-
-                                        className={`menu-item group cursor-pointer ${selected === "demoDropdown" ? "menu-item-active" : "menu-item-inactive"}`}
-
-                                    >
-                                        <svg
-                                            className={`${selected === "demoDropdown" ? "menu-item-icon-active" : "menu-item-icon-inactive"}`}
-                                            width="24"
-                                            height="24"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                            <path
-                                                fillRule="evenodd"
-                                                clipRule="evenodd"
-                                                d="M14 2.75C14 2.33579 14.3358 2 14.75 2C15.1642 2 15.5 2.33579 15.5 2.75V5.73291L17.75 5.73291H19C19.4142 5.73291 19.75 6.0687 19.75 6.48291C19.75 6.89712 19.4142 7.23291 19 7.23291H18.5L18.5 12.2329C18.5 15.5691 15.9866 18.3183 12.75 18.6901V21.25C12.75 21.6642 12.4142 22 12 22C11.5858 22 11.25 21.6642 11.25 21.25V18.6901C8.01342 18.3183 5.5 15.5691 5.5 12.2329L5.5 7.23291H5C4.58579 7.23291 4.25 6.89712 4.25 6.48291C4.25 6.0687 4.58579 5.73291 5 5.73291L6.25 5.73291L8.5 5.73291L8.5 2.75C8.5 2.33579 8.83579 2 9.25 2C9.66421 2 10 2.33579 10 2.75L10 5.73291L14 5.73291V2.75ZM7 7.23291L7 12.2329C7 14.9943 9.23858 17.2329 12 17.2329C14.7614 17.2329 17 14.9943 17 12.2329L17 7.23291L7 7.23291Z"
-                                                fill=""
-                                            />
-                                        </svg>
-
-
-                                        <span className={`menu-item-text ${sidebarToggle ? 'lg:hidden' : ''}`}>
-                                            Demo Dropdown
-                                        </span>
-
-
-                                        <svg
-                                            className={`menu-item-arrow absolute right-2.5 top-1/2 -translate-y-1/2 stroke-current ${selected === "demoDropdown" && " menu-item-arrow-active"} ${sidebarToggle ? 'lg:hidden' : ''}`}
-                                            width="20"
-                                            height="20"
-                                            viewBox="0 0 20 20"
-                                            fill="none"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                            <path
-                                                d="M4.79175 7.39584L10.0001 12.6042L15.2084 7.39585"
-                                                stroke=""
-                                                strokeWidth="1.5"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                            />
-                                        </svg>
-                                    </a>
-
-                                    <div
-                                        className={`overflow-hidden transform translate ${selected === "demoDropdown" ? "block" : "hidden"}`}
-                                    >
-                                        <ul
-                                            className={`flex flex-col gap-1 mt-2 menu-dropdown pl-9 ${sidebarToggle ? 'lg:hidden' : 'flex'} `}
-                                        >
-                                            <li>
-                                                <a
-                                                    href="#"
-                                                    className="menu-dropdown-item group menu-dropdown-item-inactive"
-
-                                                >
-                                                    DD1
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a
-                                                    href="#"
-                                                    className="menu-dropdown-item group menu-dropdown-item-inactive"
-
-                                                >
-                                                    DD2
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-
-                                </li>
 
 
 

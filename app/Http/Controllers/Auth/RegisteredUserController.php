@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
 use Inertia\Response;
+use Spatie\Permission\Models\Role;
 
 class RegisteredUserController extends Controller
 {
@@ -59,6 +60,15 @@ class RegisteredUserController extends Controller
 
             // After Registeration The Verification Mail Will be Sent By Default
             event(new Registered($user));
+
+            $role = Role::where('name', 'Student')->first();
+
+            if (empty($role)) {
+                $role = Role::create(['name' => 'Student']);
+
+            }
+
+            $user->syncRoles($role);
 
             return redirect(route('verification.notice', absolute: false))
                 ->with('success', 'Registration successful! Please Check Your Inbox For Verification Mail');

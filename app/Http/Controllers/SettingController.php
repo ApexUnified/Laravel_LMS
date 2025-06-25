@@ -7,6 +7,7 @@ use App\Models\SmtpSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Inertia\Inertia;
+use Spatie\Permission\Models\Role;
 
 class SettingController extends Controller
 {
@@ -131,5 +132,119 @@ class SettingController extends Controller
 
         return back()->with('success', 'Smtp Setting Updated Successfully');
 
+    }
+
+    public function rolesIndex(Request $request)
+    {
+        $roles = Role::query()->latest();
+
+        $search = ! empty($request->search) ? $request->search : null;
+        if ($request->filled('search')) {
+            $roles = $roles->where('name', 'LIKE', '%'.$search.'%');
+        }
+
+        $roles = $roles->paginate(10);
+        $roles->getCollection()->transform(function ($role) {
+            $role->added_at = $role->created_at->format('Y-m-d');
+
+            return $role;
+        });
+
+        return Inertia::render('Settings/Roles/index', compact('roles', 'search'));
+    }
+
+    public function roleCreate()
+    {
+        return Inertia::render('Settings/Roles/create');
+    }
+
+    public function roleStore(Request $request)
+    {
+        $validated_req = $request->validate([
+            'name' => 'required|min:4|unique:roles,name',
+        ], [
+            'name.required' => 'Role Name is Required',
+            'name.min' => 'Role Name Must be Valid And at least 4 characters',
+            'name.unique' => 'Role Name Already Exists Please Try Another One',
+        ]);
+
+        if (Role::create($validated_req)) {
+            return to_route('settings.roles.index')->with('success', 'Role Created Successfully');
+        } else {
+            return back()->with('error', 'Something went wrong While Creating Role');
+        }
+
+    }
+
+    public function roleEdit(string $id)
+    {
+        if (empty($id)) {
+            return back()->with('error', 'Role Not Found');
+        }
+
+        $role = Role::find($id);
+
+        if (empty($role)) {
+            return back()->with('error', 'Role Not Found');
+        }
+
+        return Inertia::render('Settings/Roles/edit', compact('role'));
+    }
+
+    public function roleUpdate(Request $request, string $id)
+    {
+        if (empty($id)) {
+            return back()->with('error', 'Role Not Found');
+        }
+
+        $validated_req = $request->validate([
+            'name' => 'required|min:4|unique:roles,name',
+        ], [
+            'name.required' => 'Role Name is Required',
+            'name.min' => 'Role Name Must be Valid And at least 4 characters',
+            'name.unique' => 'Role Name Already Exists Please Try Another One',
+        ]);
+
+        $role = Role::find($id);
+
+        if ($role->update($validated_req)) {
+            return to_route('settings.roles.index')->with('success', 'Role Updated Successfully');
+        } else {
+            return back()->with('error', 'Something went wrong While Updating Role');
+        }
+    }
+
+    public function roleDestroy(string $id)
+    {
+        if (empty($id)) {
+            return back()->with('error', 'Role Not Found');
+        }
+
+        $role = Role::find($id);
+
+        if (empty($role)) {
+            return back()->with('error', 'Role Not Found');
+        }
+
+        if ($role->delete()) {
+            return back()->with('success', 'Role Deleted Successfully');
+        } else {
+            return back()->with('error', 'Something went wrong While Deleting Role');
+        }
+    }
+
+    public function roleDestroyBySelection(Request $request)
+    {
+        $ids = $request->array('ids');
+
+        if (blank($ids)) {
+            return back()->with('error', 'No Role Selected')->withErrors($request->all());
+        }
+
+        if (Role::destroy($ids)) {
+            return back()->with('success', 'Role Deleted Successfully');
+        } else {
+            return back()->with('error', 'Something went wrong While Deleting Role');
+        }
     }
 }

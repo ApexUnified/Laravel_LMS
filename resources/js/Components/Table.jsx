@@ -310,14 +310,31 @@ export default function Table({
                                                                 <div className="flex items-center gap-3">
                                                                     <div>
                                                                         <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
-                                                                            {item[column["key"]]}
+                                                                            {column.key === "profile" ? (
+                                                                                item.profile != null ? (
+                                                                                    <img
+                                                                                        src={item.profile}
+                                                                                        alt="Profile"
+                                                                                        className="object-cover w-20 h-20 rounded-full"
+                                                                                    />
+                                                                                ) : (
+                                                                                    <>
+                                                                                        <span className='flex items-center justify-center w-20 h-20 text-2xl text-white bg-gray-500 rounded-full'>
+                                                                                            {item.avatar}
+                                                                                        </span>
+                                                                                    </>
+                                                                                )
+                                                                            ) : (
+                                                                                item[column.key]
+                                                                            )}
                                                                         </span>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </td>
-                                                    )
+                                                    );
                                                 })}
+
 
 
 

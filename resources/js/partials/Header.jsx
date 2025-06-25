@@ -548,9 +548,19 @@ export default function Header({
                                 href="#"
                                 onClick={() => setProfileDropdown(!profileDropdown)}
                             >
-                                <span className="flex items-center justify-center mr-3 overflow-hidden bg-white border border-gray-200 rounded-full hover:text-dark-900 h-11 w-11 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white">
-                                    {user.avatar}
-                                </span>
+                                {user.profile === null ? (
+                                    <span className="flex items-center justify-center mr-3 overflow-hidden bg-white border border-gray-200 rounded-full hover:text-dark-900 h-11 w-11 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white">
+                                        {user.avatar}
+                                    </span>
+                                )
+                                    : (
+                                        <span className="flex items-center justify-center mr-3 overflow-hidden bg-white border border-gray-200 rounded-full hover:text-dark-900 h-11 w-11 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white">
+                                            <img src={user.profile} alt="" />
+                                        </span>
+                                    )
+                                }
+
+
 
                                 <span className="block mr-1 font-medium text-theme-sm"> {user.name.length > 10 ? user.name.slice(0, 10) + "..." : user.name} </span>
 
