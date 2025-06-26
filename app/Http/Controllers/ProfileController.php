@@ -2,39 +2,32 @@
 
 namespace App\Http\Controllers;
 
+use App\Repositories\Profile\Interface\ProfileRepositoryInterface;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class ProfileController extends Controller
 {
+    public function __construct(
+        private ProfileRepositoryInterface $user
+    ) {}
+
     public function index()
     {
-        $user = Auth::user();
+        $user = $this->user->getUser();
 
-        $user = collect($user)->merge([
-            'profile' => ! empty($user->profile) ? asset('assets/images/user/'.$user->profile) : null,
-        ]);
+        if (empty($user)) {
+            return back()->with('error', 'User not found');
+        }
 
         return Inertia::render('Profile/index', compact('user'));
     }
 
     public function updateProfile(Request $request)
     {
-        $validated_req = $request->validate([
-            'name' => 'required',
-            'email' => 'required|email|unique:users,email,'.$request->user()->id,
-        ]);
+        $updated = $this->user->updateProfile($request);
 
-        $user = Auth::user();
-
-        $user->fill($validated_req);
-
-        if ($user->isDirty('email')) {
-            $user->email_verified_at = null;
-        }
-
-        if ($user->save()) {
+        if ($updated) {
             return redirect()->route('profile.index')->with('success', 'Profile updated successfully');
         } else {
             return redirect()->route('profile.index')->with('error', 'Failed to update profile');
@@ -43,32 +36,22 @@ class ProfileController extends Controller
 
     public function updatePassword(Request $request)
     {
-        $validated_req = $request->validate([
-            'current_password' => 'required|current_password',
-            'password' => 'required|min:8',
-            'password_confirmation' => 'required|same:password',
-        ]);
 
-        $user = Auth::user();
+        $updated = $this->user->updatePassword($request);
 
-        if ($user->update(['password' => bcrypt($request->password)])) {
+        if ($updated) {
             return redirect()->route('profile.index')->with('success', 'Password updated successfully');
         } else {
             return redirect()->route('profile.index')->with('error', 'Failed to update password');
         }
     }
 
-    public function deleteAccount(Request $request)
+    public function destroyAccount(Request $request)
     {
-        $request->validate([
-            'current_password' => 'required|current_password',
-        ]);
 
-        $user = Auth::user();
+        $deleted = $this->user->destroyAccount($request);
 
-        if ($user->delete()) {
-            Auth::logout();
-
+        if ($deleted) {
             return redirect()->route('login')->with('success', 'Account Permanently deleted successfully');
         } else {
             return redirect()->route('profile.index')->withErrors(request()->all())->with('error', 'Failed to delete account');

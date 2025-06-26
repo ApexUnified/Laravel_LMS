@@ -31,7 +31,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/profile', 'index')->name('profile.index');
         Route::put('/profile-update', 'updateProfile')->name('profile.update');
         Route::put('/profile-password-update', 'updatePassword')->name('profile.password.update');
-        Route::delete('/profile/account-destroy', 'deleteAccount')->name('profile.account.destroy');
+        Route::delete('/profile/account-destroy', 'destroyAccount')->name('profile.account.destroy');
     });
 
     // Setting Routes

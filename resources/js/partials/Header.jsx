@@ -114,7 +114,7 @@ export default function Header({
         <>
 
             <header
-                className="z-[9999] flex w-full border-gray-200 bg-white lg:border-b dark:border-gray-800 dark:bg-gray-900"
+                className="flex w-full bg-white border-gray-200 lg:border-b dark:border-gray-800 dark:bg-gray-900"
             >
                 <div
                     className="flex flex-col items-center justify-between grow lg:flex-row lg:px-6"
@@ -314,7 +314,7 @@ export default function Header({
 
                                 {NotificationDropdown && (
                                     <div
-                                        className="shadow-2xl dark:bg-gray-900 absolute -right-[240px] mt-[17px] flex h-[300px] w-[350px] flex-col rounded-2xl border border-gray-200 bg-white p-3 sm:w-[361px] lg:right-0 dark:border-gray-800"
+                                        className="shadow-2xl dark:bg-gray-900 absolute z-[1]  mt-[17px] flex h-[300px] w-[250px] flex-col rounded-2xl border border-gray-200 bg-white p-3 sm:w-[361px] lg:right-0 dark:border-gray-800"
                                     >
                                         <div
                                             className="flex items-center justify-between pb-3 mb-3 border-b border-gray-100 dark:border-gray-800"
@@ -540,7 +540,7 @@ export default function Header({
 
 
                         <div
-                            className="relative"
+                            className="relative z-[1]"
                             ref={profileDropdownRef}
                         >
                             <a
@@ -548,19 +548,9 @@ export default function Header({
                                 href="#"
                                 onClick={() => setProfileDropdown(!profileDropdown)}
                             >
-                                {user.profile === null ? (
-                                    <span className="flex items-center justify-center mr-3 overflow-hidden bg-white border border-gray-200 rounded-full hover:text-dark-900 h-11 w-11 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white">
-                                        {user.avatar}
-                                    </span>
-                                )
-                                    : (
-                                        <span className="flex items-center justify-center mr-3 overflow-hidden bg-white border border-gray-200 rounded-full hover:text-dark-900 h-11 w-11 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white">
-                                            <img src={user.profile} alt="" />
-                                        </span>
-                                    )
-                                }
-
-
+                                <span className="flex items-center justify-center mr-3 overflow-hidden bg-white border border-gray-200 rounded-full hover:text-dark-900 h-11 w-11 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white">
+                                    {user.avatar}
+                                </span>
 
                                 <span className="block mr-1 font-medium text-theme-sm"> {user.name.length > 10 ? user.name.slice(0, 10) + "..." : user.name} </span>
 
