@@ -12,8 +12,10 @@ class UserController extends Controller
 
     public function index(Request $request)
     {
-        $users = $this->user->getAllUsers($request);
-        $search = $request->filled('search') ? $request->input('search') : null;
+        $data = $this->user->getAllUsers($request);
+
+        $users = $data['users'];
+        $search = $data['search'];
 
         return Inertia::render('Users/index', compact('users', 'search'));
     }

@@ -38,7 +38,9 @@ class UserRepository implements UserRepositoryInterface
             return $user;
         });
 
-        return $users;
+        $search = $request->filled('search') ? $request->input('search') : null;
+
+        return ['users' => $users, 'search' => $search];
     }
 
     public function create()
