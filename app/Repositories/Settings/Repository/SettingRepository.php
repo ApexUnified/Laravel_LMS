@@ -139,7 +139,7 @@ class SettingRepository implements SettingRepositoryInterface
 
     }
 
-    public function roleIndex(Request $request)
+    public function getRoles(Request $request)
     {
         $roles = $this->role->query()->latest();
 
@@ -171,7 +171,7 @@ class SettingRepository implements SettingRepositoryInterface
         return $this->role->create($validated_req) ? true : false;
     }
 
-    public function roleEdit(string $id)
+    public function getRole(string $id)
     {
         $role = $this->role->find($id);
 
@@ -192,7 +192,7 @@ class SettingRepository implements SettingRepositoryInterface
             'name.unique' => 'Role Name Already Exists Please Try Another One',
         ]);
 
-        $role = $this->role->find($id);
+        $role = $this->getRole($id);
 
         if (empty($role)) {
             return false;
@@ -203,7 +203,7 @@ class SettingRepository implements SettingRepositoryInterface
 
     public function roleDestroy(string $id)
     {
-        $role = $this->role->find($id);
+        $role = $this->getRole($id);
 
         if (empty($role)) {
             return false;

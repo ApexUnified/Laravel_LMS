@@ -1,13 +1,12 @@
 import BreadCrumb from '@/Components/BreadCrumb'
-import Card from '@/Components/Card'
-import LinkButton from '@/Components/LinkButton'
-import Table from '@/Components/Table'
+import Card from '@/Components/Card';
+import LinkButton from '@/Components/LinkButton';
+import Table from '@/Components/Table';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import { Head, useForm, usePage } from '@inertiajs/react'
 import React from 'react'
 
-export default function index({ users }) {
-
+export default function index({ courses }) {
 
     // Bulk Delete Form Data
     const { props } = usePage();
@@ -22,33 +21,40 @@ export default function index({ users }) {
     })
 
     const columns = [
-        { key: 'profile', label: 'Profile' },
-        { key: 'name', label: 'Name' },
-        { key: 'email', label: 'Email' },
-        { key: 'role_name', label: 'Role Name' },
+        { key: 'title', label: 'Title' },
+        { key: 'instructor.name', label: 'Instructor' },
+        { key: 'category.name', label: 'Category' },
+        { key: 'total_course_duration', label: 'Course Duration' },
+        { key: 'is_published', label: 'Published Status' },
+        { key: 'is_approved', label: 'Approved Status' },
+        { key: 'level', label: 'Course Level' },
+        { key: 'course_language', label: 'Course Language' },
+        { key: 'price', label: 'Course Price' },
         { key: 'added_at', label: 'Created At' },
     ];
 
     return (
         <>
+
             <AuthenticatedLayout>
 
-                <Head title='Users' />
+                <Head title='Courses' />
 
                 <BreadCrumb
-                    header={"Users"}
+                    header={"Courses"}
                     parent={"Dashboard"}
+                    child={"Courses"}
                     parent_link={route("dashboard")}
-                    child={"Users"}
                 />
+
 
                 <Card
                     Content={
                         <>
                             <div className="flex flex-wrap justify-end my-3">
                                 <LinkButton
-                                    Text={"Create User"}
-                                    URL={route("users.create")}
+                                    Text={"Create Course"}
+                                    URL={route("courses.create")}
                                     Icon={
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -66,19 +72,18 @@ export default function index({ users }) {
                                 resetSingleSelectedId={resetSingleSelectedId}
                                 BulkDeleteMethod={BulkDelete}
                                 SingleDeleteMethod={SingleDelete}
-                                EditRoute={"users.edit"}
-                                BulkDeleteRoute={"users.destroybyselection"}
-                                SearchRoute={"users.index"}
-                                SingleDeleteRoute={"users.destroy"}
-                                ViewRoute={"users.show"}
-                                items={users}
+                                EditRoute={"courses.edit"}
+                                BulkDeleteRoute={"courses.destroybyselection"}
+                                SearchRoute={"courses.index"}
+                                SingleDeleteRoute={"courses.destroy"}
+                                ViewRoute={"courses.show"}
+                                items={courses}
                                 props={props}
                                 columns={columns}
                             />
                         </>
                     }
                 />
-
 
 
             </AuthenticatedLayout>

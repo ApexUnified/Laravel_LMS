@@ -18,7 +18,7 @@ registerPlugin(
     FilePondPluginImageExifOrientation,
     FilePondPluginFileValidateSize
 );
-export default function FileUploaderInput({ Multiple = false, InputName, CustomCss, imagePathName, Id, Required = false, Label, Error, onUpdate, DefaultFile }) {
+export default function FileUploaderInput({ Multiple = false, InputName, CustomCss, imagePathName, Id, Required = false, Label, Error, onUpdate, DefaultFile, acceptedFileTypes }) {
 
     const { asset } = usePage().props;
 
@@ -26,7 +26,7 @@ export default function FileUploaderInput({ Multiple = false, InputName, CustomC
         DefaultFile
             ? [
                 {
-                    source: `${asset}assets/images/${imagePathName}/${DefaultFile}`,
+                    ...imagePathName ? { source: `${asset}assets/images/${imagePathName}/${DefaultFile}` } : { source: DefaultFile },
                     options: { type: 'remote' },
                 },
             ]
@@ -48,7 +48,7 @@ export default function FileUploaderInput({ Multiple = false, InputName, CustomC
                     <FilePond
                         allowMultiple={Multiple}
                         credits={false}
-                        acceptedFileTypes={['image/*']}
+                        acceptedFileTypes={[acceptedFileTypes ?? 'image/*']}
 
                         labelIdle={Label ?? "Drag & Drop Your Files or <strong>Click</strong>"}
                         onupdatefiles={(fileItems) => {
@@ -63,7 +63,7 @@ export default function FileUploaderInput({ Multiple = false, InputName, CustomC
                         allowDrop={true}
                         dropOnElement={true}
                         className="filepond--root"
-                        maxFileSize='2MB'
+                        maxFileSize={acceptedFileTypes?.includes('video/*') ? '1000MB' : '2MB'}
                     />
 
 

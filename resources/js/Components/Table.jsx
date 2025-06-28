@@ -18,6 +18,7 @@ export default function Table({
     columns,
     items,
     props,
+    ViewRoute,
 }) {
 
 
@@ -72,6 +73,9 @@ export default function Table({
 
 
 
+    const getNestedValue = (obj, path) => {
+        return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+    }
     // Handle Selection For All Items
     const handleSelectAll = () => {
         if (selectedIds.length === items.data.length) setSelectedIds([]);
@@ -126,7 +130,7 @@ export default function Table({
     const performSearch = useCallback(
         debounce((value) => {
             router.get(route(SearchRoute, { search: value }, { preserveState: true, preserveScroll: true }));
-        }, 500),
+        }, 1000),
         []
     );
 
@@ -315,17 +319,17 @@ export default function Table({
                                                                                     <img
                                                                                         src={item.profile}
                                                                                         alt="Profile"
-                                                                                        className="object-cover w-20 h-20 rounded-full"
+                                                                                        className="object-cover w-full rounded-full sm:w-20 "
                                                                                     />
                                                                                 ) : (
                                                                                     <>
-                                                                                        <span className='flex items-center justify-center w-20 h-20 text-2xl text-white bg-gray-500 rounded-full'>
+                                                                                        <span className='flex items-center justify-center w-full text-2xl text-white bg-gray-500 rounded-full sm:h-20 sm:w-20 '>
                                                                                             {item.avatar}
                                                                                         </span>
                                                                                     </>
                                                                                 )
                                                                             ) : (
-                                                                                item[column.key]
+                                                                                getNestedValue(item, column.key)
                                                                             )}
                                                                         </span>
                                                                     </div>
@@ -354,11 +358,21 @@ export default function Table({
 
                                                             {openDropdownId === item.id && (
                                                                 <div
-                                                                    className={`absolute right-0 mt-2 rounded-lg bg-slate-50 w-44  dark:bg-white/10 dark:text-white/90 dark:hover:bg-white/10 shadow-lg z-[9999] ${openDropdownId === 1 ? 'mt-0 mb-5' : ''
+                                                                    className={`relative right-0 mt-2 rounded-lg bg-slate-50 w-44  dark:bg-white/10 dark:text-white/90 dark:hover:bg-white/10 shadow-lg z-[9999] ${openDropdownId === 1 ? 'mt-0 mb-5' : ''
                                                                         }`}
                                                                 >
 
                                                                     <ul className="py-2 text-sm text-gray-700 dark:text-gray-200">
+
+
+                                                                        {ViewRoute != null && (
+                                                                            <li>
+                                                                                <Link href={route(ViewRoute, item.id)} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                                                                                    View
+                                                                                </Link>
+                                                                            </li>
+                                                                        )}
+
                                                                         <li>
                                                                             <Link href={route(EditRoute, item.id)} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
                                                                                 Edit
@@ -377,6 +391,8 @@ export default function Table({
                                                                             </button>
                                                                         </li>
 
+
+
                                                                     </ul>
                                                                 </div>
                                                             )}
@@ -388,20 +404,14 @@ export default function Table({
                                         )
                                     })}
 
-
-                                    {items.data.length === 0 && (
-                                        <tr>
-                                            <td colSpan={7} className="text-center">
-                                                <p className='text-gray-900 dark:text-white'>
-                                                    No data found
-                                                </p>
-                                            </td>
-                                        </tr>
-                                    )}
-
-
                                 </tbody>
                             </table>
+
+                            {items.data.length === 0 && (
+                                <p className='flex justify-center p-5 mb-20 text-center text-gray-900 bg-blue-200 dark:bg-white/5 dark:text-white align-center'>
+                                    No data found
+                                </p>
+                            )}
                         </div>
                     </div>
                 </div>

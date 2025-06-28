@@ -14,11 +14,11 @@ interface SettingRepositoryInterface
 
     public function updateSmtpSetting(Request $request);
 
-    public function roleIndex(Request $request);
+    public function getRoles(Request $request);
 
     public function roleStore(Request $request);
 
-    public function roleEdit(string $id);
+    public function getRole(string $id);
 
     public function roleUpdate(Request $request, string $id);
 

@@ -57,7 +57,7 @@ class SettingController extends Controller
 
     public function rolesIndex(Request $request)
     {
-        $data = $this->setting->roleIndex($request);
+        $data = $this->setting->getRoles($request);
         $roles = $data['roles'];
         $search = $data['search'];
 
@@ -86,7 +86,7 @@ class SettingController extends Controller
             return back()->with('error', 'Role Not Found');
         }
 
-        $role = $this->setting->roleEdit($id);
+        $role = $this->setting->getRole($id);
 
         if (empty($role)) {
             return back()->with('error', 'Role Not Found');

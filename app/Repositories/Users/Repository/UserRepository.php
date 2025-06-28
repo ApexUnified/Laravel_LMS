@@ -19,7 +19,7 @@ class UserRepository implements UserRepositoryInterface
         $this->directory = public_path('assets/images/user/');
     }
 
-    public function getAllUsers(Request $request)
+    public function getUsers(Request $request)
     {
         $users = $this->user->query()->latest()->with('roles');
 
@@ -43,12 +43,12 @@ class UserRepository implements UserRepositoryInterface
         return ['users' => $users, 'search' => $search];
     }
 
-    public function create()
+    public function getRoles()
     {
         return $this->role->all();
     }
 
-    public function store(Request $request)
+    public function storeUser(Request $request)
     {
         $validated_req = $request->validate([
             'name' => 'required',
@@ -83,19 +83,7 @@ class UserRepository implements UserRepositoryInterface
         return $user;
     }
 
-    public function show(string $id)
-    {
-
-        $user = $this->user->find($id);
-
-        if (empty($user)) {
-            return false;
-        }
-
-        return $user;
-    }
-
-    public function edit(string $id)
+    public function getUser(string $id)
     {
 
         $user = $this->user->find($id);
@@ -109,7 +97,7 @@ class UserRepository implements UserRepositoryInterface
         return ['user' => $user, 'roles' => $roles];
     }
 
-    public function update(Request $request, string $id)
+    public function updateUser(Request $request, string $id)
     {
 
         $validated_req = $request->validate([
@@ -158,7 +146,7 @@ class UserRepository implements UserRepositoryInterface
         return false;
     }
 
-    public function destroy(string $id)
+    public function destroyUser(string $id)
     {
 
         $user = $this->user->find($id);
@@ -175,7 +163,7 @@ class UserRepository implements UserRepositoryInterface
         return $user->delete();
     }
 
-    public function destroyBySelection(Request $request)
+    public function destroyUsersBySelection(Request $request)
     {
         $deletedCount = 0;
 

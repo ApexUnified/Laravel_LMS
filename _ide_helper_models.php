@@ -19,6 +19,8 @@ namespace App\Models{
  * @property string $name
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Course> $courses
+ * @property-read int|null $courses_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Category newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Category newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Category query()
@@ -28,6 +30,67 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Category whereUpdatedAt($value)
  */
 	class Category extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * 
+ *
+ * @property int $id
+ * @property string $title
+ * @property string $slug
+ * @property string $short_description
+ * @property array<array-key, mixed> $description
+ * @property string $thumbnail
+ * @property string $thumbnail_public_id
+ * @property string|null $promo_video
+ * @property string|null $promo_video_public_id
+ * @property int|null $category_id
+ * @property int|null $instructor_id
+ * @property string $price
+ * @property int $discount
+ * @property string $total_course_duration
+ * @property string $level
+ * @property string $course_language
+ * @property int $is_published
+ * @property int $is_approved
+ * @property array<array-key, mixed>|null $requirements
+ * @property array<array-key, mixed>|null $learning_outcomes
+ * @property string|null $meta_title
+ * @property string|null $meta_description
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Category|null $category
+ * @property-read \App\Models\User|null $instructor
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereCategoryId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereCourseLanguage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereDiscount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereInstructorId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereIsApproved($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereIsPublished($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereLearningOutcomes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereLevel($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereMetaDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereMetaTitle($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course wherePrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course wherePromoVideo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course wherePromoVideoPublicId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereRequirements($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereShortDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereSlug($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereThumbnail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereThumbnailPublicId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereTitle($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereTotalCourseDuration($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereUpdatedAt($value)
+ */
+	class Course extends \Eloquent {}
 }
 
 namespace App\Models{
@@ -103,6 +166,8 @@ namespace App\Models{
  * @property string|null $remember_token
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Course> $courses
+ * @property-read int|null $courses_count
  * @property-read mixed $avatar
  * @property-read mixed $role_id
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications

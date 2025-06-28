@@ -12,7 +12,7 @@ class UserController extends Controller
 
     public function index(Request $request)
     {
-        $data = $this->user->getAllUsers($request);
+        $data = $this->user->getUsers($request);
 
         $users = $data['users'];
         $search = $data['search'];
@@ -22,14 +22,14 @@ class UserController extends Controller
 
     public function create()
     {
-        $roles = $this->user->create();
+        $roles = $this->user->getRoles();
 
         return Inertia::render('Users/create', compact('roles'));
     }
 
     public function store(Request $request)
     {
-        $user = $this->user->store($request);
+        $user = $this->user->storeUser($request);
         if (! empty($user)) {
             return to_route('users.index')->with('success', 'User created successfully');
         } else {
@@ -45,7 +45,7 @@ class UserController extends Controller
             return back()->with('error', 'User not found');
         }
 
-        $user = $this->user->show($id);
+        $user = $this->user->getUser($id);
 
         if (empty($user)) {
             return back()->with('error', 'User not found');
@@ -61,7 +61,7 @@ class UserController extends Controller
             return back()->with('info', 'User not found');
         }
 
-        $data = $this->user->edit($id);
+        $data = $this->user->getUser($id);
 
         if (empty($data)) {
             return back()->with('info', 'User not found');
@@ -79,7 +79,7 @@ class UserController extends Controller
             return back()->with('info', 'User not found');
         }
 
-        $updated = $this->user->update($request, $id);
+        $updated = $this->user->updateUser($request, $id);
         if ($updated) {
             return to_route('users.index')->with('success', 'User updated successfully');
         } else {
@@ -94,7 +94,7 @@ class UserController extends Controller
             return back()->with('info', 'User not found');
         }
 
-        $deleted = $this->user->destroy($id);
+        $deleted = $this->user->destroyUser($id);
 
         if ($deleted) {
             return to_route('users.index')->with('success', 'User deleted successfully');
@@ -111,7 +111,7 @@ class UserController extends Controller
             return back()->with('error', 'No User Found With The Given IDs')->withErrors($request->all());
         }
 
-        $deleted = $this->user->destroyBySelection($request);
+        $deleted = $this->user->destroyUsersBySelection($request);
 
         if ($deleted) {
             return to_route('users.index')->with('success', 'Users deleted successfully');

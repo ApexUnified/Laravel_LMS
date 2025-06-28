@@ -16,6 +16,7 @@ export default function Input({ Name, Value, Action, Placeholder, Type, Error, R
                     value={Value}
                     onChange={Action}
                     required={Required}
+                    {...Type === "number" ? { min: 0 } : {}}
 
                 />
                 {(Error && Type !== "password") &&

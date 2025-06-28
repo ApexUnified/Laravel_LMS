@@ -119,6 +119,85 @@ export default function Sidebar({
 
 
 
+                                <li>
+                                    <a
+                                        onClick={() => {
+                                            if (selected === "Categories") {
+                                                setSelected(null);
+                                            } else {
+                                                setSelected("Categories");
+                                            }
+                                        }}
+
+                                        className={`menu-item group cursor-pointer ${(route().current().includes("category.") || selected === "Categories") ? "menu-item-active" : "menu-item-inactive"}  `}
+
+                                    >
+
+
+
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6Z" />
+                                        </svg>
+
+
+
+
+                                        <span className={`menu-item-text ${sidebarToggle ? 'lg:hidden' : ''}`}>
+                                            Categories
+                                        </span>
+
+
+
+
+
+                                        <svg
+                                            className={`menu-item-arrow absolute right-2.5 top-1/2 -translate-y-1/2 stroke-current
+                                            ${route().current().includes("category.") || selected === "Categories" && " menu-item-arrow-active"} ${sidebarToggle ? 'lg:hidden' : ''}`}
+                                            width="20"
+                                            height="20"
+                                            viewBox="0 0 20 20"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                            <path
+                                                d="M4.79175 7.39584L10.0001 12.6042L15.2084 7.39585"
+                                                stroke=""
+                                                strokeWidth="1.5"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                            />
+                                        </svg>
+                                    </a>
+
+                                    <div
+                                        className={`overflow-hidden transform translate ${selected === "Categories" ? "block" : "hidden"}`}
+                                    >
+                                        <ul
+                                            className={`flex flex-col gap-1 mt-2 menu-dropdown pl-9 ${sidebarToggle ? 'lg:hidden' : 'flex'} `}
+                                        >
+                                            <li>
+                                                <Link
+                                                    href={route("category.index")}
+                                                    className={`menu-dropdown-item group ${route().current() === "category.index" ? "menu-dropdown-item-active" : "menu-dropdown-item-inactive"}`}
+
+                                                >
+                                                    Category List
+                                                </Link>
+                                            </li>
+                                            <li>
+                                                <Link
+                                                    href={route("category.create")}
+                                                    className={`menu-dropdown-item group ${route().current() === "category.create" ? "menu-dropdown-item-active" : "menu-dropdown-item-inactive"}`}
+
+                                                >
+                                                    Create Category
+                                                </Link>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                </li>
 
 
 
@@ -198,6 +277,83 @@ export default function Sidebar({
 
                                 </li>
 
+
+                                <li>
+                                    <a
+                                        onClick={() => {
+                                            if (selected === "Courses") {
+                                                setSelected(null);
+                                            } else {
+                                                setSelected("Courses");
+                                            }
+                                        }}
+
+                                        className={`menu-item group cursor-pointer ${(route().current().includes("courses.") || selected === "Courses") ? "menu-item-active" : "menu-item-inactive"}  `}
+
+                                    >
+
+
+
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+                                        </svg>
+
+
+
+
+                                        <span className={`menu-item-text ${sidebarToggle ? 'lg:hidden' : ''}`}>
+                                            Courses
+                                        </span>
+
+
+
+                                        <svg
+                                            className={`menu-item-arrow absolute right-2.5 top-1/2 -translate-y-1/2 stroke-current
+                                            ${route().current().includes("users.") || selected === "Users" && " menu-item-arrow-active"} ${sidebarToggle ? 'lg:hidden' : ''}`}
+                                            width="20"
+                                            height="20"
+                                            viewBox="0 0 20 20"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                            <path
+                                                d="M4.79175 7.39584L10.0001 12.6042L15.2084 7.39585"
+                                                stroke=""
+                                                strokeWidth="1.5"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                            />
+                                        </svg>
+                                    </a>
+
+                                    <div
+                                        className={`overflow-hidden transform translate ${selected === "Courses" ? "block" : "hidden"}`}
+                                    >
+                                        <ul
+                                            className={`flex flex-col gap-1 mt-2 menu-dropdown pl-9 ${sidebarToggle ? 'lg:hidden' : 'flex'} `}
+                                        >
+                                            <li>
+                                                <Link
+                                                    href={route("courses.index")}
+                                                    className={`menu-dropdown-item group ${route().current() === "courses.index" ? "menu-dropdown-item-active" : "menu-dropdown-item-inactive"}`}
+
+                                                >
+                                                    Courses List
+                                                </Link>
+                                            </li>
+                                            <li>
+                                                <Link
+                                                    href={route("courses.create")}
+                                                    className={`menu-dropdown-item group ${route().current() === "courses.create" ? "menu-dropdown-item-active" : "menu-dropdown-item-inactive"}`}
+
+                                                >
+                                                    Create Course
+                                                </Link>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                </li>
 
 
 

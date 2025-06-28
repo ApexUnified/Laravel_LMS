@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CourseController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\UserController;
@@ -22,9 +24,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
 
+    // Category Routes
+    Route::resource('/category', CategoryController::class)->except(['show']);
+    Route::delete('/category-delete-by-selectetion', [CategoryController::class, 'deleteBySelection'])->name('category.deletebyselection');
+
     // User Routes
     Route::resource('/users', UserController::class);
     Route::delete('users-destroybyselection', [UserController::class, 'destroyBySelection'])->name('users.destroybyselection');
+
+    // Course Routes
+    Route::resource('/courses', CourseController::class);
+    Route::delete('/courses-destroybyselection', [CourseController::class, 'destroyBySelection'])->name('courses.destroybyselection');
 
     // Profile Routes
     Route::controller(ProfileController::class)->group(function () {
