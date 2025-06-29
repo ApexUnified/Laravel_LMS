@@ -36,7 +36,7 @@ class ProfileRepository implements ProfileRepositoryInterface
         ]);
 
         if (empty($this->user)) {
-            return false;
+            return ['status' => false, 'message' => 'User not found'];
         }
 
         $this->user->fill($validated_req);
@@ -46,9 +46,9 @@ class ProfileRepository implements ProfileRepositoryInterface
         }
 
         if ($this->user->save()) {
-            return true;
+            return ['status' => true, 'message' => 'Profile updated successfully'];
         } else {
-            return false;
+            return ['status' => false, 'message' => 'Failed to update profile'];
         }
     }
 
@@ -61,13 +61,13 @@ class ProfileRepository implements ProfileRepositoryInterface
         ]);
 
         if (empty($this->user)) {
-            return false;
+            return ['status' => false, 'message' => 'User not found'];
         }
 
         if ($this->user->update(['password' => bcrypt($request->password)])) {
-            return true;
+            return ['status' => true, 'message' => 'Password updated successfully'];
         } else {
-            return false;
+            return ['status' => false, 'message' => 'Failed To Update Password'];
         }
     }
 
@@ -78,15 +78,15 @@ class ProfileRepository implements ProfileRepositoryInterface
         ]);
 
         if (empty($this->user)) {
-            return false;
+            return ['status' => false, 'message' => 'User not found'];
         }
 
         if ($this->user->delete()) {
             Auth::logout();
 
-            return true;
+            return ['status' => true, 'message' => 'Account Permanently deleted successfully'];
         } else {
-            return false;
+            return ['status' => false, 'message' => 'Failed to delete account'];
         }
     }
 }

@@ -27,10 +27,10 @@ class ProfileController extends Controller
     {
         $updated = $this->user->updateProfile($request);
 
-        if ($updated) {
-            return redirect()->route('profile.index')->with('success', 'Profile updated successfully');
+        if ($updated['status']) {
+            return to_route('profile.index')->with('success', $updated['message']);
         } else {
-            return redirect()->route('profile.index')->with('error', 'Failed to update profile');
+            return to_route('profile.index')->with('error', '$updated["message"]');
         }
     }
 
@@ -39,10 +39,10 @@ class ProfileController extends Controller
 
         $updated = $this->user->updatePassword($request);
 
-        if ($updated) {
-            return redirect()->route('profile.index')->with('success', 'Password updated successfully');
+        if ($updated['status']) {
+            return to_route('profile.index')->with('success', $updated['message']);
         } else {
-            return redirect()->route('profile.index')->with('error', 'Failed to update password');
+            return to_route('profile.index')->with('error', $updated['message']);
         }
     }
 
@@ -51,10 +51,10 @@ class ProfileController extends Controller
 
         $deleted = $this->user->destroyAccount($request);
 
-        if ($deleted) {
-            return redirect()->route('login')->with('success', 'Account Permanently deleted successfully');
+        if ($deleted['status']) {
+            return to_route('login')->with('success', $deleted['message']);
         } else {
-            return redirect()->route('profile.index')->withErrors(request()->all())->with('error', 'Failed to delete account');
+            return to_route('profile.index')->with('error', $deleted['message']);
         }
     }
 }

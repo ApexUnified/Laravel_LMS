@@ -22,81 +22,67 @@ class CategoryController extends Controller
         return Inertia::render('Categories/index', compact('categories', 'search'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         return Inertia::render('Categories/create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
 
         $created = $this->category->storeCategory($request);
 
-        if ($created) {
-            return redirect()->route('category.index')->with('success', 'Category Created Succesfully');
+        if ($created['status']) {
+            return to_route('category.index')->with('success', $created['message']);
         } else {
-            return redirect()->back()->with('error', 'Something went wrong');
+            return back()->with('error', $created['message']);
         }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
+
         if (empty($id)) {
-            return redirect()->route('category.index')->with('error', 'No Category Found');
+            return back()->with('error', 'No Category Found');
         }
 
         $category = $this->category->getCategory($id);
 
-        if (empty($category)) {
-            return redirect()->route('category.index')->with('error', 'No Category Found');
+        if (isset($category['status']) && $category['status'] == false) {
+            return to_route('category.index')->with('error', $category['message']);
         }
 
         return Inertia::render('Categories/edit', compact('category'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
 
         if (empty($id)) {
-            return redirect()->route('category.index')->with('error', 'No Category Found');
+            return back()->with('error', 'No Category Found');
         }
 
         $updated = $this->category->updateCategory($request, $id);
 
-        if ($updated) {
-            return redirect()->route('category.index')->with('success', 'Category Updated Succesfully');
+        if ($updated['status']) {
+            return to_route('category.index')->with('success', $updated['message']);
         } else {
-            return redirect()->back()->with('error', 'Something went wrong');
+            return back()->with('error', $updated['message']);
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         if (empty($id)) {
-            return redirect()->route('category.index')->withErrors(request()->all())->with('error', 'No Category Found');
+            return back()->with('error', 'No Category Found');
         }
 
         $deleted = $this->category->destroyCategory($id);
 
-        if ($deleted) {
-            return redirect()->route('category.index')->with('success', 'Category Deleted Succesfully');
+        if ($deleted['status']) {
+            return back()->with('success', $deleted['message']);
         } else {
-            return redirect()->back()->with('error', 'Something went wrong');
+            return back()->with('error', $deleted['message']);
         }
     }
 
@@ -105,14 +91,10 @@ class CategoryController extends Controller
 
         $deleted = $this->category->destroyCategoriesBySelection($request);
 
-        if (is_array($deleted) && isset($deleted['error'])) {
-            return back()->with('error', $deleted['error'])->withErrors($request->all());
-        }
-
-        if ($deleted) {
-            return back()->with('success', 'Seletced Categories Deleted Succesfully');
+        if ($deleted['status']) {
+            return back()->with('success', $deleted['message']);
         } else {
-            return back()->with('error', 'Something went wrong While Deleting Categories')->withErrors($request->all());
+            return back()->with('error', $deleted['message']);
         }
     }
 }

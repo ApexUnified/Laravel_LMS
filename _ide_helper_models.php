@@ -62,6 +62,8 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Category|null $category
  * @property-read \App\Models\User|null $instructor
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Lesson> $lessons
+ * @property-read int|null $lessons_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Course newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Course newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Course query()
@@ -120,6 +122,38 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GeneralSetting whereUpdatedAt($value)
  */
 	class GeneralSetting extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * 
+ *
+ * @property int $id
+ * @property int $course_id
+ * @property string $title
+ * @property string $slug
+ * @property string $description
+ * @property string $thumbnail
+ * @property string $video
+ * @property array<array-key, mixed>|null $attachments
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Course $course
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson whereAttachments($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson whereCourseId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson whereSlug($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson whereThumbnail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson whereTitle($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson whereVideo($value)
+ */
+	class Lesson extends \Eloquent {}
 }
 
 namespace App\Models{

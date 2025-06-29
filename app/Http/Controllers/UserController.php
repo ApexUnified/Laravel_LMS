@@ -29,27 +29,29 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        $user = $this->user->storeUser($request);
-        if (! empty($user)) {
-            return to_route('users.index')->with('success', 'User created successfully');
+        $created = $this->user->storeUser($request);
+
+        if ($created['status']) {
+            return to_route('users.index')->with('success', $created['message']);
         } else {
-            return back()->with('error', 'Something went wrong While Creating User');
+            return back()->with('error', $created['message']);
         }
 
     }
 
     public function show(string $id)
     {
-
         if (empty($id)) {
             return back()->with('error', 'User not found');
         }
 
-        $user = $this->user->getUser($id);
+        $data = $this->user->getUser($id);
 
-        if (empty($user)) {
-            return back()->with('error', 'User not found');
+        if (isset($data['status']) && $data['status'] == false) {
+            return to_route('users.index')->with('error', $data['message']);
         }
+
+        $user = $data['user'];
 
         return Inertia::render('Users/view', compact('user'));
     }
@@ -63,8 +65,8 @@ class UserController extends Controller
 
         $data = $this->user->getUser($id);
 
-        if (empty($data)) {
-            return back()->with('info', 'User not found');
+        if (isset($data['status']) && $data['status'] == false) {
+            return to_route('users.index')->with('error', $data['message']);
         }
 
         $user = $data['user'];
@@ -80,10 +82,10 @@ class UserController extends Controller
         }
 
         $updated = $this->user->updateUser($request, $id);
-        if ($updated) {
-            return to_route('users.index')->with('success', 'User updated successfully');
+        if ($updated['status']) {
+            return to_route('users.index')->with('success', $updated['message']);
         } else {
-            return back()->with('error', 'Something went wrong While Updating User');
+            return back()->with('error', $updated['message']);
         }
 
     }
@@ -96,27 +98,21 @@ class UserController extends Controller
 
         $deleted = $this->user->destroyUser($id);
 
-        if ($deleted) {
-            return to_route('users.index')->with('success', 'User deleted successfully');
+        if ($deleted['status']) {
+            return to_route('users.index')->with('success', $deleted['message']);
         } else {
-            return back()->with('error', 'Something went wrong While Deleting User');
+            return back()->with('error', $deleted['message']);
         }
     }
 
     public function destroyBySelection(Request $request)
     {
-
-        $ids = $request->array('ids');
-        if (blank($ids)) {
-            return back()->with('error', 'No User Found With The Given IDs')->withErrors($request->all());
-        }
-
         $deleted = $this->user->destroyUsersBySelection($request);
 
-        if ($deleted) {
-            return to_route('users.index')->with('success', 'Users deleted successfully');
+        if ($deleted['status']) {
+            return to_route('users.index')->with('success', $deleted['message']);
         } else {
-            return back()->with('error', 'Something went wrong While Deleting Users')->withErrors($request->all());
+            return back()->with('error', $deleted['message']);
         }
 
     }

@@ -20,8 +20,8 @@ export default function create({ categories, instructors }) {
         short_description: '',
         category_id: '',
         instructor_id: '',
-        thumbnail: '',
-        promo_video: '',
+        thumbnail: null,
+        promo_video: null,
         price: 0,
         discount: 0,
         total_course_duration: '',
@@ -365,7 +365,7 @@ export default function create({ categories, instructors }) {
                                                 data.short_description === '' ||
                                                 data.category_id === '' ||
                                                 data.instructor_id === '' ||
-                                                data.thumbnail === '' ||
+                                                data.thumbnail === null ||
                                                 data.total_course_duration === '' ||
                                                 data.level === '' ||
                                                 data.course_language === ''

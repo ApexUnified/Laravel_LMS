@@ -4,7 +4,7 @@ import LinkButton from '@/Components/LinkButton'
 import Table from '@/Components/Table'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import { Head, useForm, usePage } from '@inertiajs/react'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 export default function index({ users }) {
 
@@ -21,13 +21,19 @@ export default function index({ users }) {
         id: null,
     })
 
-    const columns = [
-        { key: 'profile', label: 'Profile' },
-        { key: 'name', label: 'Name' },
-        { key: 'email', label: 'Email' },
-        { key: 'role_name', label: 'Role Name' },
-        { key: 'added_at', label: 'Created At' },
-    ];
+    const [columns, setColumns] = useState([]);
+
+    useEffect(() => {
+        const columns = [
+            { key: 'profile', label: 'Profile' },
+            { key: 'name', label: 'Name' },
+            { key: 'email', label: 'Email' },
+            { key: 'role_name', label: 'Role Name' },
+            { key: 'added_at', label: 'Created At' },
+        ];
+
+        setColumns(columns);
+    }, []);
 
     return (
         <>

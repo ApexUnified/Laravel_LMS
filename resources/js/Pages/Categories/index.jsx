@@ -5,6 +5,7 @@ import BreadCrumb from '@/Components/BreadCrumb'
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react'
 import Table from '@/Components/Table';
 import { Label } from '@headlessui/react';
+import { useEffect, useState } from 'react';
 
 export default function index({ categories }) {
 
@@ -19,13 +20,20 @@ export default function index({ categories }) {
     // Single Delete Form Data
     const { data: SingleSelectedId, setData: setSingleSelectedId, delete: SingleDelete, reset: resetSingleSelectedId } = useForm({
         id: null,
-    })
+    });
 
-    const columns = [
-        { key: 'name', label: 'Category Name' },
-        { key: 'courses_count', label: 'Total Courses' },
-        { key: 'added_at', label: 'Created At' },
-    ];
+    const [columns, setColumns] = useState([]);
+
+    useEffect(() => {
+        const columns = [
+            { key: 'name', label: 'Category Name' },
+            { key: 'courses_count', label: 'Total Courses', badge: (value) => 'bg-gray-800 text-white  dark:bg-white dark:text-black  px-4' },
+            { key: 'added_at', label: 'Created At' },
+        ];
+
+
+        setColumns(columns);
+    }, []);
 
 
 

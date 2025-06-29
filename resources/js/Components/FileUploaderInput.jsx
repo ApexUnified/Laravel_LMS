@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { FilePond, registerPlugin } from "react-filepond";
 
 import "filepond/dist/filepond.min.css";
@@ -57,13 +57,16 @@ export default function FileUploaderInput({ Multiple = false, InputName, CustomC
                             if (item?.file instanceof File) {
                                 onUpdate(item.file);
                                 setFiles(fileItems);
+                            } else if (fileItems.length === 0) {
+                                setFiles([]);
+                                onUpdate(null);
                             }
                         }}
                         files={files}
                         allowDrop={true}
                         dropOnElement={true}
                         className="filepond--root"
-                        maxFileSize={acceptedFileTypes?.includes('video/*') ? '1000MB' : '2MB'}
+                        maxFileSize={acceptedFileTypes?.includes('video/*') ? '10000MB' : '2MB'}
                     />
 
 

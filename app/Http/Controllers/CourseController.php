@@ -18,9 +18,15 @@ class CourseController extends Controller
         $data = $this->course->getCourses($request);
 
         $courses = $data['courses'];
+        $instructors = $data['instructors'];
+        $categories = $data['categories'];
         $search = $data['search'];
+        $category_id = $data['category_id'];
+        $instructor_id = $data['instructor_id'];
 
-        return Inertia::render('Courses/index', compact('courses', 'search'));
+        // return $courses;
+
+        return Inertia::render('Courses/index', compact('courses', 'instructors', 'categories', 'category_id', 'instructor_id', 'search'));
     }
 
     public function create()
@@ -34,15 +40,10 @@ class CourseController extends Controller
     public function store(Request $request)
     {
         $created = $this->course->storeCourse($request);
-
-        if (isset($created['status']) && $created['status'] == false) {
-            return back()->with('error', $created['message'])->withErrors($request->all());
-        }
-
-        if ($created) {
-            return to_route('courses.index')->with('success', 'Course created successfully');
+        if ($created['status']) {
+            return to_route('courses.index')->with('success', $created['message']);
         } else {
-            return to_route('courses.index')->with('error', 'Something went wrong While Creating Course');
+            return back()->with('error', $created['message']);
         }
     }
 
@@ -50,8 +51,8 @@ class CourseController extends Controller
     {
         $course = $this->course->getCourse($id);
 
-        if (empty($course)) {
-            return to_route('courses.index')->with('error', 'Course not found');
+        if (isset($course['status']) && $course['status'] === false) {
+            return to_route('courses.index')->with('error', $course['message']);
         }
 
         return Inertia::render('Courses/view', compact('course'));
@@ -62,8 +63,8 @@ class CourseController extends Controller
 
         $course = $this->course->getCourse($id);
 
-        if (empty($course)) {
-            return to_route('courses.index')->with('error', 'Course not found');
+        if (isset($course['status']) && $course['status'] === false) {
+            return to_route('courses.index')->with('error', $course['message']);
         }
 
         $categories = $this->course->getCategories();
@@ -76,14 +77,10 @@ class CourseController extends Controller
     {
         $updated = $this->course->updateCourse($request, $id);
 
-        if (isset($updated['status']) && $updated['status'] == false) {
-            return back()->with('error', $updated['message'])->withErrors($request->all());
-        }
-
-        if ($updated) {
-            return to_route('courses.index')->with('success', 'Course updated successfully');
+        if ($updated['status']) {
+            return to_route('courses.index')->with('success', $updated['message']);
         } else {
-            return to_route('courses.index')->with('error', 'Something went wrong While Updating Course');
+            return back()->with('error', $updated['message']);
         }
     }
 
@@ -91,10 +88,10 @@ class CourseController extends Controller
     {
         $deleted = $this->course->destroyCourse($id);
 
-        if ($deleted) {
-            return to_route('courses.index')->with('success', 'Course deleted successfully');
+        if ($deleted['status']) {
+            return to_route('courses.index')->with('success', $deleted['message']);
         } else {
-            return to_route('courses.index')->with('error', 'Something went wrong While Deleting Course');
+            return back()->with('error', $deleted['message']);
         }
     }
 
@@ -102,10 +99,10 @@ class CourseController extends Controller
     {
         $deleted = $this->course->destroyCourseBySelection($request);
 
-        if ($deleted) {
-            return to_route('courses.index')->with('success', 'Courses deleted successfully');
+        if ($deleted['status']) {
+            return to_route('courses.index')->with('success', $deleted['message']);
         } else {
-            return to_route('courses.index')->with('error', 'Something went wrong While Deleting Courses');
+            return back()->with('error', $deleted['message']);
         }
     }
 }

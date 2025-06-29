@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 
 export default function ForgotPassword() {
 
-    const { flash } = usePage().props;
+
     // Forgot Password Form Data
     const { data, setData, post, processing, errors, reset } = useForm({
         email: '',
@@ -40,7 +40,10 @@ export default function ForgotPassword() {
 
         post(route('password.email'),
             {
-                onSuccess: () => reset('email'),
+                onSuccess: () => {
+                    reset('email');
+                    setVerificationSent(true);
+                },
             }
         );
     };
@@ -48,23 +51,21 @@ export default function ForgotPassword() {
 
     // Start Timer After Mail is Sent
     useEffect(() => {
-        if (!!flash.success) {
-            setVerificationSent(true);
-
+        if (verificationSent) {
             timerRef.current = setInterval(() => {
                 setTimer((t) => t - 1);
             }, 1000);
         }
-    }, [!!flash.success]);
+    }, [verificationSent]);
 
 
 
     // Reset Timer After Timer Completes The Given Time And Enables The Again Mail Sent Button
     useEffect(() => {
         if (timer === 0) {
+            setVerificationSent(false);
             clearInterval(timerRef.current);
             setTimer(60);
-            setVerificationSent(false);
         }
     }, [timer]);
 

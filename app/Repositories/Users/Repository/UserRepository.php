@@ -80,16 +80,15 @@ class UserRepository implements UserRepositoryInterface
             $user->assignRole($role);
         }
 
-        return $user;
+        return ! empty($user) ? ['status' => true, 'message' => 'User created successfully'] : ['status' => false, 'message' => 'User creation failed Something Went Wrong'];
     }
 
     public function getUser(string $id)
     {
-
         $user = $this->user->find($id);
 
         if (empty($user)) {
-            return false;
+            return ['status' => false, 'message' => 'No User Found'];
         }
 
         $roles = $this->role->all();
@@ -114,7 +113,7 @@ class UserRepository implements UserRepositoryInterface
         $user = $this->user->find($id);
 
         if (empty($user)) {
-            return false;
+            return ['status' => false, 'message' => 'No User Found'];
         }
 
         if ($request->hasFile('profile')) {
@@ -140,18 +139,19 @@ class UserRepository implements UserRepositoryInterface
             $role = $this->role->find($request->integer('role_id'));
             $user->syncRoles($role);
 
-            return true;
+            return ['status' => true, 'message' => 'User updated successfully'];
         }
 
-        return false;
+        return ['status' => false, 'message' => 'User update failed Something Went Wrong'];
     }
 
     public function destroyUser(string $id)
     {
 
         $user = $this->user->find($id);
+
         if (empty($user)) {
-            return false;
+            return ['status' => false, 'message' => 'No User Found'];
         }
 
         if (! empty($user->profile)) {
@@ -160,17 +160,23 @@ class UserRepository implements UserRepositoryInterface
             }
         }
 
-        return $user->delete();
+        return $user->delete() ? ['status' => true, 'message' => 'User deleted successfully'] : ['status' => false, 'message' => 'User deletion failed Something Went Wrong'];
     }
 
     public function destroyUsersBySelection(Request $request)
     {
+
+        $ids = $request->array('ids');
+        if (blank($ids)) {
+            return ['status' => false, 'message' => 'Please select at least one user'];
+        }
+
         $deletedCount = 0;
 
         $users = $this->user->whereIn('id', $request->array('ids'))->get();
 
         if ($users->isEmpty()) {
-            return false;
+            return ['status' => false, 'message' => 'No User Found With The Given IDs'];
         }
 
         foreach ($users as $user) {
@@ -184,6 +190,6 @@ class UserRepository implements UserRepositoryInterface
             $deletedCount++;
         }
 
-        return $deletedCount === count($request->array('ids'));
+        return $deletedCount === count($request->array('ids')) ? ['status' => true, 'message' => 'Users deleted successfully'] : ['status' => false, 'message' => 'Users Deletion Failed Something Went Wrong'];
     }
 }

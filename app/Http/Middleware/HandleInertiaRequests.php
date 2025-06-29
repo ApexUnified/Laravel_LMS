@@ -33,9 +33,14 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $request->user() ? collect($request->user())->merge([
-                    'profile' => ! empty($request->user()->profile) ? asset('assets/images/user/'.$request->user()->profile) : null,
-                ]) : null,
+                'user' => $request->user() ? array_merge(
+                    $request->user()->toArray(),
+                    [
+                        'profile' => ! empty($request->user()->profile)
+                            ? asset('assets/images/users/'.$request->user()->profile)
+                            : null,
+                    ]
+                ) : null,
             ],
 
             'flash' => function () {

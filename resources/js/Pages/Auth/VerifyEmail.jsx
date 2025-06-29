@@ -6,9 +6,6 @@ import { useEffect, useRef, useState } from 'react';
 
 export default function VerifyEmail() {
 
-
-    const { flash } = usePage().props;
-
     // Verify Email Form Data
     const { post, processing, errors } = useForm({});
 
@@ -31,21 +28,21 @@ export default function VerifyEmail() {
     // Verify Email Form Request
     const submit = (e) => {
         e.preventDefault();
-        post(route('verification.send'));
+        post(route('verification.send'), {
+            onSuccess: () => setVerificationSent(true),
+        });
     };
 
 
 
     // Start Timer After Mail is Sent
     useEffect(() => {
-        if (!!flash.success) {
-            setVerificationSent(true);
-
+        if (verificationSent) {
             timerRef.current = setInterval(() => {
                 setTimer((t) => t - 1);
             }, 1000);
         }
-    }, [!!flash.success]);
+    }, [verificationSent]);
 
 
     // Reset Timer After Timer Completes The Given Time And Enables The Again Mail Sent Button
@@ -53,8 +50,8 @@ export default function VerifyEmail() {
     useEffect(() => {
         if (timer === 0) {
             clearInterval(timerRef.current);
-            setTimer(60);
             setVerificationSent(false);
+            setTimer(60);
         }
     }, [timer]);
 

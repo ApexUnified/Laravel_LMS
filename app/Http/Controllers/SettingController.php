@@ -27,10 +27,10 @@ class SettingController extends Controller
     public function updateGeneralSetting(Request $request)
     {
         $updated = $this->setting->updateGeneralSetting($request);
-        if ($updated) {
-            return back()->with('success', 'General Setting Updated Successfully');
+        if ($updated['status']) {
+            return back()->with('success', $updated['message']);
         } else {
-            return back()->with('error', 'Something went wrong While Updating General Setting');
+            return back()->with('error', $updated['message']);
         }
     }
 
@@ -45,13 +45,11 @@ class SettingController extends Controller
     {
         $updated = $this->setting->updateSmtpSetting($request);
 
-        if ($updated) {
-            return back()->with('success', 'Smtp Setting Updated Successfully');
+        if ($updated['status']) {
+            return back()->with('success', $updated['message']);
         } else {
-            return back()->with('error', 'Something went wrong While Updating Smtp Setting');
+            return back()->with('error', $updated['message']);
         }
-
-        return back()->with('success', 'Smtp Setting Updated Successfully');
 
     }
 
@@ -72,10 +70,10 @@ class SettingController extends Controller
     public function roleStore(Request $request)
     {
         $created = $this->setting->roleStore($request);
-        if ($created) {
-            return to_route('settings.roles.index')->with('success', 'Role Created Successfully');
+        if ($created['status']) {
+            return to_route('settings.roles.index')->with('success', $created['message']);
         } else {
-            return back()->with('error', 'Something went wrong While Creating Role');
+            return back()->with('error', $created['message']);
         }
 
     }
@@ -88,8 +86,8 @@ class SettingController extends Controller
 
         $role = $this->setting->getRole($id);
 
-        if (empty($role)) {
-            return back()->with('error', 'Role Not Found');
+        if (isset($role['status']) && $role['status'] == false) {
+            return back()->with('error', $role['message']);
         }
 
         return Inertia::render('Settings/Roles/edit', compact('role'));
@@ -102,10 +100,10 @@ class SettingController extends Controller
         }
 
         $updated = $this->setting->roleUpdate($request, $id);
-        if ($updated) {
-            return to_route('settings.roles.index')->with('success', 'Role Updated Successfully');
+        if ($updated['status']) {
+            return to_route('settings.roles.index')->with('success', $updated['message']);
         } else {
-            return back()->with('error', 'Something went wrong While Updating Role');
+            return back()->with('error', $updated['message']);
         }
     }
 
@@ -117,10 +115,10 @@ class SettingController extends Controller
 
         $deleted = $this->setting->roleDestroy($id);
 
-        if ($deleted) {
-            return back()->with('success', 'Role Deleted Successfully');
+        if ($deleted['status']) {
+            return back()->with('success', $deleted['message']);
         } else {
-            return back()->with('error', 'Something went wrong While Deleting Role');
+            return back()->with('error', $deleted['message']);
         }
     }
 
@@ -128,10 +126,10 @@ class SettingController extends Controller
     {
         $deleted = $this->setting->roleDestroyBySelection($request);
 
-        if ($deleted) {
-            return back()->with('success', 'Role Deleted Successfully');
+        if ($deleted['status']) {
+            return back()->with('success', $deleted['message']);
         } else {
-            return back()->with('error', 'Something went wrong While Deleting Role')->withErrors($request->all());
+            return back()->with('error', $deleted['message']);
         }
     }
 }

@@ -20,8 +20,8 @@ export default function edit({ course, categories, instructors }) {
         short_description: course.short_description || '',
         category_id: course.category_id || '',
         instructor_id: course.instructor_id || '',
-        thumbnail: '',
-        promo_video: '',
+        thumbnail: null,
+        promo_video: null,
         price: course.price ?? 0,
         discount: course.discount ?? 0,
         total_course_duration: course.total_course_duration || '',
@@ -46,7 +46,6 @@ export default function edit({ course, categories, instructors }) {
     }, []);
     const submit = (e) => {
         e.preventDefault();
-        console.log(data);
         post(route("courses.update", course.id));
     }
     return (
@@ -353,8 +352,24 @@ export default function edit({ course, categories, instructors }) {
                                         Type={"submit"}
                                         CustomClass={"w-[200px] mx-5 mt-10"}
                                         Disabled={
+                                            processing ||
                                             (
-                                                processing
+                                                data.title === (course.title || '') &&
+                                                data.description === (course.description || '') &&
+                                                data.short_description === (course.short_description || '') &&
+                                                data.category_id === (course.category_id || '') &&
+                                                data.instructor_id === (course.instructor_id || '') &&
+                                                data.thumbnail === null &&
+                                                data.promo_video === null &&
+                                                data.price === (course.price ?? 0) &&
+                                                data.discount === (course.discount ?? 0) &&
+                                                data.total_course_duration === (course.total_course_duration || '') &&
+                                                data.level === (course.level || '') &&
+                                                data.course_language === (course.course_language || '') &&
+                                                data.is_published === (course.is_published ?? 0) &&
+                                                data.is_approved === (course.is_approved ?? 0) &&
+                                                data.requirements === (course.requirements || '') &&
+                                                data.learning_outcomes === (course.learning_outcomes || '')
                                             )
                                         }
                                         Spinner={processing}

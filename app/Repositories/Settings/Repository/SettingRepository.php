@@ -96,14 +96,14 @@ class SettingRepository implements SettingRepositoryInterface
         if (! empty($generalSetting)) {
             $generalSetting->update($validated_req);
 
-            return true;
+            return ['status' => true, 'message' => 'General Setting Has Been Saved Successfully'];
         } else {
             GeneralSetting::create($validated_req);
 
-            return true;
+            return ['status' => true, 'message' => 'General Setting Has Been Saved Successfully'];
         }
 
-        return false;
+        return ['status' => false, 'message' => 'Something went wrong While Saving General Setting'];
     }
 
     public function smtpSetting()
@@ -126,16 +126,16 @@ class SettingRepository implements SettingRepositoryInterface
         $smtpSetting = $this->smtpSetting->first();
 
         if (empty($smtpSetting)) {
-            SmtpSetting::create($validated_req);
+            $this->smtpSetting->create($validated_req);
 
-            return true;
+            return ['status' => true, 'message' => 'SMTP Setting Has Been Saved Successfully'];
         } else {
             $smtpSetting->update($validated_req);
 
-            return true;
+            return ['status' => true, 'message' => 'SMTP Setting Has Been Saved Successfully'];
         }
 
-        return false;
+        return ['status' => false, 'message' => 'Something went wrong While Saving SMTP Setting'];
 
     }
 
@@ -168,7 +168,7 @@ class SettingRepository implements SettingRepositoryInterface
             'name.unique' => 'Role Name Already Exists Please Try Another One',
         ]);
 
-        return $this->role->create($validated_req) ? true : false;
+        return $this->role->create($validated_req) ? ['status' => true, 'message' => 'Role Created Successfully'] : ['status' => false, 'message' => 'Something went wrong While Creating Role'];
     }
 
     public function getRole(string $id)
@@ -176,7 +176,7 @@ class SettingRepository implements SettingRepositoryInterface
         $role = $this->role->find($id);
 
         if (empty($role)) {
-            return false;
+            return ['status' => false, 'message' => 'Role Not Found'];
         }
 
         return $role;
@@ -185,7 +185,7 @@ class SettingRepository implements SettingRepositoryInterface
     public function roleUpdate(Request $request, string $id)
     {
         $validated_req = $request->validate([
-            'name' => 'required|min:4|unique:roles,name',
+            'name' => 'required|min:4|unique:roles,name,'.$id,
         ], [
             'name.required' => 'Role Name is Required',
             'name.min' => 'Role Name Must be Valid And at least 4 characters',
@@ -194,22 +194,20 @@ class SettingRepository implements SettingRepositoryInterface
 
         $role = $this->getRole($id);
 
-        if (empty($role)) {
-            return false;
-        }
-
-        return $role->update($validated_req);
+        return $role->update($validated_req) ?
+        ['status' => true, 'message' => 'Role Updated Successfully']
+        :
+        ['status' => false, 'message' => 'Something went wrong While Updating Role'];
     }
 
     public function roleDestroy(string $id)
     {
         $role = $this->getRole($id);
 
-        if (empty($role)) {
-            return false;
-        }
-
-        return $role->delete();
+        return $role->delete() ?
+        ['status' => true, 'message' => 'Role Deleted Successfully']
+        :
+        ['status' => false, 'message' => 'Something went wrong While Deleting Role'];
     }
 
     public function roleDestroyBySelection(Request $request)
@@ -217,10 +215,13 @@ class SettingRepository implements SettingRepositoryInterface
         $ids = $request->array('ids');
 
         if (blank($ids)) {
-            return false;
+            return ['status' => false, 'message' => 'Please Select Atleast One Role'];
         }
 
-        return $this->role->whereIn('id', $ids)->delete() > 0;
+        return $this->role->whereIn('id', $ids)->delete() > 0 ?
+        ['status' => true, 'message' => 'Role Deleted Successfully']
+        :
+        ['status' => false, 'message' => 'Something went wrong While Deleting Role'];
 
     }
 }

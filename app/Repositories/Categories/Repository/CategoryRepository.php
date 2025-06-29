@@ -6,7 +6,6 @@ use App\Models\Category;
 use App\Repositories\Categories\Interface\CategoryRepositoryInterface;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 
 class CategoryRepository implements CategoryRepositoryInterface
 {
@@ -21,7 +20,7 @@ class CategoryRepository implements CategoryRepositoryInterface
 
     public function getCategories(Request $request)
     {
-        $categories = $this->category->query();
+        $categories = $this->category->query()->latest();
 
         $request->validate(['name' => 'nullable|string']);
 
@@ -49,15 +48,19 @@ class CategoryRepository implements CategoryRepositoryInterface
         ]);
 
         if ($this->category->create($validated_req)) {
-            return true;
+            return ['status' => true, 'message' => 'Category created successfully'];
         } else {
-            return false;
+            return ['status' => false, 'message' => 'Category creation failed'];
         }
     }
 
     public function getCategory(string $id)
     {
         $category = $this->category->find($id);
+
+        if (empty($category)) {
+            return ['status' => false, 'message' => 'No Category Found'];
+        }
 
         return $category;
     }
@@ -70,14 +73,10 @@ class CategoryRepository implements CategoryRepositoryInterface
 
         $category = $this->getCategory($id);
 
-        if (empty($category)) {
-            return false;
-        }
-
         if ($category->update($validated_req)) {
-            return true;
+            return ['status' => true, 'message' => 'Category Created Succesfully'];
         } else {
-            return false;
+            return ['status' => false, 'message' => 'Category Creation Failed Something Went Wrong'];
         }
 
     }
@@ -86,30 +85,20 @@ class CategoryRepository implements CategoryRepositoryInterface
     {
         $category = $this->getCategory($id);
 
-        if (empty($category)) {
-            return false;
-        }
-
         if ($category->delete()) {
-            return true;
+            return ['status' => true, 'message' => 'Category Deleted Successfully'];
         } else {
-            return false;
+            return ['status' => false, 'message' => 'Category Deletion Failed Something Went Wrong'];
         }
     }
 
     public function destroyCategoriesBySelection(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'ids' => 'required|array|min:1',
-            'ids.*' => 'exists:categories,id',
-        ]);
-
-        if ($validator->fails()) {
-            return ['error' => $validator->errors()->first()];
+        $ids = $request->array('ids');
+        if (blank($ids)) {
+            return ['status' => false, 'message' => 'Please select at least one Category'];
         }
 
-        $ids = $request->ids;
-
-        return $this->category->whereIn('id', $ids)->delete() > 0;
+        return $this->category->whereIn('id', $ids)->delete() > 0 ? ['status' => true, 'message' => 'Categories Deleted Successfully'] : ['status' => false, 'message' => 'Categories Deletion Failed Something Went Wrong'];
     }
 }

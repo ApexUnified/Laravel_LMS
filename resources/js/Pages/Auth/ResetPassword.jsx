@@ -139,7 +139,7 @@ export default function ResetPassword({ token, email }) {
                                     <div>
                                         <PrimaryButton
                                             Text={"Reset Password "}
-                                            Disabled={(processing || data.password === "" || data.password_confirmation === "" || data.email === "")}
+                                            Disabled={(processing || (data.password === "" || data.password_confirmation === "" || data.email === "") || (data.password !== data.password_confirmation))}
                                             Type={"submit"}
                                             Icon={
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5">
