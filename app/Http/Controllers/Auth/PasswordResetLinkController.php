@@ -34,10 +34,10 @@ class PasswordResetLinkController extends Controller
 
         if (empty(Cache::get('smtp_config'))) {
             if (app()->environment('local')) {
-                return back()->with('info', 'Please Configure SMTP Setting First');
+                return back()->withErrors(['email' => 'Please Configure SMTP Setting First'])->with('info', 'Please Configure SMTP Setting First');
             }
             if (app()->environment('production')) {
-                return back()->with('error', 'Failed To Send Reset Password Mail Please Try Again Later');
+                return back()->withErrors(['email' => 'Failed To Send Reset Password Mail Please Try Again Later'])->with('error', 'Failed To Send Reset Password Mail Please Try Again Later');
             }
         }
 
