@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\LessonController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\UserController;
@@ -33,8 +34,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('users-destroybyselection', [UserController::class, 'destroyBySelection'])->name('users.destroybyselection');
 
     // Course Routes
-    Route::resource('/courses', CourseController::class);
+    Route::resource('/courses', CourseController::class)->except(['show']);
     Route::delete('/courses-destroybyselection', [CourseController::class, 'destroyBySelection'])->name('courses.destroybyselection');
+
+    // Lesson Routes
+    Route::resource('/lessons', LessonController::class)->except(['show']);
+    Route::delete('/lessons-delete-by-selectetion', [LessonController::class, 'destroyBySelection'])->name('lessons.destroybyselection');
 
     // Profile Routes
     Route::controller(ProfileController::class)->group(function () {

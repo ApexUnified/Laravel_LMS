@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('lessons', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('course_id')->constrained('courses')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('course_id')->nullable()->constrained('courses')->nullOnDelete()->cascadeOnUpdate();
             $table->string('title');
             $table->string('slug');
             $table->longText('description');
@@ -21,7 +21,10 @@ return new class extends Migration
             $table->string('thumbnail_public_id');
             $table->string('video');
             $table->string('video_public_id');
+            $table->string('video_duration');
             $table->json('attachments')->nullable();
+            $table->boolean('is_published')->default(false);
+            $table->boolean('is_approved')->default(false);
             $table->timestamps();
         });
     }

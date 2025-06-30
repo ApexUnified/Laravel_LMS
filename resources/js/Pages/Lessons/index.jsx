@@ -1,14 +1,13 @@
-import BreadCrumb from '@/Components/BreadCrumb'
+import BreadCrumb from '@/Components/BreadCrumb';
 import Card from '@/Components/Card';
 import LinkButton from '@/Components/LinkButton';
 import SelectInput from '@/Components/SelectInput';
 import Table from '@/Components/Table';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
-import { Head, router, useForm, usePage } from '@inertiajs/react'
-import debounce from 'lodash.debounce';
-import React, { use, useCallback, useEffect, useState } from 'react'
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { Head, useForm, usePage } from '@inertiajs/react';
+import React, { useEffect, useState } from 'react'
 
-export default function index({ courses, users, categories, instructors }) {
+export default function index({ lessons, categories, instructors, courses }) {
 
     // Bulk Delete Form Data
     const { props } = usePage();
@@ -23,112 +22,24 @@ export default function index({ courses, users, categories, instructors }) {
     });
 
     const [columns, setColumns] = useState([]);
-    // const [customActions, setCustomActions] = useState([]);
 
 
     // Custom Search States
     const [instructor_id, setInstructor_id] = useState(props.instructor_id ?? '');
     const [category_id, setCategory_id] = useState(props.category_id ?? '');
+    const [course_id, setCourse_id] = useState(props.course_id ?? '');
     const [ParentSearched, setParentSearched] = useState(false);
 
 
     useEffect(() => {
 
         const columns = [
-            { key: 'title', label: 'Title' },
-            {
-                label: 'Instructor', render: (item) => {
-                    if (!item.instructor_id) {
-                        return (
-                            <span
-                                className={`inline-block px-2 py-1 text-xs font-semibold rounded-full  bg-red-200 text-red-800 `}
-                            >
-                                N/A
-                            </span>
-                        )
-                    }
-
-
-                    return (
-                        <span
-                            className={`inline-block px-2 py-1 text-xs font-semibold rounded-full dark:bg-white dark:text-gray-800  bg-green-200 text-green-800 `}
-                        >
-                            {item.instructor.name}
-                        </span>
-                    )
-                }
-            },
-            {
-                label: 'Category', render: (item) => {
-                    if (!item.category_id) {
-                        return (
-                            <span
-                                className={`inline-block px-2 py-1 text-xs font-semibold rounded-full  bg-red-200 text-red-800 `}
-                            >
-                                N/A
-                            </span>
-                        )
-                    }
-
-
-                    return (
-                        <span
-                            className={`inline-block px-2 py-1 text-xs font-semibold rounded-full dark:bg-white dark:text-gray-800  bg-green-200 text-green-800 `}
-                        >
-                            {item.category.name}
-                        </span>
-                    )
-                }
-            },
+            { key: 'title', label: 'Lesson Title' },
 
             {
-                key: 'is_published',
-                label: 'Published Status',
-                badge: (value) => value === 'Published' ? 'bg-green-200 text-green-800 dark:bg-white dark:text-gray-800' : 'bg-red-200 text-red-800'
-
-            },
-
-            {
-                key: 'is_approved', label: 'Approved Status',
-                badge: (value) => value === 'Approved' ? 'bg-green-200 text-green-800 dark:bg-white dark:text-gray-800' : 'bg-red-200 text-red-800'
-            },
-
-            { key: 'level', label: 'Course Level' },
-            { key: 'course_language', label: 'Course Language' },
-
-            {
-                key: 'promo_video_duration', label: 'Course Promo Video Duration', render: (item) => {
-                    if (item.promo_video_duration === null) {
-                        return (
-                            <span
-                                className={`inline-block px-2 py-1 text-xs font-semibold rounded-full  bg-red-200 text-red-800 `}
-                            >
-                                N/A
-                            </span>
-                        )
-                    }
-
-                    return (
-                        <span
-                            className={`inline-block px-2 py-1 text-xs font-semibold rounded-full dark:bg-white dark:text-gray-800  bg-green-200 text-green-800 `}
-                        >
-                            {item.promo_video_duration}
-                        </span>
-                    )
-
-                }
-            },
-
-            {
-                key: 'price',
-                label: 'Course Price',
-                badge: (value) => value === 'Free' ? 'bg-green-200 text-green-800 dark:bg-white dark:text-gray-800' : ''
-            },
-
-            {
-                label: 'Course Price Discount',
+                label: 'Instructor Related To Course',
                 render: (item) => {
-                    if (item.discount === 0) {
+                    if (!item?.course?.instructor_id) {
                         return (
                             <span
                                 className={`inline-block px-2 py-1 text-xs font-semibold rounded-full  bg-red-200 text-red-800 `}
@@ -137,46 +48,78 @@ export default function index({ courses, users, categories, instructors }) {
                             </span>
                         )
                     }
-
                     return (
                         <span
                             className={`inline-block px-2 py-1 text-xs font-semibold rounded-full dark:bg-white dark:text-gray-800  bg-green-200 text-green-800 `}
                         >
-                            {item.discount} %
+                            {item.course.instructor.name}
                         </span>
-                    );
+                    )
                 }
             },
 
+            {
+                label: 'Lesson Related To Course',
+                render: (item) => {
+                    if (!item?.course_id) {
+                        return (
+                            <span
+                                className={`inline-block px-2 py-1 text-xs font-semibold rounded-full  bg-red-200 text-red-800 `}
+                            >
+                                N/A
+                            </span>
+                        )
+                    }
+                    return (
+                        <span
+                            className={`inline-block px-2 py-1 text-xs font-semibold rounded-full dark:bg-white dark:text-gray-800  bg-green-200 text-green-800 `}
+                        >
+                            {item.course.title}
+                        </span>
+                    )
+                }
+            },
+
+            {
+                label: 'Course Category',
+                render: (item) => {
+                    if (!item?.course?.category_id) {
+                        return (
+                            <span
+                                className={`inline-block px-2 py-1 text-xs font-semibold rounded-full  bg-red-200 text-red-800 `}
+                            >
+                                N/A
+                            </span>
+                        )
+                    }
+                    return (
+                        <span
+                            className={`inline-block px-2 py-1 text-xs font-semibold rounded-full dark:bg-white dark:text-gray-800  bg-green-200 text-green-800 `}
+                        >
+                            {item.course.category.name}
+                        </span>
+                    )
+                }
+            },
+
+            { key: 'video_duration', badge: (value) => 'bg-green-200 text-green-800 dark:bg-white dark:text-gray-800', label: 'Lesson Duration' },
             { key: 'added_at', label: 'Created At' },
         ];
 
-
-        // it works
-        // const customActions = [
-        //     {
-        //         label: "Demo",
-        //         onClick: (item) => router.visit(route("courses.show", item.id))
-
-        //     }
-        // ]
-
-        // setCustomActions(customActions);
         setColumns(columns);
 
     }, []);
 
     return (
         <>
-
             <AuthenticatedLayout>
 
-                <Head title='Courses' />
+                <Head title='Lessons' />
 
                 <BreadCrumb
-                    header={"Courses"}
+                    header={"Lessons"}
                     parent={"Dashboard"}
-                    child={"Courses"}
+                    child={"Lessons"}
                     parent_link={route("dashboard")}
                 />
 
@@ -186,8 +129,8 @@ export default function index({ courses, users, categories, instructors }) {
                         <>
                             <div className="flex flex-wrap justify-end my-3">
                                 <LinkButton
-                                    Text={"Create Course"}
-                                    URL={route("courses.create")}
+                                    Text={"Create Lesson"}
+                                    URL={route("lessons.create")}
                                     Icon={
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -205,15 +148,15 @@ export default function index({ courses, users, categories, instructors }) {
                                 resetSingleSelectedId={resetSingleSelectedId}
                                 BulkDeleteMethod={BulkDelete}
                                 SingleDeleteMethod={SingleDelete}
-                                EditRoute={"courses.edit"}
-                                BulkDeleteRoute={"courses.destroybyselection"}
-                                SearchRoute={"courses.index"}
-                                SingleDeleteRoute={"courses.destroy"}
-                                items={courses}
+                                EditRoute={"lessons.edit"}
+                                BulkDeleteRoute={"lessons.destroybyselection"}
+                                SearchRoute={"lessons.index"}
+                                SingleDeleteRoute={"lessons.destroy"}
+                                items={lessons}
                                 props={props}
                                 columns={columns}
                                 ParentSearched={ParentSearched}
-                                searchProps={{ instructor_id: instructor_id, category_id: category_id }}
+                                searchProps={{ instructor_id: instructor_id, category_id: category_id, course_id: course_id }}
                                 customSearch={
                                     <>
                                         <div className="relative mb-2">
@@ -250,6 +193,24 @@ export default function index({ courses, users, categories, instructors }) {
                                             />
 
                                         </div>
+
+
+                                        <div className="relative mb-2">
+                                            <SelectInput
+                                                Id={'course_id'}
+                                                Name={'course_id'}
+                                                InputName={'Course'}
+                                                items={courses}
+                                                itemKey={'title'}
+                                                Value={course_id}
+                                                Action={(e) => {
+                                                    const value = e.target.value;
+                                                    setCourse_id(value);
+                                                    setParentSearched(true);
+                                                }}
+                                            />
+
+                                        </div>
                                     </>
                                 }
 
@@ -261,6 +222,7 @@ export default function index({ courses, users, categories, instructors }) {
 
 
             </AuthenticatedLayout>
+
         </>
     )
 }

@@ -21,11 +21,11 @@ return new class extends Migration
             $table->string('thumbnail_public_id');
             $table->string('promo_video')->nullable();
             $table->string('promo_video_public_id')->nullable();
+            $table->string('promo_video_duration')->nullable();
             $table->foreignId('category_id')->nullable()->constrained('categories')->nullOnDelete()->cascadeOnUpdate();
             $table->foreignId('instructor_id')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate();
             $table->decimal('price', 20, 2)->default(0); // 0 will be === Free
             $table->integer('discount')->default(0); // 0 will be === No Discount
-            $table->string('total_course_duration'); // eg: 5 Hours
             $table->enum('level', ['Beginner', 'Intermediate', 'Advanced']);
             $table->string('course_language'); // eg: English Urdu
             $table->boolean('is_published')->default(false); // show/hide from users

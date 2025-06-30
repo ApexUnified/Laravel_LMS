@@ -47,16 +47,16 @@ class CourseController extends Controller
         }
     }
 
-    public function show(string $id)
-    {
-        $course = $this->course->getCourse($id);
+    // public function show(string $id)
+    // {
+    //     $course = $this->course->getCourse($id);
 
-        if (isset($course['status']) && $course['status'] === false) {
-            return to_route('courses.index')->with('error', $course['message']);
-        }
+    //     if (isset($course['status']) && $course['status'] === false) {
+    //         return to_route('courses.index')->with('error', $course['message']);
+    //     }
 
-        return Inertia::render('Courses/view', compact('course'));
-    }
+    //     return Inertia::render('Courses/view', compact('course'));
+    // }
 
     public function edit(string $id)
     {

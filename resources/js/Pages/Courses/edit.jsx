@@ -24,7 +24,6 @@ export default function edit({ course, categories, instructors }) {
         promo_video: null,
         price: course.price ?? 0,
         discount: course.discount ?? 0,
-        total_course_duration: course.total_course_duration || '',
         level: course.level || '',
         course_language: course.course_language || '',
         is_published: course.is_published ?? 0,
@@ -203,21 +202,7 @@ export default function edit({ course, categories, instructors }) {
 
 
 
-                                        <Input
-                                            InputName={"Course Duration"}
-                                            Error={errors.total_course_duration}
-                                            Value={data.total_course_duration}
-                                            Action={
-                                                (e) => setData("total_course_duration", e.target.value)
-                                            }
 
-                                            Placeholder={"Enter Course Duration"}
-                                            Id={"total_course_duration"}
-                                            Name={"total_course_duration"}
-                                            Type={"text"}
-                                            Required={true}
-
-                                        />
 
 
                                         <SelectInput
@@ -324,7 +309,7 @@ export default function edit({ course, categories, instructors }) {
                                             onUpdate={(file) => {
                                                 setData("thumbnail", file);
                                             }}
-                                            DefaultFile={course.thumbnail}
+                                            DefaultFile={course.thumbnail && [course.thumbnail]}
                                             Required={true}
                                             Multiple={false}
                                         />
@@ -341,7 +326,8 @@ export default function edit({ course, categories, instructors }) {
                                             onUpdate={(file) => {
                                                 setData("promo_video", file);
                                             }}
-                                            DefaultFile={course.promo_video}
+                                            MaxFileSize={"10000MB"}
+                                            DefaultFile={course.promo_video && [course.promo_video]}
                                             Multiple={false}
                                         />
                                     </div>
@@ -363,7 +349,6 @@ export default function edit({ course, categories, instructors }) {
                                                 data.promo_video === null &&
                                                 data.price === (course.price ?? 0) &&
                                                 data.discount === (course.discount ?? 0) &&
-                                                data.total_course_duration === (course.total_course_duration || '') &&
                                                 data.level === (course.level || '') &&
                                                 data.course_language === (course.course_language || '') &&
                                                 data.is_published === (course.is_published ?? 0) &&

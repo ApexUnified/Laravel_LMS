@@ -45,11 +45,11 @@ namespace App\Models{
  * @property string $thumbnail_public_id
  * @property string|null $promo_video
  * @property string|null $promo_video_public_id
+ * @property string|null $promo_video_duration
  * @property int|null $category_id
  * @property int|null $instructor_id
  * @property string $price
  * @property int $discount
- * @property string $total_course_duration
  * @property string $level
  * @property string $course_language
  * @property int $is_published
@@ -82,6 +82,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereMetaTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Course wherePrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Course wherePromoVideo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Course wherePromoVideoDuration($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Course wherePromoVideoPublicId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereRequirements($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereShortDescription($value)
@@ -89,7 +90,6 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereThumbnail($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereThumbnailPublicId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereTitle($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereTotalCourseDuration($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereUpdatedAt($value)
  */
 	class Course extends \Eloquent {}
@@ -108,6 +108,9 @@ namespace App\Models{
  * @property string|null $app_favicon
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read mixed $app_favicon_url
+ * @property-read mixed $app_main_logo_dark_url
+ * @property-read mixed $app_main_logo_light_url
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GeneralSetting newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GeneralSetting newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GeneralSetting query()
@@ -128,30 +131,11 @@ namespace App\Models{
 /**
  * 
  *
- * @property int $id
- * @property int $course_id
- * @property string $title
- * @property string $slug
- * @property string $description
- * @property string $thumbnail
- * @property string $video
- * @property array<array-key, mixed>|null $attachments
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Course $course
+ * @property-read \App\Models\Course|null $course
+ * @property-read mixed $video_duration
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson whereAttachments($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson whereCourseId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson whereDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson whereSlug($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson whereThumbnail($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson whereTitle($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson whereVideo($value)
  */
 	class Lesson extends \Eloquent {}
 }
@@ -203,6 +187,7 @@ namespace App\Models{
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Course> $courses
  * @property-read int|null $courses_count
  * @property-read mixed $avatar
+ * @property-read array<string, string> $profile_url
  * @property-read mixed $role_id
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
@@ -228,6 +213,6 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User withoutPermission($permissions)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User withoutRole($roles, $guard = null)
  */
-	class User extends \Eloquent implements \Illuminate\Contracts\Auth\MustVerifyEmail {}
+	class User extends \Eloquent {}
 }
 

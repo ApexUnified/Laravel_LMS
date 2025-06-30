@@ -20,4 +20,22 @@ class GeneralSetting extends Model
         });
 
     }
+
+    protected $appends = ['app_main_logo_dark_url', 'app_main_logo_light_url', 'app_favicon_url'];
+
+    // Attributes
+    public function getAppMainLogoDarkUrlAttribute()
+    {
+        return $this->attributes['app_main_logo_dark'] ? asset('assets/images/Logo/'.$this->attributes['app_main_logo_dark']) : null;
+    }
+
+    public function getAppMainLogoLightUrlAttribute()
+    {
+        return $this->attributes['app_main_logo_light'] ? asset('assets/images/Logo/'.$this->attributes['app_main_logo_light']) : null;
+    }
+
+    public function getAppFaviconUrlAttribute()
+    {
+        return $this->attributes['app_favicon'] ? asset('assets/images/Logo/'.$this->attributes['app_favicon']) : null;
+    }
 }

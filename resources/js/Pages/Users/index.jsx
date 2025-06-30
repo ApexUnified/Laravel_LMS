@@ -25,7 +25,7 @@ export default function index({ users }) {
 
     useEffect(() => {
         const columns = [
-            { key: 'profile', label: 'Profile' },
+            { key: 'profile_url', label: 'Profile', image: true, default: 'avatar' },
             { key: 'name', label: 'Name' },
             { key: 'email', label: 'Email' },
             { key: 'role_name', label: 'Role Name' },

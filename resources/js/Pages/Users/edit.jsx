@@ -174,8 +174,7 @@ export default function edit({ user, roles }) {
                                                 setData("profile", file);
                                             }}
                                             Multiple={false}
-                                            imagePathName={"user"}
-                                            DefaultFile={user.profile}
+                                            DefaultFile={user.profile_url && [user.profile_url]}
                                         />
                                     </div>
 

@@ -97,13 +97,13 @@ export default function index({ user }) {
                                 <>
                                     <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
                                         <div className="flex flex-col items-center w-full gap-6 xl:flex-row">
-                                            {user.profile === null ? (
-                                                <div className="flex items-center justify-center w-20 h-20 overflow-hidden text-2xl border border-gray-200 rounded-full dark:border-white dark:text-white">
+                                            {user.profile_url === null ? (
+                                                <div className="flex items-center justify-center w-20 h-20 overflow-hidden text-2xl border rounded-full dark:border-gray-500 dark:text-white">
                                                     {user.avatar}
                                                 </div>
                                             ) : (
-                                                <div className="flex items-center justify-center w-20 h-20 overflow-hidden text-2xl border border-gray-200 rounded-full dark:border-white dark:text-white">
-                                                    <img src={user.profile} alt="Profile" />
+                                                <div className="flex items-center justify-center w-20 h-20 overflow-hidden text-2xl border rounded-full dark:border-gray-500 dark:text-white">
+                                                    <img src={user.profile_url} alt="Profile" />
                                                 </div>
                                             )}
 

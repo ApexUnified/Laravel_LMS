@@ -24,7 +24,6 @@ export default function create({ categories, instructors }) {
         promo_video: null,
         price: 0,
         discount: 0,
-        total_course_duration: '',
         level: '',
         course_language: '',
         is_published: 0,
@@ -210,22 +209,6 @@ export default function create({ categories, instructors }) {
 
 
 
-                                        <Input
-                                            InputName={"Course Duration"}
-                                            Error={errors.total_course_duration}
-                                            Value={data.total_course_duration}
-                                            Action={
-                                                (e) => setData("total_course_duration", e.target.value)
-                                            }
-
-                                            Placeholder={"Enter Course Duration"}
-                                            Id={"total_course_duration"}
-                                            Name={"total_course_duration"}
-                                            Type={"text"}
-                                            Required={true}
-
-                                        />
-
 
                                         <SelectInput
                                             InputName={"Course Level"}
@@ -347,6 +330,7 @@ export default function create({ categories, instructors }) {
                                             onUpdate={(file) => {
                                                 setData("promo_video", file);
                                             }}
+                                            MaxFileSize={"10000MB"}
                                             Multiple={false}
                                         />
                                     </div>
@@ -366,7 +350,6 @@ export default function create({ categories, instructors }) {
                                                 data.category_id === '' ||
                                                 data.instructor_id === '' ||
                                                 data.thumbnail === null ||
-                                                data.total_course_duration === '' ||
                                                 data.level === '' ||
                                                 data.course_language === ''
 

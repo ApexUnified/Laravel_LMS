@@ -10,6 +10,7 @@ use Cloudinary\Cloudinary;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Spatie\Permission\Models\Role;
 
 class CourseRepository implements CoursesRepositoryInterface
@@ -78,26 +79,79 @@ class CourseRepository implements CoursesRepositoryInterface
         $validated_req = $request->validate([
             'title' => 'required|string|min:5|max:150',
             'short_description' => 'required|string|min:10',
-            'description' => 'required|string|min:20',
+            'description' => 'required',
             'thumbnail' => 'required|image|mimes:jpeg,png,jpg|max:2048',
             'promo_video' => 'nullable|mimetypes:video/mp4|max:10485760',
             'instructor_id' => 'required|exists:users,id',
             'category_id' => 'required|exists:categories,id',
             'price' => 'required|numeric|min:0',
             'discount' => 'required|numeric|min:0',
-            'total_course_duration' => 'required|string',
             'level' => 'required|string|in:Beginner,Intermediate,Advanced',
             'course_language' => 'required|string',
             'is_published' => 'nullable|boolean',
             'is_approved' => 'nullable|boolean',
-            'requirements' => 'nullable|string',
-            'learning_outcomes' => 'nullable|string',
+            'requirements' => 'nullable',
+            'learning_outcomes' => 'nullable',
         ], [
             'thumbnail.max' => 'Thumbnail size should be less than Or Equal To 2MB',
             'promo_video.max' => 'Promo video size should be less than Or Equal To 10GB',
             'category_id.exists' => 'Selected Category does not exist',
             'instructor_id.exists' => 'Selected Instructor does not exist',
         ]);
+
+        if ($validated_req['price'] == 0 && $validated_req['discount'] > 0) {
+            throw ValidationException::withMessages([
+                'discount' => 'Discount Cannot be Applied If Price is 0',
+            ]);
+        }
+
+        $description = trim(strip_tags($validated_req['description']));
+        if (Str::length($description) < 20) {
+            throw ValidationException::withMessages([
+                'description' => 'Description is required And Its length should be more than 20 characters.',
+            ]);
+        }
+
+        $requirements = trim(strip_tags($validated_req['requirements']));
+        if (! empty($requirements)) {
+            if (Str::length($requirements) < 20) {
+                throw ValidationException::withMessages([
+                    'requirements' => 'Requirements length should be more than 20 characters.',
+                ]);
+            }
+        }
+
+        $learning_outcomes = trim(strip_tags($validated_req['learning_outcomes']));
+        if (! empty($learning_outcomes)) {
+            if (Str::length($learning_outcomes) < 20) {
+                throw ValidationException::withMessages([
+                    'learning_outcomes' => 'Learning Outcomes length should be more than 20 characters.',
+                ]);
+            }
+        }
+
+        if ($request->hasFile('promo_video')) {
+            try {
+
+                $file = $request->file('promo_video');
+                $renamedFile = time().uniqid();
+
+                $movedToCloudaniry = $this->cloudinary->uploadApi()->upload($file->getRealPath(), [
+                    'folder' => 'ApexUnified_LMS/Courses/PromoVideos',
+                    'public_id' => $renamedFile,
+                    'resource_type' => 'video',
+                ]);
+                if (! $movedToCloudaniry || ! $movedToCloudaniry['secure_url'] || ! $movedToCloudaniry['public_id']) {
+                    return ['status' => false, 'message' => 'Something went wrong! While uploading video.'];
+                }
+
+                $validated_req['promo_video_duration'] = $movedToCloudaniry['duration'];
+                $validated_req['promo_video'] = $movedToCloudaniry['secure_url'];
+                $validated_req['promo_video_public_id'] = $movedToCloudaniry['public_id'];
+            } catch (Exception $e) {
+                return ['status' => false, 'message' => 'Something went wrong! While uploading Video. '.$e->getMessage()];
+            }
+        }
 
         if ($request->hasFile('thumbnail')) {
             try {
@@ -123,28 +177,6 @@ class CourseRepository implements CoursesRepositoryInterface
                 $validated_req['thumbnail_public_id'] = $movedToCloudaniry['public_id'];
             } catch (Exception $e) {
                 return ['status' => false, 'message' => 'Something went wrong! While uploading Thumbnail. '.$e->getMessage()];
-            }
-        }
-
-        if ($request->hasFile('promo_video')) {
-            try {
-
-                $file = $request->file('promo_video');
-                $renamedFile = time().uniqid();
-
-                $movedToCloudaniry = $this->cloudinary->uploadApi()->upload($file->getRealPath(), [
-                    'folder' => 'ApexUnified_LMS/Courses/PromoVideos',
-                    'public_id' => $renamedFile,
-                    'resource_type' => 'video',
-                ]);
-                if (! $movedToCloudaniry || ! $movedToCloudaniry['secure_url'] || ! $movedToCloudaniry['public_id']) {
-                    return ['status' => false, 'message' => 'Something went wrong! While uploading video.'];
-                }
-
-                $validated_req['promo_video'] = $movedToCloudaniry['secure_url'];
-                $validated_req['promo_video_public_id'] = $movedToCloudaniry['public_id'];
-            } catch (Exception $e) {
-                return ['status' => false, 'message' => 'Something went wrong! While uploading Video. '.$e->getMessage()];
             }
         }
 
@@ -178,31 +210,92 @@ class CourseRepository implements CoursesRepositoryInterface
         $validated_req = $request->validate([
             'title' => 'required|string|min:5|max:150',
             'short_description' => 'required|string|min:10',
-            'description' => 'required|string|min:20',
-            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'promo_video' => 'nullable|mimetypes:video/mp4|max:10485760',
+            'description' => 'required',
+            ...($request->hasFile('thumbnail') ? ['thumbnail' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'] : []),
+            ...($request->hasFile('promo_video') ? ['promo_video' => 'nullable|mimetypes:video/mp4|max:10240000'] : []),
             'instructor_id' => 'required|exists:users,id',
             'category_id' => 'required|exists:categories,id',
             'price' => 'required|numeric|min:0',
             'discount' => 'required|numeric|min:0',
-            'total_course_duration' => 'required|string',
             'level' => 'required|string|in:Beginner,Intermediate,Advanced',
             'course_language' => 'required|string',
             'is_published' => 'nullable|boolean',
             'is_approved' => 'nullable|boolean',
-            'requirements' => 'nullable|string',
-            'learning_outcomes' => 'nullable|string',
+            'requirements' => 'nullable',
+            'learning_outcomes' => 'nullable',
         ], [
-            'thumbnail.max' => 'Thumbnail size should be less than Or Equal To 2MB',
-            'promo_video.max' => 'Promo video size should be less than Or Equal To 10GB',
+            ...($request->hasFile('thumbanil') ? ['thumbnail.max' => 'Thumbnail size should be less than Or Equal To 2MB'] : []),
+            ...($request->hasFile('promo_video') ? ['promo_video.max' => 'Video size should be less than Or Equal To 10GB'] : []),
             'category_id.exists' => 'Selected Category does not exist',
             'instructor_id.exists' => 'Selected Instructor does not exist',
         ]);
+
+        if ($validated_req['price'] == 0 && $validated_req['discount'] > 0) {
+            throw ValidationException::withMessages([
+                'discount' => 'Discount Cannot be Applied If Price is 0',
+            ]);
+        }
+
+        $description = trim(strip_tags($validated_req['description']));
+        if (Str::length($description) < 20) {
+            throw ValidationException::withMessages([
+                'description' => 'Description is required And Its length should be more than 20 characters.',
+            ]);
+        }
+
+        $requirements = trim(strip_tags($validated_req['requirements']));
+        if (! empty($requirements)) {
+            if (Str::length($requirements) < 20) {
+                throw ValidationException::withMessages([
+                    'requirements' => 'Requirements length should be more than 20 characters.',
+                ]);
+            }
+        }
+
+        $learning_outcomes = trim(strip_tags($validated_req['learning_outcomes']));
+        if (! empty($learning_outcomes)) {
+            if (Str::length($learning_outcomes) < 20) {
+                throw ValidationException::withMessages([
+                    'learning_outcomes' => 'Learning Outcomes length should be more than 20 characters.',
+                ]);
+            }
+        }
 
         $course = $this->getCourse($id);
 
         if (empty($course->thumbnail)) {
             $request->validate(['thumbnail' => 'required']);
+        }
+
+        if ($request->hasFile('promo_video')) {
+
+            try {
+                $file = $request->file('promo_video');
+                $renamedFile = time().uniqid();
+
+                $movedToCloudaniry = $this->cloudinary->uploadApi()->upload($file->getRealPath(), [
+                    'folder' => 'ApexUnified_LMS/Courses/PromoVideos',
+                    'public_id' => $renamedFile,
+                    'resource_type' => 'video',
+                ]);
+
+                if (! $movedToCloudaniry || ! $movedToCloudaniry['secure_url'] || ! $movedToCloudaniry['public_id']) {
+                    return ['status' => false, 'message' => 'Something went wrong! While uploading video.'];
+                }
+
+                if (! empty($course->promo_video) && ! empty($course->promo_video_public_id)) {
+                    $this->cloudinary->uploadApi()->destroy($course->promo_video_public_id, [
+                        'resource_type' => 'video',
+                    ]);
+                }
+                $validated_req['promo_video_duration'] = $movedToCloudaniry['duration'];
+                $validated_req['promo_video'] = $movedToCloudaniry['secure_url'];
+                $validated_req['promo_video_public_id'] = $movedToCloudaniry['public_id'];
+
+            } catch (Exception $e) {
+                return ['status' => false, 'message' => 'Something went wrong! While uploading video. '.$e->getMessage()];
+            }
+
         }
 
         if ($request->hasFile('thumbnail')) {
@@ -238,43 +331,6 @@ class CourseRepository implements CoursesRepositoryInterface
                 return ['status' => false, 'message' => 'Something went wrong! While uploading Thumbnail. '.$e->getMessage()];
             }
 
-        } else {
-            $validated_req['thumbnail'] = $course->thumbnail;
-            $validated_req['thumbnail_public_id'] = $course->thumbnail_public_id;
-        }
-
-        if ($request->hasFile('promo_video')) {
-
-            try {
-                $file = $request->file('promo_video');
-                $renamedFile = time().uniqid();
-
-                $movedToCloudaniry = $this->cloudinary->uploadApi()->upload($file->getRealPath(), [
-                    'folder' => 'ApexUnified_LMS/Courses/PromoVideos',
-                    'public_id' => $renamedFile,
-                    'resource_type' => 'video',
-                ]);
-
-                if (! $movedToCloudaniry || ! $movedToCloudaniry['secure_url'] || ! $movedToCloudaniry['public_id']) {
-                    return ['status' => false, 'message' => 'Something went wrong! While uploading video.'];
-                }
-
-                if (! empty($course->promo_video) && ! empty($course->promo_video_public_id)) {
-                    $this->cloudinary->uploadApi()->destroy($course->promo_video_public_id, [
-                        'resource_type' => 'video',
-                    ]);
-                }
-
-                $validated_req['promo_video'] = $movedToCloudaniry['secure_url'];
-                $validated_req['promo_video_public_id'] = $movedToCloudaniry['public_id'];
-
-            } catch (Exception $e) {
-                return ['status' => false, 'message' => 'Something went wrong! While uploading video. '.$e->getMessage()];
-            }
-
-        } else {
-            $validated_req['promo_video'] = $course->promo_video;
-            $validated_req['promo_video_public_id'] = $course->promo_video_public_id;
         }
 
         $validated_req['slug'] = Str::slug($validated_req['title']);
@@ -282,22 +338,24 @@ class CourseRepository implements CoursesRepositoryInterface
         $validated_req['meta_title'] = $validated_req['slug'];
         $validated_req['meta_description'] = $validated_req['short_description'];
 
-        return $course->update($validated_req);
+        return $course->update($validated_req) ?
+        ['status' => true, 'message' => 'Course updated successfully!']
+        :
+        ['status' => false, 'message' => 'Something went wrong!'];
     }
 
     public function destroyCourse(string $id)
     {
-        $course = $this->getCourse($id);
-
         try {
-            if (! empty($course->thumbnail) && ! empty($course->thumbnail_public_id)) {
-                $this->cloudinary->uploadApi()->destroy($course->thumbnail_public_id);
-            }
-
+            $course = $this->getCourse($id);
             if (! empty($course->promo_video) && ! empty($course->promo_video_public_id)) {
                 $this->cloudinary->uploadApi()->destroy($course->promo_video_public_id, [
                     'resource_type' => 'video',
                 ]);
+            }
+
+            if (! empty($course->thumbnail) && ! empty($course->thumbnail_public_id)) {
+                $this->cloudinary->uploadApi()->destroy($course->thumbnail_public_id);
             }
 
             return $course->delete() ?
@@ -313,30 +371,31 @@ class CourseRepository implements CoursesRepositoryInterface
 
     public function destroyCourseBySelection(Request $request)
     {
-        $ids = $request->array('ids');
-        $deleted = 0;
-
-        if (blank($ids)) {
-            return ['status' => false, 'message' => 'Please select at least one course!'];
-        }
-
-        $courses = $this->course->whereIn('id', $ids)->get();
-
-        if ($courses->isEmpty()) {
-            return ['status' => false, 'message' => 'No Course Found With The Given IDs!'];
-        }
-
         try {
 
+            $ids = $request->array('ids');
+            $deleted = 0;
+
+            if (blank($ids)) {
+                return ['status' => false, 'message' => 'Please select at least one course!'];
+            }
+
+            $courses = $this->course->whereIn('id', $ids)->get();
+
+            if ($courses->isEmpty()) {
+                return ['status' => false, 'message' => 'No Course Found With The Given IDs!'];
+            }
+
             foreach ($courses as $course) {
-                if (! empty($course->thumbnail) && ! empty($course->thumbnail_public_id)) {
-                    $this->cloudinary->uploadApi()->destroy($course->thumbnail_public_id);
-                }
 
                 if (! empty($course->promo_video) && ! empty($course->promo_video_public_id)) {
                     $this->cloudinary->uploadApi()->destroy($course->promo_video_public_id, [
                         'resource_type' => 'video',
                     ]);
+                }
+
+                if (! empty($course->thumbnail) && ! empty($course->thumbnail_public_id)) {
+                    $this->cloudinary->uploadApi()->destroy($course->thumbnail_public_id);
                 }
 
                 $course->delete();

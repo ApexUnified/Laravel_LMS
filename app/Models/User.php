@@ -13,7 +13,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable // implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, HasRoles, Notifiable;
@@ -40,13 +40,18 @@ class User extends Authenticatable implements MustVerifyEmail
         'remember_token',
     ];
 
-    protected $appends = ['avatar', 'role_id'];
+    protected $appends = ['avatar', 'role_id', 'profile_url'];
 
     /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
      */
+    public function getProfileUrlAttribute()
+    {
+        return ! empty($this->attributes['profile']) ? asset('assets/images/user/'.$this->attributes['profile']) : null;
+    }
+
     protected function casts(): array
     {
         return [

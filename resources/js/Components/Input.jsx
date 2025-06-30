@@ -30,7 +30,7 @@ export default function Input({ Name, Value, Action, Placeholder, Type, Error, R
 
                 {Type === "password" && (
                     <span
-                        className="absolute z-30 text-gray-500 -translate-y-1/2 cursor-pointer right-4 top-1/2 dark:text-gray-400"
+                        className="absolute z-30 pb-2 text-gray-500 -translate-y-1/2 cursor-pointer right-4 top-1/2 dark:text-gray-400"
                         onClick={() => setShowPasswordToggle(!ShowPasswordToggle)}
                     >
                         <svg

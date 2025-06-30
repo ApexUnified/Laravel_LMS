@@ -18,20 +18,33 @@ registerPlugin(
     FilePondPluginImageExifOrientation,
     FilePondPluginFileValidateSize
 );
-export default function FileUploaderInput({ Multiple = false, InputName, CustomCss, imagePathName, Id, Required = false, Label, Error, onUpdate, DefaultFile, acceptedFileTypes }) {
+export default function FileUploaderInput(
+    { Multiple = false,
+        InputName,
+        CustomCss,
+        Id,
+        Required = false,
+        Label,
+        Error,
+        onUpdate,
+        DefaultFile,
+        acceptedFileTypes,
+        MaxFileSize
+    }
+) {
 
-    const { asset } = usePage().props;
 
-    const [files, setFiles] = useState(
-        DefaultFile
-            ? [
-                {
-                    ...imagePathName ? { source: `${asset}assets/images/${imagePathName}/${DefaultFile}` } : { source: DefaultFile },
-                    options: { type: 'remote' },
-                },
-            ]
-            : []
-    );
+
+    const [files, setFiles] = useState(() => {
+        if (!DefaultFile || !Array.isArray(DefaultFile)) return [];
+
+        const preloaded = DefaultFile.map((url) => ({
+            source: url,
+            options: { type: 'remote' },
+        }));
+
+        return Multiple ? preloaded : preloaded.slice(0, 1);
+    });
 
 
     return (
@@ -48,25 +61,33 @@ export default function FileUploaderInput({ Multiple = false, InputName, CustomC
                     <FilePond
                         allowMultiple={Multiple}
                         credits={false}
-                        acceptedFileTypes={[acceptedFileTypes ?? 'image/*']}
+                        acceptedFileTypes={acceptedFileTypes ?? ['image/*']}
 
                         labelIdle={Label ?? "Drag & Drop Your Files or <strong>Click</strong>"}
                         onupdatefiles={(fileItems) => {
-                            const item = fileItems[0];
 
-                            if (item?.file instanceof File) {
-                                onUpdate(item.file);
+                            if (Multiple) {
+                                const files = fileItems.map(item => item.file);
+                                onUpdate(files);
                                 setFiles(fileItems);
-                            } else if (fileItems.length === 0) {
-                                setFiles([]);
-                                onUpdate(null);
+                            } else {
+                                const item = fileItems[0];
+                                if (item?.file instanceof File) {
+                                    onUpdate(item.file);
+                                    setFiles(fileItems);
+                                } else if (fileItems.length === 0) {
+                                    setFiles([]);
+                                    onUpdate(null);
+                                }
                             }
+
+
                         }}
                         files={files}
                         allowDrop={true}
                         dropOnElement={true}
                         className="filepond--root"
-                        maxFileSize={acceptedFileTypes?.includes('video/*') ? '10000MB' : '2MB'}
+                        maxFileSize={MaxFileSize ?? "2MB"}
                     />
 
 

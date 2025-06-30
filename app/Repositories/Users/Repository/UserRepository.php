@@ -31,7 +31,6 @@ class UserRepository implements UserRepositoryInterface
         $users = $users->paginate(10);
 
         $users->getCollection()->transform(function ($user) {
-            $user->profile = ! empty($user->profile) ? asset('assets/images/user/'.$user->profile) : null;
             $user->added_at = (string) $user->created_at->format('Y-m-d');
             $user->role_name = $user->roles->pluck('name')->implode('');
 

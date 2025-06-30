@@ -162,12 +162,12 @@ export default function Table({
         }
 
         // Handle profile image/avatar
-        if (column.key === 'profile') {
-            return item.profile ? (
-                <img src={item.profile} alt="Profile" className="object-cover w-full rounded-full sm:w-20" />
+        if (column.image === true) {
+            return column.image && item.profile_url ? (
+                <img src={item.profile_url} alt="Profile" className="object-cover w-full rounded-full sm:w-20" />
             ) : (
                 <span className="flex items-center justify-center w-full text-2xl text-white bg-gray-500 rounded-full sm:h-20 sm:w-20">
-                    {item.avatar}
+                    {item[column.default]}
                 </span>
             );
         }
