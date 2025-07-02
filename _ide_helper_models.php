@@ -40,7 +40,7 @@ namespace App\Models{
  * @property string $title
  * @property string $slug
  * @property string $short_description
- * @property array<array-key, mixed> $description
+ * @property string $description
  * @property string $thumbnail
  * @property string $thumbnail_public_id
  * @property string|null $promo_video
@@ -54,8 +54,8 @@ namespace App\Models{
  * @property string $course_language
  * @property int $is_published
  * @property int $is_approved
- * @property array<array-key, mixed>|null $requirements
- * @property array<array-key, mixed>|null $learning_outcomes
+ * @property string|null $requirements
+ * @property string|null $learning_outcomes
  * @property string|null $meta_title
  * @property string|null $meta_description
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -64,6 +64,7 @@ namespace App\Models{
  * @property-read \App\Models\User|null $instructor
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Lesson> $lessons
  * @property-read int|null $lessons_count
+ * @method static \Database\Factories\CourseFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Course newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Course newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Course query()
@@ -131,11 +132,41 @@ namespace App\Models{
 /**
  * 
  *
+ * @property int $id
+ * @property int|null $course_id
+ * @property string $title
+ * @property string $slug
+ * @property string $description
+ * @property string $thumbnail
+ * @property string $thumbnail_public_id
+ * @property string $video
+ * @property string $video_public_id
+ * @property string $video_duration
+ * @property array<array-key, mixed>|null $attachments
+ * @property int $is_published
+ * @property int $is_approved
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Course|null $course
- * @property-read mixed $video_duration
+ * @method static \Database\Factories\LessonFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson whereAttachments($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson whereCourseId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson whereIsApproved($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson whereIsPublished($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson whereSlug($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson whereThumbnail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson whereThumbnailPublicId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson whereTitle($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson whereVideo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson whereVideoDuration($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson whereVideoPublicId($value)
  */
 	class Lesson extends \Eloquent {}
 }

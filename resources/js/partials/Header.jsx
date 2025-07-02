@@ -554,7 +554,7 @@ export default function Header({
                                     </div>
                                 ) : (
                                     <div className="flex items-center justify-center mx-2 overflow-hidden text-xl border rounded-full dark:border-gray-800 w-11 h-11 dark:text-white">
-                                        <img src={user.profile_url} alt="Profile" />
+                                        <img src={user.profile_url} alt="Profile" className='object-cover w-full sm:h-20 sm:w-20' />
                                     </div>
                                 )}
 

@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Repositories\Categories\Interface\CategoryRepositoryInterface;
 use App\Repositories\Categories\Repository\CategoryRepository;
+use App\Repositories\CoursePlayer\Interface\CoursePlayerRepositoryInterface;
+use App\Repositories\CoursePlayer\Repository\CoursePlayerRepository;
 use App\Repositories\Courses\Interface\CoursesRepositoryInterface;
 use App\Repositories\Courses\Repository\CourseRepository;
 use App\Repositories\Lessons\Interface\LessonRepositoryInterface;
@@ -29,6 +31,7 @@ class RepositoryServiceBinderProvider extends ServiceProvider
         $this->app->bind(CategoryRepositoryInterface::class, CategoryRepository::class);
         $this->app->bind(CoursesRepositoryInterface::class, CourseRepository::class);
         $this->app->bind(LessonRepositoryInterface::class, LessonRepository::class);
+        $this->app->bind(CoursePlayerRepositoryInterface::class, CoursePlayerRepository::class);
     }
 
     /**

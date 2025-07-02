@@ -26,10 +26,9 @@ export default function edit({ lesson, courses }) {
     });
 
 
-
     const submit = (e) => {
         e.preventDefault();
-        post(route("lessons.update", lesson.id));
+        post(route("lessons.update", lesson.slug));
     }
 
     return (
@@ -222,7 +221,10 @@ export default function edit({ lesson, courses }) {
                                                 (
                                                     data.title === lesson.title &&
                                                     data.description === lesson.description &&
-                                                    data.course_id === lesson.course_id
+                                                    data.course_id === lesson.course_id &&
+                                                    (data.video == 0 || data.video == null) &&
+                                                    (data.thumbnail == 0 || data.thumbnail == null) &&
+                                                    data.attachments.length == 0
                                                 )
 
 

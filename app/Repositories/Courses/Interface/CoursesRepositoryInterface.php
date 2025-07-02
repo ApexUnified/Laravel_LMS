@@ -10,9 +10,9 @@ interface CoursesRepositoryInterface
 
     public function storeCourse(Request $request);
 
-    public function getCourse(string $id);
+    public function getCourse(string $slug);
 
-    public function updateCourse(Request $request, string $id);
+    public function updateCourse(Request $request, string $slug);
 
     public function destroyCourse(string $id);
 

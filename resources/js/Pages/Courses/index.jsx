@@ -3,6 +3,7 @@ import Card from '@/Components/Card';
 import LinkButton from '@/Components/LinkButton';
 import SelectInput from '@/Components/SelectInput';
 import Table from '@/Components/Table';
+import Toast from '@/Components/Toast';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import { Head, router, useForm, usePage } from '@inertiajs/react'
 import debounce from 'lodash.debounce';
@@ -22,8 +23,10 @@ export default function index({ courses, users, categories, instructors }) {
         id: null,
     });
 
+
+    const [flash, setFlash] = useState(null);
     const [columns, setColumns] = useState([]);
-    // const [customActions, setCustomActions] = useState([]);
+    const [customActions, setCustomActions] = useState([]);
 
 
     // Custom Search States
@@ -93,6 +96,14 @@ export default function index({ courses, users, categories, instructors }) {
                 badge: (value) => value === 'Approved' ? 'bg-green-200 text-green-800 dark:bg-white dark:text-gray-800' : 'bg-red-200 text-red-800'
             },
 
+
+
+            {
+                key: 'lessons_count', label: 'Lessons Count',
+                badge: (value) => value > 0 ? 'bg-green-200 text-green-800 dark:bg-white dark:text-gray-800' : 'bg-red-200 text-red-800'
+            },
+
+
             { key: 'level', label: 'Course Level' },
             { key: 'course_language', label: 'Course Language' },
 
@@ -152,16 +163,15 @@ export default function index({ courses, users, categories, instructors }) {
         ];
 
 
-        // it works
-        // const customActions = [
-        //     {
-        //         label: "Demo",
-        //         onClick: (item) => router.visit(route("courses.show", item.id))
+        const customActions = [
+            {
+                label: "View Course",
+                onClick: (item) => router.visit(route("courses.player", item.slug)),
 
-        //     }
-        // ]
+            }
+        ]
 
-        // setCustomActions(customActions);
+        setCustomActions(customActions);
         setColumns(columns);
 
     }, []);
@@ -213,7 +223,9 @@ export default function index({ courses, users, categories, instructors }) {
                                 props={props}
                                 columns={columns}
                                 ParentSearched={ParentSearched}
+                                RouteParameterKey={"slug"}
                                 searchProps={{ instructor_id: instructor_id, category_id: category_id }}
+                                customActions={customActions}
                                 customSearch={
                                     <>
                                         <div className="relative mb-2">

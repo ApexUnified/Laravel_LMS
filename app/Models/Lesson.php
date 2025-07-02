@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Lesson extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'course_id',
         'title',
@@ -43,8 +46,12 @@ class Lesson extends Model
         return sprintf('%02d:%02d:%02d', $hours, $minutes, $remainingSeconds);
     }
 
+    public function getDescriptionAttribute()
+    {
+        return ! empty($this->attributes['description']) ? json_decode($this->attributes['description']) : null;
+    }
+
     protected $casts = [
         'attachments' => 'array',
-        'description' => 'array',
     ];
 }

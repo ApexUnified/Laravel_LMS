@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Course extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'title',
         'slug',
@@ -63,9 +66,18 @@ class Course extends Model
         return sprintf('%02d:%02d:%02d', $hours, $minutes, $remainingSeconds);
     }
 
-    protected $casts = [
-        'description' => 'array',
-        'requirements' => 'array',
-        'learning_outcomes' => 'array',
-    ];
+    public function getDescriptionAttribute()
+    {
+        return json_decode($this->attributes['description']);
+    }
+
+    public function getRequirementsAttribute()
+    {
+        return ! empty($this->attributes['requirements']) ? json_decode($this->attributes['requirements']) : null;
+    }
+
+    public function getLearningOutcomesAttribute()
+    {
+        return ! empty($this->attributes['learning_outcomes']) ? json_decode($this->attributes['learning_outcomes']) : null;
+    }
 }

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\CoursePlayerController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettingController;
@@ -40,6 +41,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Lesson Routes
     Route::resource('/lessons', LessonController::class)->except(['show']);
     Route::delete('/lessons-delete-by-selectetion', [LessonController::class, 'destroyBySelection'])->name('lessons.destroybyselection');
+
+    // Course Player
+    Route::get('/course-player/{course_slug}', [CoursePlayerController::class, 'coursePlayer'])->name('courses.player');
+    Route::get('/course-player/{course_slug}/{lesson_slug}', [CoursePlayerController::class, 'lessonPlayer'])->name('lessons.player');
 
     // Profile Routes
     Route::controller(ProfileController::class)->group(function () {

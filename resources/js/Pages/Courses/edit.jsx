@@ -45,7 +45,7 @@ export default function edit({ course, categories, instructors }) {
     }, []);
     const submit = (e) => {
         e.preventDefault();
-        post(route("courses.update", course.id));
+        post(route("courses.update", course.slug));
     }
     return (
         <>

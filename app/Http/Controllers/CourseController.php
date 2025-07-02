@@ -47,21 +47,14 @@ class CourseController extends Controller
         }
     }
 
-    // public function show(string $id)
-    // {
-    //     $course = $this->course->getCourse($id);
-
-    //     if (isset($course['status']) && $course['status'] === false) {
-    //         return to_route('courses.index')->with('error', $course['message']);
-    //     }
-
-    //     return Inertia::render('Courses/view', compact('course'));
-    // }
-
-    public function edit(string $id)
+    public function edit(string $slug)
     {
 
-        $course = $this->course->getCourse($id);
+        if (empty($slug)) {
+            return back()->with('error', 'Course Not Found!');
+        }
+
+        $course = $this->course->getCourse($slug);
 
         if (isset($course['status']) && $course['status'] === false) {
             return to_route('courses.index')->with('error', $course['message']);
@@ -73,9 +66,14 @@ class CourseController extends Controller
         return Inertia::render('Courses/edit', compact('course', 'categories', 'instructors'));
     }
 
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $slug)
     {
-        $updated = $this->course->updateCourse($request, $id);
+
+        if (empty($slug)) {
+            return back()->with('error', 'Course Not Found!');
+        }
+
+        $updated = $this->course->updateCourse($request, $slug);
 
         if ($updated['status']) {
             return to_route('courses.index')->with('success', $updated['message']);

@@ -103,7 +103,7 @@ export default function index({ user }) {
                                                 </div>
                                             ) : (
                                                 <div className="flex items-center justify-center w-20 h-20 overflow-hidden text-2xl border rounded-full dark:border-gray-500 dark:text-white">
-                                                    <img src={user.profile_url} alt="Profile" />
+                                                    <img src={user.profile_url} alt="Profile" className='object-cover w-full sm:h-20 sm:w-20' />
                                                 </div>
                                             )}
 

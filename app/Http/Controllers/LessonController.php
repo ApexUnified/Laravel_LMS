@@ -48,13 +48,13 @@ class LessonController extends Controller
         }
     }
 
-    public function edit(string $id)
+    public function edit(string $slug)
     {
-        if (empty($id)) {
+        if (empty($slug)) {
             return back()->with('error', 'Lesson Not Found!');
         }
 
-        $lesson = $this->lesson->getLesson($id);
+        $lesson = $this->lesson->getLesson($slug);
 
         if (isset($lesson['status']) && $lesson['status'] === false) {
             return back()->with('error', $lesson['message']);
@@ -65,13 +65,13 @@ class LessonController extends Controller
         return Inertia::render('Lessons/edit', compact('lesson', 'courses'));
     }
 
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $slug)
     {
-        if (empty($id)) {
+        if (empty($slug)) {
             return back()->with('error', 'Lesson Not Found!');
         }
 
-        $updated = $this->lesson->updateLesson($request, $id);
+        $updated = $this->lesson->updateLesson($request, $slug);
 
         if ($updated['status']) {
             return to_route('lessons.index')->with('success', $updated['message']);

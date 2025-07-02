@@ -23,7 +23,8 @@ export default function Table({
     customActions = [],
     customSearch,
     searchProps = {},
-    ParentSearched = false
+    ParentSearched = false,
+    RouteParameterKey
 
 }) {
 
@@ -164,7 +165,7 @@ export default function Table({
         // Handle profile image/avatar
         if (column.image === true) {
             return column.image && item.profile_url ? (
-                <img src={item.profile_url} alt="Profile" className="object-cover w-full rounded-full sm:w-20" />
+                <img src={item.profile_url} alt="Profile" className="object-cover w-full rounded-full sm:h-20 sm:w-20" />
             ) : (
                 <span className="flex items-center justify-center w-full text-2xl text-white bg-gray-500 rounded-full sm:h-20 sm:w-20">
                     {item[column.default]}
@@ -334,19 +335,10 @@ export default function Table({
                                                             }`}
                                                     >
                                                         <ul className="py-2 text-sm text-gray-700 dark:text-gray-200">
-                                                            {ViewRoute && (
-                                                                <li>
-                                                                    <Link
-                                                                        href={route(ViewRoute, item.id)}
-                                                                        className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                                                                    >
-                                                                        View
-                                                                    </Link>
-                                                                </li>
-                                                            )}
+
                                                             <li>
                                                                 <Link
-                                                                    href={route(EditRoute, item.id)}
+                                                                    href={route(EditRoute, RouteParameterKey ? item[RouteParameterKey] : item.id)}
                                                                     className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
                                                                 >
                                                                     Edit
@@ -474,8 +466,9 @@ export default function Table({
                                                 setDeleteBulkSelectedProcessing(false);
                                                 setDeleteSelectedBuilkConfirmationModal(false);
                                             }}
+                                            disabled={DeleteBulkSelectedProcessing}
                                             type="button"
-                                            className="flex justify-center rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
+                                            className={`flex justify-center rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200 ${DeleteBulkSelectedProcessing && "opacity-25  dark:opacity-40"}`}
                                         >
                                             Close
                                             <svg

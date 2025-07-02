@@ -67,9 +67,9 @@ class LessonRepository implements LessonRepositoryInterface
         ];
     }
 
-    public function getLesson(string $id)
+    public function getLesson(string $slug)
     {
-        $lesson = $this->lesson->with(['course'])->find($id);
+        $lesson = $this->lesson->with(['course'])->where('slug', $slug)->first();
 
         if (empty($lesson)) {
             return ['status' => false, 'message' => 'Lesson Not Found!'];
@@ -86,7 +86,7 @@ class LessonRepository implements LessonRepositoryInterface
             'description' => 'required',
             'course_id' => 'required|exists:courses,id',
             'thumbnail' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-            'video' => 'required|mimetypes:video/mp4|max:10240000',
+            'video' => 'required|mimes:mp4,webm,ogg,avi|max:10485760',
             'attachments' => 'nullable|array',
             'attachments.*' => 'nullable|mimes:jpeg,png,jpg,pdf,doc,docx,ppt,pptx,xls,xlsx|max:5048',
             'is_published' => 'nullable|boolean',
@@ -130,7 +130,6 @@ class LessonRepository implements LessonRepositoryInterface
         }
 
         if ($request->hasFile('attachments')) {
-
             try {
                 $attachments = [];
                 $files = $request->file('attachments');
@@ -192,7 +191,9 @@ class LessonRepository implements LessonRepositoryInterface
             }
         }
 
-        $validated_req['slug'] = Str::slug($validated_req['title']);
+        $validated_req['slug'] = Str::slug($validated_req['title']).substr(uniqid(), 2, 5);
+
+        $validated_req['description'] = json_encode($request->description);
 
         if ($this->lesson->create($validated_req)) {
             return ['status' => true, 'message' => 'Lesson created successfully.'];
@@ -202,14 +203,14 @@ class LessonRepository implements LessonRepositoryInterface
 
     }
 
-    public function updateLesson(Request $request, string $id)
+    public function updateLesson(Request $request, string $slug)
     {
         $validated_req = $request->validate([
             'title' => 'required|string',
             'description' => 'required',
             'course_id' => 'required|exists:courses,id',
             ...($request->hasFile('thumbnail') ? ['thumbnail' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'] : []),
-            ...($request->hasFile('video') ? ['video' => 'nullable|mimetypes:video/mp4|max:10240000'] : []),
+            ...($request->hasFile('video') ? ['video' => 'nullable|mimes:mp4,webm,ogg,avi|max:10485760'] : []),
             ...($request->hasFile('attachments') ? [
                 'attachments' => 'nullable|array',
                 'attachments.*' => 'nullable|mimes:jpeg,png,jpg,pdf,doc,docx,ppt,pptx,xls,xlsx|max:5048',
@@ -223,7 +224,11 @@ class LessonRepository implements LessonRepositoryInterface
             'course_id.required' => 'Course is required',
         ]);
 
-        $lesson = $this->getLesson($id);
+        $lesson = $this->getLesson($slug);
+
+        if (isset($lesson['status']) && $lesson['status'] === false) {
+            return ['status' => false, 'message' => $lesson['message']];
+        }
 
         $description = trim(strip_tags($validated_req['description']));
 
@@ -344,7 +349,11 @@ class LessonRepository implements LessonRepositoryInterface
             }
         }
 
-        $validated_req['slug'] = Str::slug($validated_req['title']);
+        if ($validated_req['title'] != $lesson->title) {
+            $validated_req['slug'] = Str::slug($validated_req['title']).substr(uniqid(), 2, 5);
+        }
+
+        $validated_req['description'] = json_encode($request->description);
 
         if ($lesson->update($validated_req)) {
             return ['status' => true, 'message' => 'Lesson updated successfully.'];
@@ -356,7 +365,11 @@ class LessonRepository implements LessonRepositoryInterface
     public function destroyLesson(string $id)
     {
         try {
-            $lesson = $this->getLesson($id);
+            $lesson = $this->lesson->find($id);
+
+            if (empty($lesson)) {
+                return ['status' => false, 'message' => 'Lesson Not Found!'];
+            }
 
             if (! empty($lesson->video) && ! empty($lesson->video_public_id)) {
                 $this->cloudinary->uploadApi()->destroy($lesson->video_public_id, [

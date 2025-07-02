@@ -66,20 +66,25 @@ export default function FileUploaderInput(
                         labelIdle={Label ?? "Drag & Drop Your Files or <strong>Click</strong>"}
                         onupdatefiles={(fileItems) => {
 
-                            if (Multiple) {
-                                const files = fileItems.map(item => item.file);
-                                onUpdate(files);
-                                setFiles(fileItems);
-                            } else {
-                                const item = fileItems[0];
-                                if (item?.file instanceof File) {
-                                    onUpdate(item.file);
+
+                            if (fileItems.length > 0) {
+                                const newFiles = fileItems
+                                    .filter(item => item.file instanceof File)
+                                    .map(item => item.file);
+                                if (Multiple) {
+                                    onUpdate(newFiles);
                                     setFiles(fileItems);
-                                } else if (fileItems.length === 0) {
-                                    setFiles([]);
-                                    onUpdate(null);
+                                } else {
+                                    onUpdate(newFiles[0]);
+                                    setFiles(fileItems);
                                 }
+
+
+                            } else if (fileItems.length === 0) {
+                                setFiles([]);
+                                onUpdate(null);
                             }
+
 
 
                         }}

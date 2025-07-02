@@ -5,7 +5,7 @@ import Sidebar from '@/partials/Sidebar';
 import { Link, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import Toast from '@/Components/Toast';
-export default function AuthenticatedLayout({ children }) {
+export default function AuthenticatedLayout({ children, ManuallytoggleSidebar }) {
 
 
     // Global General Setting Prop
@@ -18,23 +18,6 @@ export default function AuthenticatedLayout({ children }) {
     // Application Logo Sate With Default Images
     const [ApplicationLogoLight, setApplicationLogoLight] = useState(asset + "assets/images/Logo/ApplicationLogoLight.png");
     const [ApplicationLogoDark, setApplicationLogoDark] = useState(asset + "assets/images/Logo/ApplicationLogoDark.png");
-
-
-    // For Updating Application Logo
-    useEffect(() => {
-
-        // Assigning Application logos
-        if (generalSetting?.app_main_logo_light) {
-            setApplicationLogoLight(asset + "assets/images/Logo/" + generalSetting?.app_main_logo_light);
-        }
-
-        if (generalSetting?.app_main_logo_dark) {
-            setApplicationLogoDark(asset + "assets/images/Logo/" + generalSetting?.app_main_logo_dark);
-        }
-
-
-
-    }, []);
 
 
     // Global Auth user Prop
@@ -52,6 +35,29 @@ export default function AuthenticatedLayout({ children }) {
 
     // Managing Dark Mode State
     const [darkMode, setDarkMode] = useState(false);
+
+    // For Updating Application Logo
+    useEffect(() => {
+
+        // Assigning Application logos
+        if (generalSetting?.app_main_logo_light) {
+            setApplicationLogoLight(asset + "assets/images/Logo/" + generalSetting?.app_main_logo_light);
+        }
+
+        if (generalSetting?.app_main_logo_dark) {
+            setApplicationLogoDark(asset + "assets/images/Logo/" + generalSetting?.app_main_logo_dark);
+        }
+
+
+        if (ManuallytoggleSidebar) {
+            setSidebarToggle(true);
+        }
+
+
+    }, []);
+
+
+
 
 
     return (

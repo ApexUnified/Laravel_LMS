@@ -102,6 +102,54 @@ export default function index({ lessons, categories, instructors, courses }) {
                 }
             },
 
+
+            {
+                label: 'Lesson Publish Status',
+                render: (item) => {
+                    if (item.is_published == 0) {
+                        return (
+                            <span
+                                className={`inline-block px-2 py-1 text-xs font-semibold rounded-full  bg-red-200 text-red-800 `}
+                            >
+                                Not Published
+                            </span>
+                        )
+                    }
+                    return (
+                        <span
+                            className={`inline-block px-2 py-1 text-xs font-semibold rounded-full dark:bg-white dark:text-gray-800  bg-green-200 text-green-800 `}
+                        >
+                            Published
+                        </span>
+                    )
+                }
+            },
+
+
+
+            {
+                label: 'Lesson Approval Status',
+                render: (item) => {
+                    if (item.is_approved == 0) {
+                        return (
+                            <span
+                                className={`inline-block px-2 py-1 text-xs font-semibold rounded-full  bg-red-200 text-red-800 `}
+                            >
+                                Not Approved
+                            </span>
+                        )
+                    }
+                    return (
+                        <span
+                            className={`inline-block px-2 py-1 text-xs font-semibold rounded-full dark:bg-white dark:text-gray-800  bg-green-200 text-green-800 `}
+                        >
+                            Approved
+                        </span>
+                    )
+                }
+            },
+
+
             { key: 'video_duration', badge: (value) => 'bg-green-200 text-green-800 dark:bg-white dark:text-gray-800', label: 'Lesson Duration' },
             { key: 'added_at', label: 'Created At' },
         ];
@@ -156,6 +204,7 @@ export default function index({ lessons, categories, instructors, courses }) {
                                 props={props}
                                 columns={columns}
                                 ParentSearched={ParentSearched}
+                                RouteParameterKey={"slug"}
                                 searchProps={{ instructor_id: instructor_id, category_id: category_id, course_id: course_id }}
                                 customSearch={
                                     <>

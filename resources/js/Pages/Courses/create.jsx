@@ -50,7 +50,6 @@ export default function create({ categories, instructors }) {
 
     const submit = (e) => {
         e.preventDefault();
-        console.log(data);
         post(route("courses.store"));
     }
     return (

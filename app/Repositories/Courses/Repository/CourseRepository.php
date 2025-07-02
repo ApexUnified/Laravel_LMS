@@ -15,9 +15,6 @@ use Spatie\Permission\Models\Role;
 
 class CourseRepository implements CoursesRepositoryInterface
 {
-    /**
-     * Create a new class instance.
-     */
     public function __construct(
         private Course $course,
         private User $user,
@@ -48,7 +45,7 @@ class CourseRepository implements CoursesRepositoryInterface
             $courses = $courses->where('instructor_id', $instructor_id);
         }
 
-        $courses = $courses->with(['instructor', 'category'])->paginate(10);
+        $courses = $courses->with(['instructor', 'category'])->withCount('lessons')->paginate(10);
 
         $courses->getCollection()->transform(function ($course) {
             $course->is_published = $course->is_published ? 'Published' : 'Not published';
@@ -80,8 +77,8 @@ class CourseRepository implements CoursesRepositoryInterface
             'title' => 'required|string|min:5|max:150',
             'short_description' => 'required|string|min:10',
             'description' => 'required',
-            'thumbnail' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-            'promo_video' => 'nullable|mimetypes:video/mp4|max:10485760',
+            'thumbnail' => 'required|image|max:2048',
+            'promo_video' => 'nullable|mimes:mp4,webm,ogg,avi|max:10485760',
             'instructor_id' => 'required|exists:users,id',
             'category_id' => 'required|exists:categories,id',
             'price' => 'required|numeric|min:0',
@@ -119,6 +116,7 @@ class CourseRepository implements CoursesRepositoryInterface
                     'requirements' => 'Requirements length should be more than 20 characters.',
                 ]);
             }
+            $validated_req['requirements'] = json_encode($request->requirements);
         }
 
         $learning_outcomes = trim(strip_tags($validated_req['learning_outcomes']));
@@ -128,6 +126,7 @@ class CourseRepository implements CoursesRepositoryInterface
                     'learning_outcomes' => 'Learning Outcomes length should be more than 20 characters.',
                 ]);
             }
+            $validated_req['learning_outcomes'] = json_encode($request->learning_outcomes);
         }
 
         if ($request->hasFile('promo_video')) {
@@ -180,7 +179,8 @@ class CourseRepository implements CoursesRepositoryInterface
             }
         }
 
-        $validated_req['slug'] = Str::slug($validated_req['title']);
+        $validated_req['slug'] = Str::slug($validated_req['title']).substr(uniqid(), 2, 5);
+        $validated_req['description'] = json_encode($request->description);
 
         $validated_req['meta_title'] = $validated_req['slug'];
         $validated_req['meta_description'] = $validated_req['short_description'];
@@ -193,9 +193,10 @@ class CourseRepository implements CoursesRepositoryInterface
 
     }
 
-    public function getCourse(string $id)
+    public function getCourse(string $slug)
     {
-        $course = $this->course->find($id);
+
+        $course = $this->course->with(['lessons'])->where('slug', $slug)->first();
 
         if (empty($course)) {
             return ['status' => false, 'message' => 'Course not found!'];
@@ -204,15 +205,15 @@ class CourseRepository implements CoursesRepositoryInterface
         return $course;
     }
 
-    public function updateCourse(Request $request, string $id)
+    public function updateCourse(Request $request, string $slug)
     {
 
         $validated_req = $request->validate([
             'title' => 'required|string|min:5|max:150',
             'short_description' => 'required|string|min:10',
             'description' => 'required',
-            ...($request->hasFile('thumbnail') ? ['thumbnail' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'] : []),
-            ...($request->hasFile('promo_video') ? ['promo_video' => 'nullable|mimetypes:video/mp4|max:10240000'] : []),
+            ...($request->hasFile('thumbnail') ? ['thumbnail' => 'nullable|image|max:2048'] : []),
+            ...($request->hasFile('promo_video') ? ['promo_video' => 'nullable|mimes:mp4,webm,ogg,avi|max:10485760'] : []),
             'instructor_id' => 'required|exists:users,id',
             'category_id' => 'required|exists:categories,id',
             'price' => 'required|numeric|min:0',
@@ -250,6 +251,7 @@ class CourseRepository implements CoursesRepositoryInterface
                     'requirements' => 'Requirements length should be more than 20 characters.',
                 ]);
             }
+            $validated_req['requirements'] = json_encode($request->requirements);
         }
 
         $learning_outcomes = trim(strip_tags($validated_req['learning_outcomes']));
@@ -259,9 +261,14 @@ class CourseRepository implements CoursesRepositoryInterface
                     'learning_outcomes' => 'Learning Outcomes length should be more than 20 characters.',
                 ]);
             }
+            $validated_req['learning_outcomes'] = json_encode($request->learning_outcomes);
         }
 
-        $course = $this->getCourse($id);
+        $course = $this->getCourse($slug);
+
+        if (isset($course['status']) && $course['status'] === false) {
+            return ['status' => false, 'message' => $course['message']];
+        }
 
         if (empty($course->thumbnail)) {
             $request->validate(['thumbnail' => 'required']);
@@ -333,9 +340,13 @@ class CourseRepository implements CoursesRepositoryInterface
 
         }
 
-        $validated_req['slug'] = Str::slug($validated_req['title']);
+        if ($validated_req['title'] != $course->title) {
+            $validated_req['slug'] = Str::slug($validated_req['title']).substr(uniqid(), 2, 5);
+            $validated_req['meta_title'] = $validated_req['slug'];
+        }
 
-        $validated_req['meta_title'] = $validated_req['slug'];
+        $validated_req['description'] = json_encode($request->description);
+
         $validated_req['meta_description'] = $validated_req['short_description'];
 
         return $course->update($validated_req) ?
@@ -347,7 +358,12 @@ class CourseRepository implements CoursesRepositoryInterface
     public function destroyCourse(string $id)
     {
         try {
-            $course = $this->getCourse($id);
+            $course = $this->course->find($id);
+
+            if (empty($course)) {
+                return ['status' => false, 'message' => 'Course not found!'];
+            }
+
             if (! empty($course->promo_video) && ! empty($course->promo_video_public_id)) {
                 $this->cloudinary->uploadApi()->destroy($course->promo_video_public_id, [
                     'resource_type' => 'video',
