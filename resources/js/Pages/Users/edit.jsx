@@ -21,6 +21,7 @@ export default function edit({ user, roles }) {
         password: '',
         password_confirmation: '',
         profile: null,
+        is_profile_removed: false,
         role_id: user.role_id || '',
     });
 
@@ -171,7 +172,15 @@ export default function edit({ user, roles }) {
                                             Id={"profile"}
                                             InputName={"User Profile"}
                                             onUpdate={(file) => {
-                                                setData("profile", file);
+                                                if (file.length > 0) {
+                                                    if (file[0].isNew) {
+                                                        setData("profile", file[0].file);
+                                                        setData('is_profile_removed', false);
+                                                    }
+                                                } else {
+                                                    setData("profile", null);
+                                                    setData('is_profile_removed', true);
+                                                }
                                             }}
                                             Multiple={false}
                                             DefaultFile={user.profile_url && [user.profile_url]}
@@ -190,6 +199,7 @@ export default function edit({ user, roles }) {
                                                 data.email === user.email &&
                                                 data.role_id === user.role_id &&
                                                 data.profile === null &&
+                                                data.is_profile_removed === false &&
                                                 data.password === "" &&
                                                 data.password_confirmation === ""
                                             ) ||

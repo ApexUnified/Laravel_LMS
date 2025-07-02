@@ -27,7 +27,7 @@ class CourseRepository implements CoursesRepositoryInterface
 
     public function getCourses(Request $request)
     {
-        // dd($request->all());
+
         $courses = $this->course->query()->latest();
 
         $search = $request->filled('search') ? $request->input('search') : null;
@@ -77,7 +77,7 @@ class CourseRepository implements CoursesRepositoryInterface
             'title' => 'required|string|min:5|max:150',
             'short_description' => 'required|string|min:10',
             'description' => 'required',
-            'thumbnail' => 'required|image|max:2048',
+            'thumbnail' => 'required|image|max:2048|dimensions:min_width=1280,min_height=720,max_width:1280,max_height:1080',
             'promo_video' => 'nullable|mimes:mp4,webm,ogg,avi|max:10485760',
             'instructor_id' => 'required|exists:users,id',
             'category_id' => 'required|exists:categories,id',
@@ -91,6 +91,7 @@ class CourseRepository implements CoursesRepositoryInterface
             'learning_outcomes' => 'nullable',
         ], [
             'thumbnail.max' => 'Thumbnail size should be less than Or Equal To 2MB',
+            'thumbnail.dimensions' => 'Thumbnail resolution should be Between 1280x720 and 1280x1080',
             'promo_video.max' => 'Promo video size should be less than Or Equal To 10GB',
             'category_id.exists' => 'Selected Category does not exist',
             'instructor_id.exists' => 'Selected Instructor does not exist',
@@ -212,7 +213,7 @@ class CourseRepository implements CoursesRepositoryInterface
             'title' => 'required|string|min:5|max:150',
             'short_description' => 'required|string|min:10',
             'description' => 'required',
-            ...($request->hasFile('thumbnail') ? ['thumbnail' => 'nullable|image|max:2048'] : []),
+            ...($request->hasFile('thumbnail') ? ['thumbnail' => 'nullable|image|max:2048|dimensions:min_width=1280,min_height=720,max_width:1280,max_height:1080'] : []),
             ...($request->hasFile('promo_video') ? ['promo_video' => 'nullable|mimes:mp4,webm,ogg,avi|max:10485760'] : []),
             'instructor_id' => 'required|exists:users,id',
             'category_id' => 'required|exists:categories,id',
@@ -225,11 +226,25 @@ class CourseRepository implements CoursesRepositoryInterface
             'requirements' => 'nullable',
             'learning_outcomes' => 'nullable',
         ], [
-            ...($request->hasFile('thumbanil') ? ['thumbnail.max' => 'Thumbnail size should be less than Or Equal To 2MB'] : []),
+            ...($request->hasFile('thumbnail')
+            ?
+            [
+                'thumbnail.max' => 'Thumbnail size should be less than Or Equal To 2MB',
+                'thumbnail.dimensions' => 'Thumbnail resolution should be Between 1280x720 and 1280x1080',
+            ]
+            :
+            []
+            ),
             ...($request->hasFile('promo_video') ? ['promo_video.max' => 'Video size should be less than Or Equal To 10GB'] : []),
             'category_id.exists' => 'Selected Category does not exist',
             'instructor_id.exists' => 'Selected Instructor does not exist',
         ]);
+
+        if ($request->boolean('is_thumbnail_removed') && ! $request->hasFile('thumbnail')) {
+            throw ValidationException::withMessages([
+                'thumbnail' => 'Course Thumbnail is required',
+            ]);
+        }
 
         if ($validated_req['price'] == 0 && $validated_req['discount'] > 0) {
             throw ValidationException::withMessages([
@@ -265,6 +280,23 @@ class CourseRepository implements CoursesRepositoryInterface
         }
 
         $course = $this->getCourse($slug);
+
+        if (isset($course['status']) && $course['status'] === false) {
+            return ['status' => false, 'message' => $course['message']];
+        }
+
+        if ($request->boolean('is_promo_video_removed') && ! empty($course->promo_video) && ! empty($course->promo_video_public_id)) {
+            try {
+                $this->cloudinary->uploadApi()->destroy($course->promo_video_public_id, [
+                    'resource_type' => 'video',
+                ]);
+                $validated_req['promo_video'] = null;
+                $validated_req['promo_video_public_id'] = null;
+                $validated_req['promo_video_duration'] = null;
+            } catch (Exception $e) {
+                return ['status' => false, 'message' => 'Something went wrong! '.$e->getMessage()];
+            }
+        }
 
         if (isset($course['status']) && $course['status'] === false) {
             return ['status' => false, 'message' => $course['message']];

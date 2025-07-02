@@ -14,13 +14,13 @@ class CoursePlayerController extends Controller
     public function coursePlayer($course_slug)
     {
         if (empty($course_slug)) {
-            return back()->with('error', 'Course not found');
+            return to_route('dashboard')->with('error', 'Course not found');
         }
 
         $course = $this->coursePlayer->getCourse($course_slug);
 
         if (isset($course['status']) && $course['status'] == false) {
-            return back()->with('error', $course['message']);
+            return to_route('dashboard')->with('error', $course['message']);
         }
 
         return Inertia::render('CoursePlayer/CoursePlayer', compact('course'));
@@ -36,13 +36,13 @@ class CoursePlayerController extends Controller
         $lesson = $this->coursePlayer->getLesson($course_slug, $lesson_slug);
 
         if (isset($lesson['status']) && $lesson['status'] == false) {
-            return back()->with('error', $lesson['message']);
+            return to_route('dashboard')->with('error', $lesson['message']);
         }
 
         $course = $this->coursePlayer->getCourse($course_slug);
 
         if (isset($course['status']) && $course['status'] == false) {
-            return back()->with('error', $course['message']);
+            return to_route('dashboard')->with('error', $course['message']);
         }
 
         return Inertia::render('CoursePlayer/LessonPlayer', compact('lesson', 'course'));

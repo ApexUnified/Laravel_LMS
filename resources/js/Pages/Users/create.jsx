@@ -171,7 +171,13 @@ export default function create({ roles }) {
                                             Id={"profile"}
                                             InputName={"User Profile"}
                                             onUpdate={(file) => {
-                                                setData("profile", file);
+                                                if (file.length > 0) {
+                                                    if (file[0].isNew) {
+                                                        setData("profile", file[0].file);
+                                                    }
+                                                } else {
+                                                    setData('profile', null);
+                                                }
                                             }}
                                             Multiple={false}
                                         />

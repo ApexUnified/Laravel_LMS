@@ -168,7 +168,7 @@ export default function Table({
                 <img src={item.profile_url} alt="Profile" className="object-cover w-full rounded-full sm:h-20 sm:w-20" />
             ) : (
                 <span className="flex items-center justify-center w-full text-2xl text-white bg-gray-500 rounded-full sm:h-20 sm:w-20">
-                    {item[column.default]}
+                    {item[column.default] ?? column.default}
                 </span>
             );
         }

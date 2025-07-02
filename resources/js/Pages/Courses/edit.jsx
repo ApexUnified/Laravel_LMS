@@ -22,6 +22,8 @@ export default function edit({ course, categories, instructors }) {
         instructor_id: course.instructor_id || '',
         thumbnail: null,
         promo_video: null,
+        is_thumbnail_removed: false,
+        is_promo_video_removed: false,
         price: course.price ?? 0,
         discount: course.discount ?? 0,
         level: course.level || '',
@@ -301,13 +303,24 @@ export default function edit({ course, categories, instructors }) {
                                     {/* FileUploader */}
 
                                     <div className="px-4 mt-4 sm:px-6 ">
+                                        <span className="text-center text-gray-800 dark:text-gray-200">
+                                            Note: Thumbnail Image Resolution Must Be Between 1280x720 to 1280x1080
+                                        </span>
                                         <FileUploaderInput
                                             Label={'Drag & Drop your Course Thumbnail Or <span class="filepond--label-action">Browse</span>'}
                                             Error={errors.thumbnail}
                                             Id={"thumbnail"}
                                             InputName={"Course Thumbnail"}
                                             onUpdate={(file) => {
-                                                setData("thumbnail", file);
+                                                if (file.length > 0) {
+                                                    if (file[0].isNew) {
+                                                        setData("thumbnail", file[0].file);
+                                                        setData('is_thumbnail_removed', false);
+                                                    }
+                                                } else {
+                                                    setData('thumbnail', null);
+                                                    setData('is_thumbnail_removed', true);
+                                                }
                                             }}
                                             DefaultFile={course.thumbnail && [course.thumbnail]}
                                             Required={true}
@@ -324,7 +337,15 @@ export default function edit({ course, categories, instructors }) {
                                             acceptedFileTypes={"video/*"}
                                             InputName={"Course Promo Video"}
                                             onUpdate={(file) => {
-                                                setData("promo_video", file);
+                                                if (file.length > 0) {
+                                                    if (file[0].isNew) {
+                                                        setData("promo_video", file[0].file);
+                                                        setData('is_promo_video_removed', false);
+                                                    }
+                                                } else {
+                                                    setData('promo_video', null);
+                                                    setData('is_promo_video_removed', true);
+                                                }
                                             }}
                                             MaxFileSize={"10000MB"}
                                             DefaultFile={course.promo_video && [course.promo_video]}
@@ -346,7 +367,7 @@ export default function edit({ course, categories, instructors }) {
                                                 data.category_id === (course.category_id || '') &&
                                                 data.instructor_id === (course.instructor_id || '') &&
                                                 data.thumbnail === null &&
-                                                data.promo_video === null &&
+                                                (data.promo_video === null && data.is_promo_video_removed === false) &&
                                                 data.price === (course.price ?? 0) &&
                                                 data.discount === (course.discount ?? 0) &&
                                                 data.level === (course.level || '') &&
@@ -354,8 +375,13 @@ export default function edit({ course, categories, instructors }) {
                                                 data.is_published === (course.is_published ?? 0) &&
                                                 data.is_approved === (course.is_approved ?? 0) &&
                                                 data.requirements === (course.requirements || '') &&
-                                                data.learning_outcomes === (course.learning_outcomes || '')
+                                                data.learning_outcomes === (course.learning_outcomes || '') &&
+                                                data.is_thumbnail_removed === false && data.thumbnail === null
                                             )
+
+
+
+
                                         }
                                         Spinner={processing}
                                         Icon={

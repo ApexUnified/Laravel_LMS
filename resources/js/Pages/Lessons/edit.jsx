@@ -23,7 +23,11 @@ export default function edit({ lesson, courses }) {
         is_published: lesson.is_published ?? 0,
         is_approved: lesson.is_approved ?? 0,
         attachments: [],
+        existing_attachments: [],
+        is_video_removed: false,
+        is_thumbnail_removed: false
     });
+
 
 
     const submit = (e) => {
@@ -152,13 +156,23 @@ export default function edit({ lesson, courses }) {
                                     {/* FileUploader */}
 
                                     <div className="px-4 mt-4 sm:px-6 ">
+                                        <span className="text-center text-gray-800 dark:text-gray-200">
+                                            Note: Thumbnail Image Resolution Must Be Between 1280x720 to 1280x1080
+                                        </span>
                                         <FileUploaderInput
                                             Label={'Drag & Drop your Lesson Thumbnail Or <span class="filepond--label-action">Browse</span>'}
                                             Error={errors.thumbnail}
                                             Id={"thumbnail"}
                                             InputName={"Lesson Thumbnail"}
                                             onUpdate={(file) => {
-                                                setData("thumbnail", file);
+                                                if (file.length > 0) {
+                                                    if (file[0].isNew) {
+                                                        setData("thumbnail", file[0].file);
+                                                        setData('is_thumbnail_removed', false);
+                                                    }
+                                                } else {
+                                                    setData('is_thumbnail_removed', true);
+                                                }
                                             }}
                                             Required={true}
                                             Multiple={false}
@@ -175,7 +189,15 @@ export default function edit({ lesson, courses }) {
                                             acceptedFileTypes={["video/*"]}
                                             InputName={"Lesson Video"}
                                             onUpdate={(file) => {
-                                                setData("video", file);
+                                                if (file.length > 0) {
+                                                    if (file[0].isNew) {
+                                                        setData("video", file[0].file);
+                                                        setData('is_video_removed', false);
+                                                    }
+                                                } else {
+                                                    setData('is_video_removed', true);
+                                                }
+
                                             }}
                                             Multiple={false}
                                             Required={true}
@@ -190,10 +212,31 @@ export default function edit({ lesson, courses }) {
                                             Label={'Drag & Drop your Lesson Attachments Or <span class="filepond--label-action">Browse</span>'}
                                             Error={errors.attachments}
                                             Id={"attachments"}
-                                            acceptedFileTypes={['image/*', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']}
+                                            acceptedFileTypes={[
+                                                'image/*',
+                                                'application/pdf',
+                                                'application/msword',
+                                                'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // docx
+                                                'application/vnd.ms-excel', // .xls
+                                                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+                                                'application/vnd.ms-powerpoint', // .ppt
+                                                'application/vnd.openxmlformats-officedocument.presentationml.presentation' // .pptx
+                                            ]}
                                             InputName={"Lesson Attachments"}
                                             onUpdate={(files) => {
-                                                setData("attachments", files);
+                                                const newFiles = [];
+                                                const existingFiles = [];
+
+                                                files.forEach(file => {
+                                                    if (file.isNew) {
+                                                        newFiles.push(file.file);
+                                                    } else {
+                                                        existingFiles.push(file.source);
+                                                    }
+                                                });
+
+                                                setData("attachments", newFiles);
+                                                setData("existing_attachments", existingFiles);
                                             }}
                                             Multiple={true}
                                             DefaultFile={lesson.attachments && lesson.attachments.map(attachment => attachment.secure_url)}
@@ -215,19 +258,7 @@ export default function edit({ lesson, courses }) {
                                                 data.description === '' ||
                                                 data.course_id === '' ||
                                                 lesson.thumbnail === null ||
-                                                lesson.video === null ||
-
-
-                                                (
-                                                    data.title === lesson.title &&
-                                                    data.description === lesson.description &&
-                                                    data.course_id === lesson.course_id &&
-                                                    (data.video == 0 || data.video == null) &&
-                                                    (data.thumbnail == 0 || data.thumbnail == null) &&
-                                                    data.attachments.length == 0
-                                                )
-
-
+                                                lesson.video === null
                                             )
                                         }
                                         Spinner={processing}

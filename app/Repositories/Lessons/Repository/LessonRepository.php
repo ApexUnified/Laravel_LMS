@@ -80,19 +80,18 @@ class LessonRepository implements LessonRepositoryInterface
 
     public function storeLesson(Request $request)
     {
-
         $validated_req = $request->validate([
             'title' => 'required|string',
             'description' => 'required',
             'course_id' => 'required|exists:courses,id',
-            'thumbnail' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'thumbnail' => 'required|image|mimes:jpeg,png,jpg|max:2048|dimensions:min_width=1280,min_height=720,max_width:1280,max_height:1080',
             'video' => 'required|mimes:mp4,webm,ogg,avi|max:10485760',
             'attachments' => 'nullable|array',
-            'attachments.*' => 'nullable|mimes:jpeg,png,jpg,pdf,doc,docx,ppt,pptx,xls,xlsx|max:5048',
             'is_published' => 'nullable|boolean',
             'is_approved' => 'nullable|boolean',
         ], [
             'thumbnail.max' => 'Thumbnail size should be less than Or Equal To 2MB',
+            'thumbnail.dimensions' => 'Thumbnail resolution should be Between 1280x720 and 1280x1080',
             'video.max' => 'Video size should be less than Or Equal To 10GB',
             'course_id.exists' => 'Selected Course does not exist',
             'course_id.required' => 'Course is required',
@@ -136,12 +135,22 @@ class LessonRepository implements LessonRepositoryInterface
 
                 foreach ($files as $file) {
 
-                    $renamedFile = time().uniqid();
+                    if ($file->getSize() > 10485760) {
+                        throw ValidationException::withMessages([
+                            'attachments' => 'Attachment size should be less than Or Equal To 10MB',
+                        ]);
+                    }
+
+                    $originalName = Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
+                    $extension = $file->getClientOriginalExtension();
+                    $uniqueSuffix = substr(time().uniqid(), 0, 5);
+
+                    $renamedFile = $originalName.'_'.$uniqueSuffix.'.'.$extension;
 
                     $movedToCloudaniry = $this->cloudinary->uploadApi()->upload($file->getRealPath(), [
                         'folder' => 'ApexUnified_LMS/Lessons/Attachments',
                         'public_id' => $renamedFile,
-                        'resource_type' => 'auto',
+                        'resource_type' => 'raw',
                     ]);
 
                     if (! $movedToCloudaniry || ! $movedToCloudaniry['secure_url'] || ! $movedToCloudaniry['public_id']) {
@@ -205,24 +214,44 @@ class LessonRepository implements LessonRepositoryInterface
 
     public function updateLesson(Request $request, string $slug)
     {
+        // dd($request->all());
         $validated_req = $request->validate([
             'title' => 'required|string',
             'description' => 'required',
             'course_id' => 'required|exists:courses,id',
-            ...($request->hasFile('thumbnail') ? ['thumbnail' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'] : []),
+            ...($request->hasFile('thumbnail') ? ['thumbnail' => 'nullable|image|mimes:jpeg,png,jpg|max:2048|dimensions:min_width=1280,min_height=720,max_width:1280,max_height:1080'] : []),
             ...($request->hasFile('video') ? ['video' => 'nullable|mimes:mp4,webm,ogg,avi|max:10485760'] : []),
             ...($request->hasFile('attachments') ? [
                 'attachments' => 'nullable|array',
-                'attachments.*' => 'nullable|mimes:jpeg,png,jpg,pdf,doc,docx,ppt,pptx,xls,xlsx|max:5048',
             ] : []),
             'is_published' => 'nullable|boolean',
             'is_approved' => 'nullable|boolean',
         ], [
-            ...($request->hasFile('thumbnail') ? ['thumbnail.max' => 'Thumbnail size should be less than Or Equal To 2MB'] : []),
+            ...($request->hasFile('thumbnail') ?
+            [
+                'thumbnail.max' => 'Thumbnail size should be less than Or Equal To 2MB',
+                'thumbnail.dimensions' => 'Thumbnail resolution should be Between 1280x720 and 1280x1080',
+            ]
+
+            :
+            []
+            ),
             ...($request->hasFile('video') ? ['video.max' => 'Video size should be less than Or Equal To 10GB'] : []),
             'course_id.exists' => 'Selected Course does not exist',
             'course_id.required' => 'Course is required',
         ]);
+
+        if ($request->boolean('is_video_removed') && ! $request->hasFile('video')) {
+            throw ValidationException::withMessages([
+                'video' => 'Lesson Video is required',
+            ]);
+        }
+
+        if ($request->boolean('is_thumbnail_removed') && ! $request->hasFile('thumbnail')) {
+            throw ValidationException::withMessages([
+                'thumbnail' => 'Lesson Thumbnail is required',
+            ]);
+        }
 
         $lesson = $this->getLesson($slug);
 
@@ -274,21 +303,69 @@ class LessonRepository implements LessonRepositoryInterface
                 return ['status' => false, 'message' => 'Something went wrong! While uploading video. '.$e->getMessage()];
             }
         }
+        $GlobalremeaningAttachments = [];
+        if ($request->filled('existing_attachments')) {
+            try {
+
+                $existing_attachments = $request->input('existing_attachments');
+                $remainingAttachments = collect($lesson->attachments)
+                    ->filter(fn ($attachment) => in_array($attachment['secure_url'], $existing_attachments))
+                    ->values();
+
+                $deletedAttachments = collect($lesson->attachments)
+                    ->filter(fn ($attachment) => ! in_array($attachment['secure_url'], $existing_attachments))
+                    ->values();
+
+                foreach ($deletedAttachments as $deletedAttachment) {
+                    $this->cloudinary->uploadApi()->destroy($deletedAttachment['public_id']);
+                }
+
+                if ($request->hasFile('attachments')) {
+                    $GlobalremeaningAttachments = $remainingAttachments->toArray();
+                }
+
+                $validated_req['attachments'] = $remainingAttachments->toArray();
+            } catch (Exception $e) {
+                return ['status' => false, 'message' => 'Something went wrong! While deleting attachments. '.$e->getMessage()];
+            }
+        }
+        // Just For Future Reference It Were Made Just For Checking and This Code is In WOrking State
+        // elseif (! $request->filled('existing_attachments') && ! $request->hasFile('attachments')) {
+        //     try {
+
+        //         foreach ($lesson->attachments as $attachments) {
+        //             $this->cloudinary->uploadApi()->destroy($attachments['public_id']);
+        //         }
+
+        //         $validated_req['attachments'] = null;
+        //     } catch (Exception $e) {
+        //         return ['status' => false, 'message' => 'Something went wrong! While deleting attachments. '.$e->getMessage()];
+        //     }
+        // }
 
         if ($request->hasFile('attachments')) {
 
             try {
-                $attachments = [];
+                $attachments = ! blank($GlobalremeaningAttachments) ? $GlobalremeaningAttachments : [];
                 $files = $request->file('attachments');
 
                 foreach ($files as $file) {
+                    if ($file->getSize() > 10485760) {
+                        throw ValidationException::withMessages([
+                            'attachments' => 'Attachment size should be less than Or Equal To 10MB',
+                        ]);
+                    }
 
-                    $renamedFile = time().uniqid();
+                    $originalName = Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
+                    $extension = $file->getClientOriginalExtension();
+                    $uniqueSuffix = substr(time().uniqid(), 0, 5);
+
+                    $renamedFile = $originalName.'_'.$uniqueSuffix.'.'.$extension;
 
                     $movedToCloudaniry = $this->cloudinary->uploadApi()->upload($file->getRealPath(), [
                         'folder' => 'ApexUnified_LMS/Lessons/Attachments',
                         'public_id' => $renamedFile,
-                        'resource_type' => 'auto',
+                        'resource_type' => 'raw',
                     ]);
 
                     if (! $movedToCloudaniry || ! $movedToCloudaniry['secure_url'] || ! $movedToCloudaniry['public_id']) {
@@ -306,6 +383,7 @@ class LessonRepository implements LessonRepositoryInterface
                     $attachments[] = [
                         'secure_url' => $movedToCloudaniry['secure_url'],
                         'public_id' => $movedToCloudaniry['public_id'],
+
                     ];
                 }
 

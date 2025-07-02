@@ -49,6 +49,7 @@ class UserRepository implements UserRepositoryInterface
 
     public function storeUser(Request $request)
     {
+
         $validated_req = $request->validate([
             'name' => 'required',
             'email' => 'required|email|unique:users,email',
@@ -110,9 +111,18 @@ class UserRepository implements UserRepositoryInterface
         ]);
 
         $user = $this->user->find($id);
-
         if (empty($user)) {
             return ['status' => false, 'message' => 'No User Found'];
+        }
+
+        if ($request->boolean('is_profile_removed')) {
+            $validated_req['profile'] = null;
+
+            if (! empty($user->profile)) {
+                if (File::exists($this->directory.$user->profile)) {
+                    File::delete($this->directory.$user->profile);
+                }
+            }
         }
 
         if ($request->hasFile('profile')) {

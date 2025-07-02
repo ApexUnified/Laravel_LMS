@@ -72,7 +72,6 @@ class LessonController extends Controller
         }
 
         $updated = $this->lesson->updateLesson($request, $slug);
-
         if ($updated['status']) {
             return to_route('lessons.index')->with('success', $updated['message']);
         } else {

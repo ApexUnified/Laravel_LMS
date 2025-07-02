@@ -24,13 +24,14 @@ class SettingRepository implements SettingRepositoryInterface
 
     public function updateGeneralSetting(Request $request)
     {
+
         $validated_req = $request->validate([
             'app_name' => 'required|min:4|string|max:100',
             'contact_email' => 'required|email',
             'contact_number' => 'required|numeric',
-            'app_main_logo_dark' => 'nullable|mimes:png|max:2048',
-            'app_main_logo_light' => 'nullable|mimes:png|max:2048',
-            'app_favicon' => 'nullable|mimes:jpg,jpeg,png|max:2048',
+            ...($request->hasFile('app_main_logo_dark') ? ['app_main_logo_dark' => 'nullable|mimes:png|max:2048'] : []),
+            ...($request->hasFile('app_main_logo_light') ? ['app_main_logo_light' => 'nullable|mimes:png|max:2048'] : []),
+            ...($request->hasFile('app_favicon') ? ['app_favicon' => 'nullable|mimes:jpg,jpeg,png|max:2048'] : []),
         ]);
 
         $generalSetting = $this->generalSetting->first();
@@ -39,6 +40,34 @@ class SettingRepository implements SettingRepositoryInterface
 
         if (! file_exists($directory)) {
             File::makeDirectory($directory, 0755, true, true);
+        }
+
+        if ($request->boolean('is_removed_app_main_logo_dark') && ! $request->hasFile('app_main_logo_dark')) {
+            if (! empty($generalSetting->app_main_logo_dark)) {
+                if (file_exists($directory.$generalSetting->app_main_logo_dark)) {
+                    File::delete($directory.$generalSetting->app_main_logo_dark);
+                    $validated_req['app_main_logo_dark'] = null;
+                }
+            }
+        }
+
+        if ($request->boolean('is_removed_app_main_logo_light') && ! $request->hasFile('app_main_logo_light')) {
+
+            if (! empty($generalSetting->app_main_logo_light)) {
+                if (file_exists($directory.$generalSetting->app_main_logo_light)) {
+                    File::delete($directory.$generalSetting->app_main_logo_light);
+                    $validated_req['app_main_logo_light'] = null;
+                }
+            }
+        }
+
+        if ($request->boolean('is_removed_app_favicon') && ! $request->hasFile('app_favicon')) {
+            if (! empty($generalSetting->app_favicon)) {
+                if (file_exists($directory.$generalSetting->app_favicon)) {
+                    File::delete($directory.$generalSetting->app_favicon);
+                    $validated_req['app_favicon'] = null;
+                }
+            }
         }
 
         if ($request->hasFile('app_favicon')) {
@@ -54,10 +83,7 @@ class SettingRepository implements SettingRepositoryInterface
             $validated_req['app_favicon'] = $new_favicon_name;
             $favicon->move($directory, $new_favicon_name);
 
-        } else {
-            $validated_req['app_favicon'] = $generalSetting?->app_favicon ?? null;
         }
-
         if ($request->hasFile('app_main_logo_dark')) {
 
             if (! empty($generalSetting->app_main_logo_dark)) {
@@ -71,8 +97,6 @@ class SettingRepository implements SettingRepositoryInterface
             $validated_req['app_main_logo_dark'] = $new_app_main_logo_dark_name;
             $app_main_logo_dark->move($directory, $new_app_main_logo_dark_name);
 
-        } else {
-            $validated_req['app_main_logo_dark'] = $generalSetting?->app_main_logo_dark ?? null;
         }
 
         if ($request->hasFile('app_main_logo_light')) {
@@ -88,11 +112,7 @@ class SettingRepository implements SettingRepositoryInterface
             $validated_req['app_main_logo_light'] = $new_app_main_logo_light_name;
             $app_main_logo_light->move($directory, $new_app_main_logo_light_name);
 
-        } else {
-            $validated_req['app_main_logo_light'] = $generalSetting?->app_main_logo_light ?? null;
-
         }
-
         if (! empty($generalSetting)) {
             $generalSetting->update($validated_req);
 

@@ -152,13 +152,22 @@ export default function create({ courses }) {
                                     {/* FileUploader */}
 
                                     <div className="px-4 mt-4 sm:px-6 ">
+                                        <span className="text-center text-gray-800 dark:text-gray-200">
+                                            Note: Thumbnail Image Resolution Must Be Between 1280x720 to 1280x1080
+                                        </span>
                                         <FileUploaderInput
                                             Label={'Drag & Drop your Lesson Thumbnail Or <span class="filepond--label-action">Browse</span>'}
                                             Error={errors.thumbnail}
                                             Id={"thumbnail"}
                                             InputName={"Lesson Thumbnail"}
                                             onUpdate={(file) => {
-                                                setData("thumbnail", file);
+                                                if (file.length > 0) {
+                                                    if (file[0].isNew) {
+                                                        setData("thumbnail", file[0].file);
+                                                    }
+                                                } else {
+                                                    setData("thumbnail", null);
+                                                }
                                             }}
                                             Required={true}
                                             Multiple={false}
@@ -174,7 +183,13 @@ export default function create({ courses }) {
                                             acceptedFileTypes={["video/*"]}
                                             InputName={"Lesson Video"}
                                             onUpdate={(file) => {
-                                                setData("video", file);
+                                                if (file.length > 0) {
+                                                    if (file[0].isNew) {
+                                                        setData("video", file[0].file);
+                                                    }
+                                                } else {
+                                                    setData("video", null);
+                                                }
                                             }}
                                             Multiple={false}
                                             Required={true}
@@ -188,10 +203,23 @@ export default function create({ courses }) {
                                             Label={'Drag & Drop your Lesson Attachments Or <span class="filepond--label-action">Browse</span>'}
                                             Error={errors.attachments}
                                             Id={"attachments"}
-                                            acceptedFileTypes={['image/*', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']}
+                                            acceptedFileTypes={[
+                                                'image/*',
+                                                'application/pdf',
+                                                'application/msword',
+                                                'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // docx
+                                                'application/vnd.ms-excel', // .xls
+                                                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+                                                'application/vnd.ms-powerpoint', // .ppt
+                                                'application/vnd.openxmlformats-officedocument.presentationml.presentation' // .pptx
+                                            ]}
                                             InputName={"Lesson Attachments"}
                                             onUpdate={(files) => {
-                                                setData("attachments", files);
+                                                const attachments = [];
+                                                files.forEach((file) => {
+                                                    attachments.push(file.file);
+                                                })
+                                                setData("attachments", attachments);
                                             }}
                                             Multiple={true}
                                             MaxFileSize={"5000MB"}

@@ -17,8 +17,11 @@ export default function index({ generalSetting }) {
         contact_email: generalSetting?.contact_email || "",
         contact_number: generalSetting?.contact_number || "",
         app_main_logo_dark: null,
+        is_removed_app_main_logo_dark: false,
         app_main_logo_light: null,
+        is_removed_app_main_logo_light: false,
         app_favicon: null,
+        is_removed_app_favicon: false,
     });
 
 
@@ -127,11 +130,21 @@ export default function index({ generalSetting }) {
                                             Id={"app_main_logo_dark"}
                                             InputName={"App Main Logo For Dark Mode"}
                                             onUpdate={(file) => {
-                                                setData("app_main_logo_dark", file);
+                                                if (file.length > 0) {
+                                                    if (file[0].isNew) {
+                                                        setData("app_main_logo_dark", file[0].file);
+                                                        setData("is_removed_app_main_logo_dark", false);
+                                                    }
+                                                } else {
+                                                    generalSetting?.app_main_logo_dark &&
+                                                        setData("is_removed_app_main_logo_dark", true);
+                                                    setData("app_main_logo_dark", null);
+                                                }
 
                                             }}
                                             Multiple={false}
-                                            DefaultFile={generalSetting?.app_main_logo_dark_url && [generalSetting?.app_main_logo_dark_url]}
+                                            DefaultFile={generalSetting?.app_main_logo_dark_url
+                                                && [generalSetting?.app_main_logo_dark_url]}
                                         />
 
 
@@ -142,12 +155,23 @@ export default function index({ generalSetting }) {
                                             Id={"app_main_logo_light"}
                                             InputName={"App Main Logo For Light Mode"}
                                             onUpdate={(file) => {
-                                                setData("app_main_logo_light", file);
+                                                if (file.length > 0) {
+                                                    if (file[0].isNew) {
+                                                        setData("app_main_logo_light", file[0].file);
+                                                        setData("is_removed_app_main_logo_light", false);
+                                                    }
+                                                } else {
+                                                    generalSetting?.app_main_logo_light &&
+                                                        setData("is_removed_app_main_logo_light", true);
+                                                    setData("app_main_logo_light", null);
+
+                                                }
 
 
                                             }}
                                             Multiple={false}
-                                            DefaultFile={generalSetting?.app_main_logo_light_url && [generalSetting?.app_main_logo_light_url]}
+                                            DefaultFile={generalSetting?.app_main_logo_light_url &&
+                                                [generalSetting?.app_main_logo_light_url]}
                                         />
 
 
@@ -167,7 +191,16 @@ export default function index({ generalSetting }) {
                                             Id={"app_favicon"}
                                             InputName={"App Favicon"}
                                             onUpdate={(file) => {
-                                                setData("app_favicon", file);
+                                                if (file.length > 0) {
+                                                    if (file[0].isNew) {
+                                                        setData("app_favicon", file[0].file);
+                                                        setData("is_removed_app_favicon", false);
+                                                    }
+                                                } else {
+                                                    generalSetting?.app_favicon &&
+                                                        setData("is_removed_app_favicon", true);
+                                                    setData("app_favicon", null);
+                                                }
 
                                             }}
                                             Multiple={false}
@@ -198,6 +231,9 @@ export default function index({ generalSetting }) {
                                                 && data.app_favicon === null
                                                 && data.app_main_logo_dark === null
                                                 && data.app_main_logo_light === null
+                                                && !data.is_removed_app_favicon
+                                                && !data.is_removed_app_main_logo_dark
+                                                && !data.is_removed_app_main_logo_light
 
                                             )
                                         }

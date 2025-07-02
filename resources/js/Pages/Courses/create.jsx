@@ -305,13 +305,22 @@ export default function create({ categories, instructors }) {
                                     {/* FileUploader */}
 
                                     <div className="px-4 mt-4 sm:px-6 ">
+                                        <span className="text-center text-gray-800 dark:text-gray-200">
+                                            Note: Thumbnail Image Resolution Must Be Between 1280x720 to 1280x1080
+                                        </span>
                                         <FileUploaderInput
                                             Label={'Drag & Drop your Course Thumbnail Or <span class="filepond--label-action">Browse</span>'}
                                             Error={errors.thumbnail}
                                             Id={"thumbnail"}
                                             InputName={"Course Thumbnail"}
                                             onUpdate={(file) => {
-                                                setData("thumbnail", file);
+                                                if (file.length > 0) {
+                                                    if (file[0].isNew) {
+                                                        setData("thumbnail", file[0].file);
+                                                    }
+                                                } else {
+                                                    setData('thumbnail', null);
+                                                }
                                             }}
                                             Required={true}
                                             Multiple={false}
@@ -327,7 +336,13 @@ export default function create({ categories, instructors }) {
                                             acceptedFileTypes={"video/*"}
                                             InputName={"Course Promo Video"}
                                             onUpdate={(file) => {
-                                                setData("promo_video", file);
+                                                if (file.length > 0) {
+                                                    if (file[0].isNew) {
+                                                        setData("promo_video", file[0].file);
+                                                    }
+                                                } else {
+                                                    setData('promo_video', null);
+                                                }
                                             }}
                                             MaxFileSize={"10000MB"}
                                             Multiple={false}

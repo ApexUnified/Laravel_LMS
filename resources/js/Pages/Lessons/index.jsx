@@ -4,7 +4,7 @@ import LinkButton from '@/Components/LinkButton';
 import SelectInput from '@/Components/SelectInput';
 import Table from '@/Components/Table';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, router, useForm, usePage } from '@inertiajs/react';
 import React, { useEffect, useState } from 'react'
 
 export default function index({ lessons, categories, instructors, courses }) {
@@ -22,6 +22,7 @@ export default function index({ lessons, categories, instructors, courses }) {
     });
 
     const [columns, setColumns] = useState([]);
+    const [customActions, setCustomActions] = useState([]);
 
 
     // Custom Search States
@@ -154,6 +155,14 @@ export default function index({ lessons, categories, instructors, courses }) {
             { key: 'added_at', label: 'Created At' },
         ];
 
+        const customActions = [
+            {
+                label: "View Lesson",
+                onClick: (item) => router.visit(route("lessons.player", { course_slug: item.course.slug, lesson_slug: item.slug })),
+
+            }
+        ];
+        setCustomActions(customActions);
         setColumns(columns);
 
     }, []);
@@ -206,6 +215,7 @@ export default function index({ lessons, categories, instructors, courses }) {
                                 ParentSearched={ParentSearched}
                                 RouteParameterKey={"slug"}
                                 searchProps={{ instructor_id: instructor_id, category_id: category_id, course_id: course_id }}
+                                customActions={customActions}
                                 customSearch={
                                     <>
                                         <div className="relative mb-2">

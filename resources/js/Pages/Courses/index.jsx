@@ -169,7 +169,7 @@ export default function index({ courses, users, categories, instructors }) {
                 onClick: (item) => router.visit(route("courses.player", item.slug)),
 
             }
-        ]
+        ];
 
         setCustomActions(customActions);
         setColumns(columns);

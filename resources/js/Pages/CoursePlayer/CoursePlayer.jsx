@@ -1,8 +1,10 @@
 import Card from '@/Components/Card'
+import VideoPlayer from '@/Components/VideoPlayer'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import CoursePlayerSidebar from '@/partials/CoursePlayerSidebar'
 import { Head, Link } from '@inertiajs/react'
-import React from 'react'
+
+import React, { useEffect } from 'react'
 
 
 export default function CoursePlayer({ course }) {
@@ -42,14 +44,7 @@ export default function CoursePlayer({ course }) {
                                         Content={
                                             <>
                                                 {course.promo_video && (
-                                                    <video
-                                                        controls
-                                                        src={course.promo_video}
-                                                        className="object-contain w-full h-[600px]"
-                                                        poster={course.thumbnail}
-                                                    >
-                                                        Your browser does not support the video tag.
-                                                    </video>
+                                                    <VideoPlayer video={course.promo_video} thumbnail={course.thumbnail} />
 
                                                 )}
                                                 {!course.promo_video && (
