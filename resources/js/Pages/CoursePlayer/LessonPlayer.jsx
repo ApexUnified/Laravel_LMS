@@ -1,19 +1,22 @@
 import Card from '@/Components/Card'
+import PrimaryButton from '@/Components/PrimaryButton'
 import VideoPlayer from '@/Components/VideoPlayer'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import CoursePlayerSidebar from '@/partials/CoursePlayerSidebar'
-import { Head, Link } from '@inertiajs/react'
+import { Head, Link, usePage } from '@inertiajs/react'
 import Plyr from 'plyr'
 import 'plyr/dist/plyr.css';
-import React, { useEffect } from 'react'
-export default function LessonPlayer({ course, lesson }) {
+import React, { useEffect, useState } from 'react'
+export default function LessonPlayer({ course, lesson, course_progress }) {
+
+
+    const user = usePage().props.auth.user;
+    const [markAsComplete, setMarkAsComplete] = useState(false);
 
 
     const getFileType = (file) => {
         const name = file.secure_url;
         const ext = name.split('.').pop().toLowerCase();
-
-        console.log(ext);
         if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) return 'image';
         if (ext === 'pdf') return 'pdf';
         if (['doc', 'docx'].includes(ext)) return 'word';
@@ -42,7 +45,7 @@ export default function LessonPlayer({ course, lesson }) {
         <>
             <AuthenticatedLayout ManuallytoggleSidebar={true}>
                 <Head>
-                    <title>{course.title}</title>
+                    <title>{lesson.title}</title>
                     <meta name="title" content={course.meta_title} />
                     <meta name="description" content={course.meta_description} />
                 </Head>
@@ -56,6 +59,7 @@ export default function LessonPlayer({ course, lesson }) {
                         allLessons={course.lessons}
                         lesson={lesson}
                         course={course}
+                        course_progress={course_progress}
                     />
 
 
@@ -69,12 +73,48 @@ export default function LessonPlayer({ course, lesson }) {
                                         {lesson.title}
                                     </h1>
 
+
+                                    <div className="text-gray-800 dark:text-white text-base sm:text-lg flex flex-wrap justify-center gap-4 items-center py-4">
+                                        {/* Instructor */}
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-medium">Instructor:</span>
+                                            <span className="bg-green-100 text-green-800 px-3 py-1 rounded-2xl text-sm font-semibold">
+                                                {course.instructor.name}
+                                            </span>
+                                        </div>
+
+                                        {/* Language */}
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-medium">Language:</span>
+                                            <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-xl text-sm">
+                                                {course.course_language}
+                                            </span>
+                                        </div>
+
+                                        {/* Level */}
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-medium">Level:</span>
+                                            <span className="bg-purple-100 text-purple-800 px-2 py-0.5 rounded-xl text-sm">
+                                                {course.level}
+                                            </span>
+                                        </div>
+
+                                        {/* Course Part */}
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-medium">Part Of Course</span>
+                                            <Link href={route("courses.player", course.slug)} className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-xl text-sm font-medium underline">
+                                                {lesson.course.title.length > 20 ? lesson.course.title.slice(0, 20) + '...' : lesson.course.title}
+                                            </Link>
+                                        </div>
+                                    </div>
+
                                     {/* Video Player */}
                                     <Card
                                         Content={
                                             <>
                                                 {lesson.video && (
-                                                    <VideoPlayer video={lesson.video} thumbnail={lesson.thumbnail} />
+                                                    <VideoPlayer videoUrl={lesson.video} thumbnail={lesson.thumbnail}
+                                                        startTime={lesson?.lesson_progress?.lesson_watched_time} lesson={lesson} course={course} user={user} LessonMarkAsComplete={markAsComplete} />
 
                                                 )}
                                                 {!lesson.video && (
@@ -84,19 +124,34 @@ export default function LessonPlayer({ course, lesson }) {
                                                         className="object-cover w-full h-full"
                                                     />
                                                 )}
+
+                                                <div className="flex justify-center items-center mt-20">
+                                                    <PrimaryButton
+                                                        Icon={
+                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                                            </svg>
+
+                                                        }
+                                                        CustomClass={"lg:w-[200px] md:w-[160px] mt-4 sm:w-[100px] w-[150px] "}
+                                                        Text={lesson?.lesson_progress?.completed == 1 ? "Completed" : "Mark As Completed"}
+                                                        Type={"button"}
+                                                        Disabled={lesson?.lesson_progress?.completed == 1 ? true : markAsComplete}
+                                                        Spinner={markAsComplete && lesson?.lesson_progress?.completed != 1}
+                                                        Action={() => setMarkAsComplete(true)}
+                                                    />
+                                                </div>
                                             </>
                                         }
                                     />
 
-                                    <div className='flex flex-wrap justify-center'>
-                                        <h2 className='text-4xl font-semibold text-gray-700 dark:text-white'>About This Lesson</h2>
-                                    </div>
+
 
                                     {lesson.description && (
                                         <Card
                                             Content={
                                                 <>
-                                                    <h2 className="text-xl font-semibold text-gray-700 dark:text-white">Lesson Description</h2>
+                                                    <h2 className="text-2xl my-2 font-semibold text-gray-700 dark:text-white">Lesson Description:</h2>
                                                     <div
                                                         className="text-gray-600 dark:text-gray-300 [&>ul]:list-disc [&>ul]:ml-6 [&>ol]:list-decimal [&>ol]:ml-6"
                                                         dangerouslySetInnerHTML={{ __html: lesson.description }}
@@ -165,57 +220,6 @@ export default function LessonPlayer({ course, lesson }) {
                                         );
                                     })}
 
-
-
-
-                                    <div className='flex flex-wrap justify-center'>
-                                        <h2 className='text-4xl font-semibold text-gray-700 dark:text-white'>About This Course</h2>
-                                    </div>
-
-                                    {/* Description */}
-                                    {course.description && (
-                                        <Card
-                                            Content={
-                                                <>
-                                                    <h2 className="text-xl font-semibold text-gray-700 dark:text-white">Course Description</h2>
-                                                    <div
-                                                        className="text-gray-600 dark:text-gray-300 [&>ul]:list-disc [&>ul]:ml-6 [&>ol]:list-decimal [&>ol]:ml-6"
-                                                        dangerouslySetInnerHTML={{ __html: course.description }}
-                                                    />
-                                                </>
-                                            }
-                                        />
-                                    )}
-
-                                    {/* What You'll Learn */}
-                                    {course.learning_outcomes && (
-                                        <Card
-                                            Content={
-                                                <>
-                                                    <h2 className="text-xl font-semibold text-indigo-600 dark:text-indigo-400">What You'll Learn</h2>
-                                                    <div
-                                                        className="text-gray-600 dark:text-gray-300 [&>ul]:list-disc [&>ul]:ml-6 [&>ol]:list-decimal [&>ol]:ml-6"
-                                                        dangerouslySetInnerHTML={{ __html: course.learning_outcomes }}
-                                                    />
-                                                </>
-                                            }
-                                        />
-                                    )}
-
-                                    {/* Requirements */}
-                                    {course.requirements && (
-                                        <Card
-                                            Content={
-                                                <>
-                                                    <h2 className="text-xl font-semibold text-rose-600 dark:text-rose-400">Requirements</h2>
-                                                    <div
-                                                        className="text-gray-600 dark:text-gray-300 [&>ul]:list-disc [&>ul]:ml-6 [&>ol]:list-decimal [&>ol]:ml-6"
-                                                        dangerouslySetInnerHTML={{ __html: course.requirements }}
-                                                    />
-                                                </>
-                                            }
-                                        />
-                                    )}
                                 </div>
                             </>
                         }

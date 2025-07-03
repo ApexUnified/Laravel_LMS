@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\Auth;
 
 class Lesson extends Model
 {
@@ -25,10 +27,17 @@ class Lesson extends Model
         'is_approved',
     ];
 
+    protected $appends = ['lesson_progress'];
+
     // Relations
     public function course(): BelongsTo
     {
         return $this->belongsTo(Course::class, 'course_id', 'id');
+    }
+
+    public function lessonProgress(): HasOne
+    {
+        return $this->hasOne(LessonProgress::class)->where('user_id', Auth::user()->id);
     }
 
     // Attributes
@@ -44,6 +53,13 @@ class Lesson extends Model
         $remainingSeconds = $seconds % 60;
 
         return sprintf('%02d:%02d:%02d', $hours, $minutes, $remainingSeconds);
+    }
+
+    public function getlessonProgressAttribute()
+    {
+        return $this->lessonProgress()
+            ->where('user_id', Auth::user()->id)
+            ->first();
     }
 
     public function getDescriptionAttribute()

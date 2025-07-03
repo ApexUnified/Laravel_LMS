@@ -360,12 +360,24 @@ export default function Table({
                                                             {/* Custom Actions */}
                                                             {customActions.map((action, idx) => (
                                                                 <li key={idx}>
-                                                                    <button
-                                                                        onClick={() => action.onClick(item)}
-                                                                        className="block w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                                                                    >
-                                                                        {action.label}
-                                                                    </button>
+                                                                    {action.type === 'button' && (
+                                                                        <button
+                                                                            onClick={() => action.onClick(item)}
+                                                                            className="block w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                                                                        >
+                                                                            {action.label}
+                                                                        </button>
+                                                                    )}
+
+
+                                                                    {action.type === 'link' && (
+                                                                        <Link
+                                                                            href={action.href(item)}
+                                                                            className="block w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                                                                        >
+                                                                            {action.label}
+                                                                        </Link>
+                                                                    )}
                                                                 </li>
                                                             ))}
                                                         </ul>

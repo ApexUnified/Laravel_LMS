@@ -45,6 +45,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Course Player
     Route::get('/course-player/{course_slug}', [CoursePlayerController::class, 'coursePlayer'])->name('courses.player');
     Route::get('/course-player/{course_slug}/{lesson_slug}', [CoursePlayerController::class, 'lessonPlayer'])->name('lessons.player');
+    Route::post('/course-player-update-lesson-progress', [CoursePlayerController::class, 'UpdateLessonProgress'])->name('lessons.update.progress');
 
     // Profile Routes
     Route::controller(ProfileController::class)->group(function () {

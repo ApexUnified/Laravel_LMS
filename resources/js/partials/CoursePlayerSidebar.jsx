@@ -2,13 +2,14 @@ import Card from '@/Components/Card'
 import { Link } from '@inertiajs/react'
 import React from 'react'
 
-export default function CoursePlayerSidebar({ allLessons, lesson = null, course }) {
+export default function CoursePlayerSidebar({ allLessons, lesson = null, course, course_progress }) {
+
     return (
         <Card
             Content={
                 <>
                     <div
-                        className="flex items-center justify-center gap-3 p-3 transition-all duration-300 bg-gray-100 rounded-lg shadow-sm dark:bg-gray-900"
+                        className="flex items-center justify-center gap-3 p-3 transition-all duration-300 bg-gray-100 rounded-lg shadow-sm dark:bg-white/[0.03]"
                     >
 
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-10 dark:text-white ">
@@ -30,6 +31,23 @@ export default function CoursePlayerSidebar({ allLessons, lesson = null, course 
                         </div>
                     )}
 
+                    {allLessons.length > 0 && (
+                        <div className="text-gray-800 dark:text-white space-y-2">
+                            <h4 className="text-lg font-semibold">Course Progress</h4>
+
+                            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 overflow-hidden">
+                                <div
+                                    className={`${course_progress === 100 ? "bg-green-600 dark:bg-green-400" : "bg-blue-600 dark:bg-blue-400"} h-full transition-all duration-500 ease-in-out `}
+                                    style={{ width: `${course_progress}%` }}
+                                ></div>
+                            </div>
+
+                            <div className="text-sm text-right text-gray-600 dark:text-gray-300">
+                                {course_progress}% Complete
+                            </div>
+                        </div>
+                    )}
+
                     {allLessons.map((c_lesson, index) => (
                         <Link
                             href={route("lessons.player", { course_slug: course.slug, lesson_slug: c_lesson.slug })}
@@ -37,13 +55,26 @@ export default function CoursePlayerSidebar({ allLessons, lesson = null, course 
                             className={`flex items-start gap-3 p-3 my-5 transition-all duration-300  rounded-lg shadow-sm cursor-pointer group
                                     ${lesson && lesson.slug === c_lesson.slug ? "bg-blue-50 text-blue-500 dark:bg-blue-500/[0.12] dark:text-blue-400"
                                     :
-                                    "bg-gray-100 hover:bg-blue-50 dark:bg-gray-800 hover:text-blue-500 hover:dark:bg-blue-500/[0.12] hover:dark:text-blue-400"
+                                    "bg-gray-100 hover:bg-blue-50 dark:bg-gray-800 hover:text-blue-500 hover:dark:bg-blue-500/[0.12] hover:dark:text-blue-400" //opacity-[0.5] pointer-events-none
                                 }
                                              `}
                         >
-                            <div className="flex items-center justify-center flex-shrink-0 w-10 h-10 font-bold text-white bg-blue-600 rounded-full">
-                                {index + 1}
-                            </div>
+
+                            {c_lesson.lesson_progress && (c_lesson.id === c_lesson.lesson_progress.lesson_id) && c_lesson.lesson_progress.completed == 1 ? (
+                                <div className="flex items-center justify-center flex-shrink-0 w-10 h-10 font-bold text-white bg-green-600 dark:bg-green-400 rounded-full">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={4} stroke="currentColor" className={`size-6 dark:text-green-800`}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                    </svg>
+
+                                </div>
+                            ) : (
+                                <div className="flex items-center justify-center flex-shrink-0 w-10 h-10 font-bold text-white bg-blue-600 rounded-full">
+                                    {index + 1}
+                                </div>
+                            )
+                            }
+
+
 
                             <div className="flex-1">
                                 <h4 className="text-sm font-semibold text-gray-800 dark:text-white group-hover:text-blue-600 dark:group-hover:text-white line-clamp-2">

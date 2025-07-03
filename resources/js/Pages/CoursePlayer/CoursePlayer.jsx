@@ -7,7 +7,7 @@ import { Head, Link } from '@inertiajs/react'
 import React, { useEffect } from 'react'
 
 
-export default function CoursePlayer({ course }) {
+export default function CoursePlayer({ course, course_progress }) {
 
     return (
         <>
@@ -26,6 +26,8 @@ export default function CoursePlayer({ course }) {
                     <CoursePlayerSidebar
                         allLessons={course.lessons}
                         course={course}
+                        lessonProgress={course.lessons.lesson_progress}
+                        course_progress={course_progress}
                     />
 
 
@@ -39,12 +41,39 @@ export default function CoursePlayer({ course }) {
                                         {course.title}
                                     </h1>
 
+                                    <div className="text-gray-800 dark:text-white text-lg  flex justify-center gap-4 items-center">
+                                        {/* Instructor */}
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-medium">Instructor:</span>
+                                            <span className="bg-green-100 text-green-800 px-3 py-1 rounded-2xl text-sm font-semibold">
+                                                {course.instructor.name}
+                                            </span>
+                                        </div>
+
+                                        {/* Language */}
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-medium">Language:</span>
+                                            <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-xl text-sm">
+                                                {course.course_language}
+                                            </span>
+                                        </div>
+
+                                        {/* Level */}
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-medium">Level:</span>
+                                            <span className="bg-purple-100 text-purple-800 px-2 py-0.5 rounded-xl text-sm">
+                                                {course.level}
+                                            </span>
+                                        </div>
+                                    </div>
+
+
                                     {/* Video Player */}
                                     <Card
                                         Content={
                                             <>
                                                 {course.promo_video && (
-                                                    <VideoPlayer video={course.promo_video} thumbnail={course.thumbnail} />
+                                                    <VideoPlayer videoUrl={course.promo_video} thumbnail={course.thumbnail} />
 
                                                 )}
                                                 {!course.promo_video && (
@@ -58,12 +87,14 @@ export default function CoursePlayer({ course }) {
                                         }
                                     />
 
+
+
                                     {/* Description */}
                                     {course.description && (
                                         <Card
                                             Content={
                                                 <>
-                                                    <h2 className="text-xl font-semibold text-gray-700 dark:text-white">Course Description</h2>
+                                                    <h2 className="text-2xl my-2 font-semibold text-gray-700 dark:text-white">Course Description:</h2>
                                                     <div
                                                         className="text-gray-600 dark:text-gray-300 [&>ul]:list-disc [&>ul]:ml-6 [&>ol]:list-decimal [&>ol]:ml-6"
                                                         dangerouslySetInnerHTML={{ __html: course.description }}
@@ -78,7 +109,7 @@ export default function CoursePlayer({ course }) {
                                         <Card
                                             Content={
                                                 <>
-                                                    <h2 className="text-xl font-semibold text-indigo-600 dark:text-indigo-400">What You'll Learn</h2>
+                                                    <h2 className="text-2xl my-2 font-semibold text-indigo-600 dark:text-indigo-400">What You'll Learn</h2>
                                                     <div
                                                         className="text-gray-600 dark:text-gray-300 [&>ul]:list-disc [&>ul]:ml-6 [&>ol]:list-decimal [&>ol]:ml-6"
                                                         dangerouslySetInnerHTML={{ __html: course.learning_outcomes }}
@@ -93,7 +124,7 @@ export default function CoursePlayer({ course }) {
                                         <Card
                                             Content={
                                                 <>
-                                                    <h2 className="text-xl font-semibold text-rose-600 dark:text-rose-400">Requirements</h2>
+                                                    <h2 className="text-2xl my-2  font-semibold text-rose-600 dark:text-rose-400">Requirements</h2>
                                                     <div
                                                         className="text-gray-600 dark:text-gray-300 [&>ul]:list-disc [&>ul]:ml-6 [&>ol]:list-decimal [&>ol]:ml-6"
                                                         dangerouslySetInnerHTML={{ __html: course.requirements }}

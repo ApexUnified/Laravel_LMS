@@ -166,7 +166,8 @@ export default function index({ courses, users, categories, instructors }) {
         const customActions = [
             {
                 label: "View Course",
-                onClick: (item) => router.visit(route("courses.player", item.slug)),
+                type: 'link',
+                href: (item) => route("courses.player", { course_slug: item.slug }),
 
             }
         ];

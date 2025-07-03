@@ -4,13 +4,17 @@ namespace App\Repositories\CoursePlayer\Repository;
 
 use App\Models\Course;
 use App\Models\Lesson;
+use App\Models\LessonProgress;
+use App\Repositories\CoursePlayer\Interface\CoursePlayerRepositoryInterface;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class CoursePlayerRepository
+class CoursePlayerRepository implements CoursePlayerRepositoryInterface
 {
     public function __construct(
         private Course $course,
-        private Lesson $lesson
+        private Lesson $lesson,
+        private LessonProgress $lessonProgress
     ) {}
 
     public function getCourse($course_slug)
@@ -21,7 +25,7 @@ class CoursePlayerRepository
                 $query->where('is_published', true)
                     ->where('is_approved', true);
             })
-            ->with(['lessons'])
+            ->with(['lessons', 'instructor'])
             ->first();
 
         if (empty($course)) {
@@ -50,5 +54,69 @@ class CoursePlayerRepository
         }
 
         return $lesson;
+    }
+
+    public function UpdateLessonProgress(Request $request)
+    {
+        $validated_req = $request->validate([
+            'course_id' => 'required',
+            'lesson_id' => 'required',
+            'user_id' => 'required',
+            'lesson_watched_time' => 'required',
+        ]);
+
+        $alreadyExistsLessonProgress = $this->lessonProgress
+            ->where('course_id', $validated_req['course_id'])
+            ->where('lesson_id', $validated_req['lesson_id'])
+            ->where('user_id', $validated_req['user_id'])
+            ->first();
+
+        if (empty($alreadyExistsLessonProgress)) {
+
+            if ($request->boolean('completed')) {
+                $validated_req['completed_at'] = now();
+                $validated_req['completed'] = true;
+            }
+
+            if ($this->lessonProgress->create($validated_req)) {
+                return ['status' => true, 'message' => 'Lesson Progress Updated Successfully'];
+            } else {
+                return ['status' => false, 'message' => 'Something went wrong'];
+            }
+        } else {
+
+            if (! $alreadyExistsLessonProgress->completed && empty($alreadyExistsLessonProgress->completed_at)) {
+                if ($request->boolean('completed') && empty($alreadyExistsLessonProgress->completed_at) && ! $alreadyExistsLessonProgress->completed) {
+                    $validated_req['completed_at'] = now();
+                    $validated_req['completed'] = true;
+                }
+
+                if ($alreadyExistsLessonProgress->update($validated_req)) {
+                    return ['status' => true, 'message' => 'Lesson Progress Updated Successfully'];
+                } else {
+                    return ['status' => false, 'message' => 'Something went wrong'];
+                }
+            }
+        }
+
+        return ['status' => true, 'message' => 'Lesson Progress Updated Successfully'];
+
+    }
+
+    public function getCourseProgress(string $course_id)
+    {
+        $course = $this->course->find($course_id);
+
+        if (empty($course)) {
+            return ['status' => false, 'message' => 'Course not found'];
+        }
+
+        $lessons = $course->lessons()->get();
+        $lessons_progress = $lessons->pluck('lesson_progress')->where('completed', 1)->all();
+
+        $total_course_progress = ! blank($lessons_progress) ? (count($lessons_progress) / count($lessons) * 100) : 0;
+
+        return round($total_course_progress);
+
     }
 }
