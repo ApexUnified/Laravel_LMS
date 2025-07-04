@@ -3,7 +3,9 @@
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\CoursePlayerController;
+use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\LessonController;
+use App\Http\Controllers\MyCoursesController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\UserController;
@@ -46,6 +48,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/course-player/{course_slug}', [CoursePlayerController::class, 'coursePlayer'])->name('courses.player');
     Route::get('/course-player/{course_slug}/{lesson_slug}', [CoursePlayerController::class, 'lessonPlayer'])->name('lessons.player');
     Route::post('/course-player-update-lesson-progress', [CoursePlayerController::class, 'UpdateLessonProgress'])->name('lessons.update.progress');
+
+    // Enrollment Routes
+    Route::resource('/enrollments', EnrollmentController::class)->except(['show', 'edit', 'update']);
+    Route::get('/enrollments-get-courses-related-to-user/{user_id}', [EnrollmentController::class, 'GetCoursesRelatedToUser'])->name('enrollments.getcourse.relatedtouser');
+    Route::delete('/enrollments-destroybyselection', [EnrollmentController::class, 'destroyBySelection'])->name('enrollments.destroybyselection');
+
+    // My Courses Routes
+    Route::get('/my-courses', MyCoursesController::class)->name('my.courses');
 
     // Profile Routes
     Route::controller(ProfileController::class)->group(function () {

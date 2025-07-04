@@ -7,7 +7,7 @@ import { Head, Link, usePage } from '@inertiajs/react'
 import Plyr from 'plyr'
 import 'plyr/dist/plyr.css';
 import React, { useEffect, useState } from 'react'
-export default function LessonPlayer({ course, lesson, course_progress }) {
+export default function LessonPlayer({ course, lesson, course_progress, is_user_enrolled }) {
 
 
     const user = usePage().props.auth.user;
@@ -60,6 +60,7 @@ export default function LessonPlayer({ course, lesson, course_progress }) {
                         lesson={lesson}
                         course={course}
                         course_progress={course_progress}
+                        is_user_enrolled={is_user_enrolled}
                     />
 
 
@@ -74,11 +75,11 @@ export default function LessonPlayer({ course, lesson, course_progress }) {
                                     </h1>
 
 
-                                    <div className="text-gray-800 dark:text-white text-base sm:text-lg flex flex-wrap justify-center gap-4 items-center py-4">
+                                    <div className="flex flex-wrap items-center justify-center gap-4 py-4 text-base text-gray-800 dark:text-white sm:text-lg">
                                         {/* Instructor */}
                                         <div className="flex items-center gap-2">
                                             <span className="font-medium">Instructor:</span>
-                                            <span className="bg-green-100 text-green-800 px-3 py-1 rounded-2xl text-sm font-semibold">
+                                            <span className="px-3 py-1 text-sm font-semibold text-green-800 bg-green-100 rounded-2xl">
                                                 {course.instructor.name}
                                             </span>
                                         </div>
@@ -102,7 +103,7 @@ export default function LessonPlayer({ course, lesson, course_progress }) {
                                         {/* Course Part */}
                                         <div className="flex items-center gap-2">
                                             <span className="font-medium">Part Of Course</span>
-                                            <Link href={route("courses.player", course.slug)} className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-xl text-sm font-medium underline">
+                                            <Link href={route("courses.player", course.slug)} className="px-3 py-1 text-sm font-medium text-yellow-800 underline bg-yellow-100 rounded-xl">
                                                 {lesson.course.title.length > 20 ? lesson.course.title.slice(0, 20) + '...' : lesson.course.title}
                                             </Link>
                                         </div>
@@ -125,7 +126,7 @@ export default function LessonPlayer({ course, lesson, course_progress }) {
                                                     />
                                                 )}
 
-                                                <div className="flex justify-center items-center mt-20">
+                                                <div className="flex items-center justify-center mt-20">
                                                     <PrimaryButton
                                                         Icon={
                                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
@@ -151,7 +152,7 @@ export default function LessonPlayer({ course, lesson, course_progress }) {
                                         <Card
                                             Content={
                                                 <>
-                                                    <h2 className="text-2xl my-2 font-semibold text-gray-700 dark:text-white">Lesson Description:</h2>
+                                                    <h2 className="my-2 text-2xl font-semibold text-gray-700 dark:text-white">Lesson Description:</h2>
                                                     <div
                                                         className="text-gray-600 dark:text-gray-300 [&>ul]:list-disc [&>ul]:ml-6 [&>ol]:list-decimal [&>ol]:ml-6"
                                                         dangerouslySetInnerHTML={{ __html: lesson.description }}

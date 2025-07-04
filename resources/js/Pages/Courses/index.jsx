@@ -24,7 +24,6 @@ export default function index({ courses, users, categories, instructors }) {
     });
 
 
-    const [flash, setFlash] = useState(null);
     const [columns, setColumns] = useState([]);
     const [customActions, setCustomActions] = useState([]);
 

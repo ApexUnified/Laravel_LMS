@@ -19,20 +19,34 @@ class CoursePlayerRepository implements CoursePlayerRepositoryInterface
 
     public function getCourse($course_slug)
     {
-        $course = $this->course
-            ->where('slug', $course_slug)
-            ->when(Auth::user()->hasRole('Student'), function ($query) {
-                $query->where('is_published', true)
-                    ->where('is_approved', true);
-            })
-            ->with(['lessons', 'instructor'])
-            ->first();
+        $scopeQuery = $this->course
+            ->where('slug', $course_slug);
+
+        if (Auth::user()->hasRole('Student')) {
+            $scopeQuery->where('is_published', true)
+                ->where('is_approved', true)
+                ->with(['lessons' => function ($query) {
+                    $query->where('is_published', true)
+                        ->where('is_approved', true);
+                }, 'instructor']);
+
+        } else {
+            $scopeQuery->with(['lessons', 'instructor']);
+        }
+
+        $course = $scopeQuery->first();
 
         if (empty($course)) {
             return ['status' => false, 'message' => 'Course not found! Or Course Might Be Not Approved Please Check Approval Statuses'];
         }
 
-        return $course;
+        $is_user_enrolled = (bool) Auth::user()->enrollments()->where('course_id', $course->id)->first();
+
+        if (! Auth::user()->hasRole('Student')) {
+            $is_user_enrolled = true;
+        }
+
+        return ['course' => $course, 'is_user_enrolled' => $is_user_enrolled];
     }
 
     public function getLesson($course_slug, $lesson_slug)

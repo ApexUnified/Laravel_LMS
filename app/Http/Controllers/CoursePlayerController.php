@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Repositories\CoursePlayer\Interface\CoursePlayerRepositoryInterface;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class CoursePlayerController extends Controller
@@ -18,15 +19,17 @@ class CoursePlayerController extends Controller
             return to_route('dashboard')->with('error', 'Course not found');
         }
 
-        $course = $this->coursePlayer->getCourse($course_slug);
+        $data = $this->coursePlayer->getCourse($course_slug);
 
-        if (isset($course['status']) && $course['status'] == false) {
-            return to_route('dashboard')->with('error', $course['message']);
+        if (isset($data['status']) && $data['status'] == false) {
+            return to_route('dashboard')->with('error', $data['message']);
         }
 
+        $course = $data['course'];
+        $is_user_enrolled = $data['is_user_enrolled'];
         $course_progress = (int) $this->coursePlayer->getCourseProgress($course['id']);
 
-        return Inertia::render('CoursePlayer/CoursePlayer', compact('course', 'course_progress'));
+        return Inertia::render('CoursePlayer/CoursePlayer', compact('course', 'course_progress', 'is_user_enrolled'));
 
     }
 
@@ -46,15 +49,22 @@ class CoursePlayerController extends Controller
             return to_route('dashboard')->with('error', $lesson['message']);
         }
 
-        $course = $this->coursePlayer->getCourse($course_slug);
+        $data = $this->coursePlayer->getCourse($course_slug);
 
-        if (isset($course['status']) && $course['status'] == false) {
-            return to_route('dashboard')->with('error', $course['message']);
+        $course = $data['course'];
+        $is_user_enrolled = $data['is_user_enrolled'];
+
+        if (Auth::user()->hasRole('Student') && ! $is_user_enrolled) {
+            return to_route('dashboard')->with('error', 'You are not enrolled in this course');
+        }
+
+        if (isset($data['status']) && $data['status'] == false) {
+            return to_route('dashboard')->with('error', $data['message']);
         }
 
         $course_progress = (int) $this->coursePlayer->getCourseProgress($course['id']);
 
-        return Inertia::render('CoursePlayer/LessonPlayer', compact('lesson', 'course', 'course_progress'));
+        return Inertia::render('CoursePlayer/LessonPlayer', compact('lesson', 'course', 'course_progress', 'is_user_enrolled'));
     }
 
     public function UpdateLessonProgress(Request $request)

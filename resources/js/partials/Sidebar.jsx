@@ -118,6 +118,40 @@ export default function Sidebar({
                                 </li>
 
 
+                                <li>
+                                    <Link href={route("my.courses")} className={`menu-item group ${route().current() === "my.courses" ? "menu-item-active" : "menu-item-inactive"}`}>
+
+
+
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 " fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 20H5a2 2 0 01-2-2V7a2 2 0 012-2h7m0 15v-2m0 2h7a2 2 0 002-2v-7m-9 0l4-4m0 0l4 4m-4-4v12" />
+                                        </svg>
+
+
+
+                                        <span className={`menu-item-text ${sidebarToggle ? 'lg:hidden' : ''}`}>
+                                            My Courses
+                                        </span>
+
+                                        <svg
+                                            className={`menu-item-arrow ${sidebarToggle ? 'lg:hidden' : ''}`}
+                                            width="20"
+                                            height="20"
+                                            viewBox="0 0 20 20"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                            <path
+                                                d="M4.79175 7.39584L10.0001 12.6042L15.2084 7.39585"
+                                                stroke=""
+                                                strokeWidth="1.5"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                            />
+                                        </svg>
+                                    </Link>
+                                </li>
+
 
                                 <li>
                                     <a
@@ -433,6 +467,93 @@ export default function Sidebar({
                                     </div>
 
                                 </li>
+
+
+
+
+                                <li>
+                                    <a
+                                        onClick={() => {
+                                            if (selected === "Enrollments") {
+                                                setSelected(null);
+                                            } else {
+                                                setSelected("Enrollments");
+                                            }
+                                        }}
+
+                                        className={`menu-item group cursor-pointer ${(route().current().includes("enrollments.") || selected === "Enrollments") ? "menu-item-active" : "menu-item-inactive"}  `}
+
+                                    >
+
+
+
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                                d="M12 14l9-5-9-5-9 5 9 5z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                                d="M12 14l6.16-3.422A12.083 12.083 0 0121 14.677V19l-9 5-9-5v-4.323a12.083 12.083 0 012.84-4.099L12 14z" />
+                                        </svg>
+
+
+
+
+
+
+                                        <span className={`menu-item-text ${sidebarToggle ? 'lg:hidden' : ''}`}>
+                                            Enrollments
+                                        </span>
+
+
+
+                                        <svg
+                                            className={`menu-item-arrow absolute right-2.5 top-1/2 -translate-y-1/2 stroke-current
+                                            ${route().current().includes("enrollments.") || selected === "Enrollments" && " menu-item-arrow-active"} ${sidebarToggle ? 'lg:hidden' : ''}`}
+                                            width="20"
+                                            height="20"
+                                            viewBox="0 0 20 20"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                            <path
+                                                d="M4.79175 7.39584L10.0001 12.6042L15.2084 7.39585"
+                                                stroke=""
+                                                strokeWidth="1.5"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                            />
+                                        </svg>
+                                    </a>
+
+                                    <div
+                                        className={`overflow-hidden transform translate ${selected === "Enrollments" ? "block" : "hidden"}`}
+                                    >
+                                        <ul
+                                            className={`flex flex-col gap-1 mt-2 menu-dropdown pl-9 ${sidebarToggle ? 'lg:hidden' : 'flex'} `}
+                                        >
+                                            <li>
+                                                <Link
+                                                    href={route("enrollments.index")}
+                                                    className={`menu-dropdown-item group ${route().current() === "enrollments.index" ? "menu-dropdown-item-active" : "menu-dropdown-item-inactive"}`}
+
+                                                >
+                                                    Enrollments List
+                                                </Link>
+                                            </li>
+                                            <li>
+                                                <Link
+                                                    href={route("enrollments.create")}
+                                                    className={`menu-dropdown-item group ${route().current() === "enrollments.create" ? "menu-dropdown-item-active" : "menu-dropdown-item-inactive"}`}
+
+                                                >
+                                                    Create Enrollment
+                                                </Link>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                </li>
+
+
 
 
 

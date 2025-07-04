@@ -335,15 +335,17 @@ export default function Table({
                                                             }`}
                                                     >
                                                         <ul className="py-2 text-sm text-gray-700 dark:text-gray-200">
+                                                            {EditRoute && (
+                                                                <li>
+                                                                    <Link
+                                                                        href={route(EditRoute, RouteParameterKey ? item[RouteParameterKey] : item.id)}
+                                                                        className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                                                                    >
+                                                                        Edit
+                                                                    </Link>
+                                                                </li>
+                                                            )}
 
-                                                            <li>
-                                                                <Link
-                                                                    href={route(EditRoute, RouteParameterKey ? item[RouteParameterKey] : item.id)}
-                                                                    className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                                                                >
-                                                                    Edit
-                                                                </Link>
-                                                            </li>
                                                             <li>
                                                                 <button
                                                                     type="button"

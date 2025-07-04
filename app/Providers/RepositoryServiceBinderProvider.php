@@ -8,8 +8,12 @@ use App\Repositories\CoursePlayer\Interface\CoursePlayerRepositoryInterface;
 use App\Repositories\CoursePlayer\Repository\CoursePlayerRepository;
 use App\Repositories\Courses\Interface\CoursesRepositoryInterface;
 use App\Repositories\Courses\Repository\CourseRepository;
+use App\Repositories\Enrollments\Interface\EnrollmentRepositoryInterface;
+use App\Repositories\Enrollments\Repository\EnrollmentRepository;
 use App\Repositories\Lessons\Interface\LessonRepositoryInterface;
 use App\Repositories\Lessons\Repository\LessonRepository;
+use App\Repositories\MyCourses\Interface\MyCourseRepositoryInterface;
+use App\Repositories\MyCourses\Repository\MyCoursesRepository;
 use App\Repositories\Profile\Interface\ProfileRepositoryInterface;
 use App\Repositories\Profile\Repository\ProfileRepository;
 use App\Repositories\Settings\Interface\SettingRepositoryInterface;
@@ -32,6 +36,8 @@ class RepositoryServiceBinderProvider extends ServiceProvider
         $this->app->bind(CoursesRepositoryInterface::class, CourseRepository::class);
         $this->app->bind(LessonRepositoryInterface::class, LessonRepository::class);
         $this->app->bind(CoursePlayerRepositoryInterface::class, CoursePlayerRepository::class);
+        $this->app->bind(EnrollmentRepositoryInterface::class, EnrollmentRepository::class);
+        $this->app->bind(MyCourseRepositoryInterface::class, MyCoursesRepository::class);
     }
 
     /**

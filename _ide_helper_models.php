@@ -61,7 +61,11 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Category|null $category
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Enrollment> $enrollments
+ * @property-read int|null $enrollments_count
  * @property-read \App\Models\User|null $instructor
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\LessonProgress> $lessonProgressCourse
+ * @property-read int|null $lesson_progress_course_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Lesson> $lessons
  * @property-read int|null $lessons_count
  * @method static \Database\Factories\CourseFactory factory($count = null, $state = [])
@@ -94,6 +98,33 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereUpdatedAt($value)
  */
 	class Course extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * 
+ *
+ * @property int $id
+ * @property int $user_id
+ * @property int $course_id
+ * @property int $is_enrolled
+ * @property string $enrolled_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Course $enrolledCourses
+ * @property-read \App\Models\User $enrolledStudents
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Enrollment newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Enrollment newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Enrollment query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Enrollment whereCourseId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Enrollment whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Enrollment whereEnrolledAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Enrollment whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Enrollment whereIsEnrolled($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Enrollment whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Enrollment whereUserId($value)
+ */
+	class Enrollment extends \Eloquent {}
 }
 
 namespace App\Models{
@@ -148,6 +179,7 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Course|null $course
+ * @property-read mixed $lesson_progress
  * @method static \Database\Factories\LessonFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson newQuery()
@@ -169,6 +201,35 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Lesson whereVideoPublicId($value)
  */
 	class Lesson extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * 
+ *
+ * @property int $id
+ * @property int $user_id
+ * @property int $course_id
+ * @property int $lesson_id
+ * @property string $lesson_watched_time
+ * @property int $completed
+ * @property string|null $completed_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|LessonProgress newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|LessonProgress newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|LessonProgress query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|LessonProgress whereCompleted($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|LessonProgress whereCompletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|LessonProgress whereCourseId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|LessonProgress whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|LessonProgress whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|LessonProgress whereLessonId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|LessonProgress whereLessonWatchedTime($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|LessonProgress whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|LessonProgress whereUserId($value)
+ */
+	class LessonProgress extends \Eloquent {}
 }
 
 namespace App\Models{
@@ -217,9 +278,13 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Course> $courses
  * @property-read int|null $courses_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Enrollment> $enrollments
+ * @property-read int|null $enrollments_count
  * @property-read mixed $avatar
  * @property-read array<string, string> $profile_url
  * @property-read mixed $role_id
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\LessonProgress> $lessonProgressUser
+ * @property-read int|null $lesson_progress_user_count
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Permission> $permissions

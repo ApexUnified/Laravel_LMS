@@ -7,7 +7,7 @@ import { Head, Link } from '@inertiajs/react'
 import React, { useEffect } from 'react'
 
 
-export default function CoursePlayer({ course, course_progress }) {
+export default function CoursePlayer({ course, course_progress, is_user_enrolled }) {
 
     return (
         <>
@@ -28,6 +28,7 @@ export default function CoursePlayer({ course, course_progress }) {
                         course={course}
                         lessonProgress={course.lessons.lesson_progress}
                         course_progress={course_progress}
+                        is_user_enrolled={is_user_enrolled}
                     />
 
 
@@ -41,11 +42,11 @@ export default function CoursePlayer({ course, course_progress }) {
                                         {course.title}
                                     </h1>
 
-                                    <div className="text-gray-800 dark:text-white text-lg  flex justify-center gap-4 items-center">
+                                    <div className="flex items-center justify-center gap-4 text-lg text-gray-800 dark:text-white">
                                         {/* Instructor */}
                                         <div className="flex items-center gap-2">
                                             <span className="font-medium">Instructor:</span>
-                                            <span className="bg-green-100 text-green-800 px-3 py-1 rounded-2xl text-sm font-semibold">
+                                            <span className="px-3 py-1 text-sm font-semibold text-green-800 bg-green-100 rounded-2xl">
                                                 {course.instructor.name}
                                             </span>
                                         </div>
@@ -94,7 +95,7 @@ export default function CoursePlayer({ course, course_progress }) {
                                         <Card
                                             Content={
                                                 <>
-                                                    <h2 className="text-2xl my-2 font-semibold text-gray-700 dark:text-white">Course Description:</h2>
+                                                    <h2 className="my-2 text-2xl font-semibold text-gray-700 dark:text-white">Course Description:</h2>
                                                     <div
                                                         className="text-gray-600 dark:text-gray-300 [&>ul]:list-disc [&>ul]:ml-6 [&>ol]:list-decimal [&>ol]:ml-6"
                                                         dangerouslySetInnerHTML={{ __html: course.description }}
@@ -109,7 +110,7 @@ export default function CoursePlayer({ course, course_progress }) {
                                         <Card
                                             Content={
                                                 <>
-                                                    <h2 className="text-2xl my-2 font-semibold text-indigo-600 dark:text-indigo-400">What You'll Learn</h2>
+                                                    <h2 className="my-2 text-2xl font-semibold text-indigo-600 dark:text-indigo-400">What You'll Learn</h2>
                                                     <div
                                                         className="text-gray-600 dark:text-gray-300 [&>ul]:list-disc [&>ul]:ml-6 [&>ol]:list-decimal [&>ol]:ml-6"
                                                         dangerouslySetInnerHTML={{ __html: course.learning_outcomes }}
@@ -124,7 +125,7 @@ export default function CoursePlayer({ course, course_progress }) {
                                         <Card
                                             Content={
                                                 <>
-                                                    <h2 className="text-2xl my-2  font-semibold text-rose-600 dark:text-rose-400">Requirements</h2>
+                                                    <h2 className="my-2 text-2xl font-semibold text-rose-600 dark:text-rose-400">Requirements</h2>
                                                     <div
                                                         className="text-gray-600 dark:text-gray-300 [&>ul]:list-disc [&>ul]:ml-6 [&>ol]:list-decimal [&>ol]:ml-6"
                                                         dangerouslySetInnerHTML={{ __html: course.requirements }}
