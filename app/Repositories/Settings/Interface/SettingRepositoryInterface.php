@@ -25,4 +25,18 @@ interface SettingRepositoryInterface
     public function roleDestroy(string $id);
 
     public function roleDestroyBySelection(Request $request);
+
+    public function getCurrencies(Request $request);
+
+    public function currencyStore(Request $request);
+
+    public function getCurrency(string $id);
+
+    public function currencyUpdate(Request $request, string $id);
+
+    public function currencyDestroy(string $id);
+
+    public function currencyDestroyBySelection(Request $request);
+
+    public function ToggleCurrencyStatus(Request $request, string $id);
 }

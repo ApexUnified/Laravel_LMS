@@ -1,0 +1,31 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('cloudinary_credentials', function (Blueprint $table) {
+            $table->id();
+            $table->string('cloudinary_cloud_name');
+            $table->string('cloudinary_url');
+            $table->string('cloudinary_api_key');
+            $table->string('cloudinary_api_secret');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('cloudinary_credentials');
+    }
+};

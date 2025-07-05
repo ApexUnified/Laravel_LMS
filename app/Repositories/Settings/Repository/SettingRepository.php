@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Settings\Repository;
 
+use App\Models\Currency;
 use App\Models\GeneralSetting;
 use App\Models\SmtpSetting;
 use App\Repositories\Settings\Interface\SettingRepositoryInterface;
@@ -14,7 +15,8 @@ class SettingRepository implements SettingRepositoryInterface
     public function __construct(
         private GeneralSetting $generalSetting,
         private SmtpSetting $smtpSetting,
-        private Role $role
+        private Role $role,
+        private Currency $currency,
     ) {}
 
     public function generalSetting()
@@ -243,5 +245,141 @@ class SettingRepository implements SettingRepositoryInterface
         :
         ['status' => false, 'message' => 'Something went wrong While Deleting Role'];
 
+    }
+
+    public function getCurrencies(Request $request)
+    {
+        $currencies = $this->currency->query()->latest();
+
+        $search = ! empty($request->search) ? $request->search : null;
+        if ($request->filled('search')) {
+            $currencies = $currencies->where('currency_name', 'LIKE', '%'.$search.'%')
+                ->orWhere('currency_code', 'LIKE', '%'.$search.'%')
+                ->orWhere('currency_symbol', 'LIKE', '%'.$search.'%');
+        }
+
+        $currencies = $currencies->paginate(10);
+
+        $currencies->getCollection()->transform(function ($currency) {
+            $currency->added_at = $currency->created_at->format('Y-m-d');
+
+            return $currency;
+        });
+
+        return $currencies;
+    }
+
+    public function currencyStore(Request $request)
+    {
+        $validated_req = $request->validate([
+            'currency_name' => 'required|min:4|string|max:100|unique:currencies,currency_name',
+            'currency_code' => 'required|string|unique:currencies,currency_code',
+            'currency_symbol' => 'required|string|unique:currencies,currency_symbol',
+        ],
+            [
+                'currency_name.required' => 'Currency Name is Required',
+                'currency_name.min' => 'Currency Name Must be Valid And at least 4 characters',
+                'currency_name.string' => 'Currency Name Must be Valid And at least 4 characters',
+                'currency_name.max' => 'Currency Name Must be Valid And at least 4 characters',
+                'currency_name.unique' => 'Currency Name Already Exists Please Try Another One',
+                'currency_code.required' => 'Currency Code is Required',
+                'currency_code.string' => 'Currency Code Must be Valid And at least 4 characters',
+                'currency_code.unique' => 'Currency Code Already Exists Please Try Another One',
+                'currency_symbol.required' => 'Currency Symbol is Required',
+                'currency_symbol.string' => 'Currency Symbol Must be Valid And at least 4 characters',
+                'currency_symbol.unique' => 'Currency Symbol Already Exists Please Try Another One',
+            ]
+        );
+
+        if (! $this->currency->exists()) {
+            $validated_req['is_active'] = true;
+        }
+
+        return $this->currency->create($validated_req) ?
+        ['status' => true, 'message' => 'Currency Created Successfully']
+        :
+        ['status' => false, 'message' => 'Something went wrong While Creating Currency'];
+    }
+
+    public function getCurrency(string $id)
+    {
+        return $this->currency->find($id);
+
+    }
+
+    public function currencyUpdate(Request $request, string $id)
+    {
+        $validated_req = $request->validate([
+            'currency_name' => 'required|min:4|string|max:100|unique:currencies,currency_name,'.$id,
+            'currency_code' => 'required|string|unique:currencies,currency_code,'.$id,
+            'currency_symbol' => 'required|string|unique:currencies,currency_symbol,'.$id,
+        ],
+            [
+                'currency_name.required' => 'Currency Name is Required',
+                'currency_name.min' => 'Currency Name Must be Valid And at least 4 characters',
+                'currency_name.string' => 'Currency Name Must be Valid And at least 4 characters',
+                'currency_name.max' => 'Currency Name Must be Valid And at least 4 characters',
+                'currency_name.unique' => 'Currency Name Already Exists Please Try Another One',
+                'currency_code.required' => 'Currency Code is Required',
+                'currency_code.string' => 'Currency Code Must be Valid And at least 4 characters',
+                'currency_code.unique' => 'Currency Code Already Exists Please Try Another One',
+                'currency_symbol.required' => 'Currency Symbol is Required',
+                'currency_symbol.string' => 'Currency Symbol Must be Valid And at least 4 characters',
+                'currency_symbol.unique' => 'Currency Symbol Already Exists Please Try Another One',
+            ]
+        );
+
+        $currency = $this->getCurrency($id);
+
+        if (empty($currency)) {
+            return ['status' => false, 'message' => 'Currency Not Found'];
+        }
+
+        if ($currency->update($validated_req)) {
+            return ['status' => true, 'message' => 'Currency Updated Successfully'];
+        } else {
+            return ['status' => false, 'message' => 'Something went wrong While Updating Currency'];
+        }
+    }
+
+    public function currencyDestroy(string $id)
+    {
+        $currency = $this->getCurrency($id);
+
+        return $currency->delete() ?
+        ['status' => true, 'message' => 'Currency Deleted Successfully']
+        :
+        ['status' => false, 'message' => 'Something went wrong While Deleting Currency'];
+    }
+
+    public function currencyDestroyBySelection(Request $request)
+    {
+        $ids = $request->array('ids');
+
+        return $this->currency->whereIn('id', $ids)->delete() > 0 ?
+        ['status' => true, 'message' => 'Currency Deleted Successfully']
+        :
+        ['status' => false, 'message' => 'Something went wrong While Deleting Currency'];
+    }
+
+    public function ToggleCurrencyStatus(Request $request, string $id)
+    {
+        $currency = $this->getCurrency($id);
+
+        if (empty($currency)) {
+            return ['status' => false, 'message' => 'Currency Not Found'];
+        }
+
+        $alreadyActiveCurrency = $this->currency->where('is_active', 1)->first();
+
+        if (! empty($alreadyActiveCurrency) && $currency->id === $alreadyActiveCurrency->id) {
+            return ['status' => false, 'message' => 'Atleast One Currency Should Be Active'];
+
+        } elseif (! empty($alreadyActiveCurrency) && $currency->id !== $alreadyActiveCurrency->id) {
+            $alreadyActiveCurrency->update(['is_active' => 0]);
+        }
+        $currency->update(['is_active' => 1]);
+
+        return ['status' => true, 'message' => 'Currency Status Updated Successfully'];
     }
 }

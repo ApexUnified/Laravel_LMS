@@ -4,16 +4,12 @@ import LinkButton from '@/Components/LinkButton'
 import PrimaryButton from '@/Components/PrimaryButton'
 import Toast from '@/Components/Toast'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
-import { Head, Link, router } from '@inertiajs/react'
+import { Head, Link, usePage } from '@inertiajs/react'
 import React from 'react'
 
 export default function index({ courses }) {
 
-    const handlePagination = (url) => {
-        if (url) {
-            router.visit(url, { preserveScroll: true, preserveState: true });
-        }
-    };
+    const currency = usePage().props.currency;
 
     return (
         <AuthenticatedLayout>
@@ -28,7 +24,7 @@ export default function index({ courses }) {
             />
 
             {courses.data.length === 0 && (
-                <Toast flash={{ info: "You Are Not Enrolled In Any Course Yet" }} />
+                <Toast flash={{ info: "No Other Coures Found " }} />
             )}
 
 
@@ -37,18 +33,13 @@ export default function index({ courses }) {
                     <>
                         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                             {courses.data.map((course) => (
-
                                 <Card
                                     key={course.id}
-                                    CustomCss={"hover:scale-105 duration-300 cursor-pointer"}
+                                    CustomCss="transform transition duration-300 hover:scale-105 shadow-md hover:shadow-xl bg-white dark:bg-gray-800 rounded-2xl overflow-hidden"
                                     Content={
                                         <>
-
-                                            <Link
-                                                href={route('courses.player', { course_slug: course.slug })}
-
-                                            >
-
+                                            <Link href={route('courses.player', { course_slug: course.slug })}>
+                                                {/* Thumbnail */}
                                                 <img
                                                     src={course?.thumbnail}
                                                     alt={course?.title}
@@ -57,70 +48,91 @@ export default function index({ courses }) {
                                                 />
 
                                                 {/* Content */}
-                                                <div className="p-4 space-y-3">
+                                                <div className="p-5 space-y-3">
                                                     {/* Title */}
-                                                    <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
+                                                    <h2 className="text-xl font-bold text-gray-900 dark:text-white line-clamp-1">
                                                         {course?.title}
                                                     </h2>
 
-                                                    {/* Description */}
+                                                    {/* Short Description */}
                                                     <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
                                                         {course?.short_description}
                                                     </p>
 
                                                     {/* Tags */}
-                                                    <div className="flex flex-wrap gap-2 mt-2 text-sm">
-                                                        <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
-                                                            {course?.course_language}
+                                                    <div className="flex flex-wrap gap-2 mt-3">
+                                                        <span className="px-3 py-1 text-xs font-medium text-blue-700 bg-blue-100 rounded-full">
+                                                            Course Language: {course?.course_language}
                                                         </span>
-                                                        <span className="bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full">
-                                                            {course?.level}
+                                                        <span className="px-3 py-1 text-xs font-medium text-purple-700 bg-purple-100 rounded-full">
+                                                            Course Level:  {course?.level}
                                                         </span>
-
+                                                        <span className="px-3 py-1 text-xs font-medium text-purple-700 bg-purple-100 rounded-full">
+                                                            Course Instructor:  {course?.instructor.name}
+                                                        </span>
+                                                        <span className="px-3 py-1 text-xs font-medium text-purple-700 bg-purple-100 rounded-full">
+                                                            Total Lessons:  {course?.lessons_count}
+                                                        </span>
                                                     </div>
 
-
-                                                    <div className="space-y-2 text-gray-800 dark:text-white">
-                                                        <h4 className="text-lg font-semibold">Course Progress</h4>
-
-                                                        <div className="w-full h-4 overflow-hidden bg-gray-200 rounded-full dark:bg-gray-700">
-                                                            <div
-                                                                className={`${course.course_progress === 100 ? "bg-green-600 dark:bg-green-400" : "bg-blue-600 dark:bg-blue-400"} h-full transition-all duration-500 ease-in-out `}
-                                                                style={{ width: `${course.course_progress}%` }}
-                                                            ></div>
+                                                    {/* Price Section */}
+                                                    <div className="flex items-center justify-between mt-4">
+                                                        <div className="text-lg font-semibold text-gray-900 dark:text-white">
+                                                            {course?.discount ? (
+                                                                <>
+                                                                    <span className="mr-2 text-sm text-gray-500 line-through dark:text-gray-400">
+                                                                        {currency?.currency_code}  {course?.actual_price}
+                                                                    </span>
+                                                                    <span> {currency?.currency_code} {course?.price}</span>
+                                                                </>
+                                                            ) : course?.price == 0 && (
+                                                                <span className="font-semibold text-green-600">Free</span>
+                                                            )}
                                                         </div>
 
-                                                        <div className="text-sm text-right text-gray-600 dark:text-gray-300">
-                                                            {course.course_progress}% Complete
-                                                        </div>
+                                                        {course?.discount != 0 && (
+                                                            <div className="text-sm font-medium text-red-500">
+                                                                {course?.discount}% Off
+                                                            </div>
+                                                        )}
                                                     </div>
-
-
-
                                                 </div>
-
                                             </Link>
 
-                                            <div className="my-4">
+                                            {/* Button */}
+                                            <div className="px-5 pb-5">
                                                 <LinkButton
-                                                    Text={"View Course"}
+                                                    Text="View Course"
                                                     URL={route("courses.player", { course_slug: course.slug })}
                                                     Icon={
-                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            fill="none"
+                                                            viewBox="0 0 24 24"
+                                                            strokeWidth={1.5}
+                                                            stroke="currentColor"
+                                                            className="w-5 h-5"
+                                                        >
+                                                            <path
+                                                                strokeLinecap="round"
+                                                                strokeLinejoin="round"
+                                                                d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+                                                            />
+                                                            <path
+                                                                strokeLinecap="round"
+                                                                strokeLinejoin="round"
+                                                                d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                                                            />
                                                         </svg>
-
                                                     }
                                                 />
                                             </div>
                                         </>
                                     }
                                 />
-
-
                             ))}
                         </div>
+
 
 
                         {(courses.data.length === 0) ? (

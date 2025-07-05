@@ -130,9 +130,28 @@ export default function index({ courses, users, categories, instructors }) {
             },
 
             {
-                key: 'price',
+
                 label: 'Course Price',
-                badge: (value) => value === 'Free' ? 'bg-green-200 text-green-800 dark:bg-white dark:text-gray-800' : ''
+
+                render: (item) => {
+                    if (item.price == 0) {
+                        return (
+                            <span
+                                className={`inline-block px-2 py-1 text-xs font-semibold rounded-full  bg-red-200 text-red-800 `}
+                            >
+                                Free
+                            </span>
+                        )
+                    }
+
+                    return (
+                        <span
+                            className={`inline-block px-2 py-1 text-xs font-semibold rounded-full dark:bg-white dark:text-gray-800  bg-green-200 text-green-800 `}
+                        >
+                            {props?.currency?.currency_code} {item.price}
+                        </span>
+                    )
+                }
             },
 
             {

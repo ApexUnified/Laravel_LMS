@@ -21,10 +21,6 @@ class MyCoursesRepository implements MyCourseRepositoryInterface
     {
         $enrolled_course_ids = $this->enrollment->where('user_id', $user_id)->pluck('course_id');
 
-        if (blank($enrolled_course_ids)) {
-            return ['status' => false, 'message' => 'You are not enrolled in any course'];
-        }
-
         $user = $this->user->find($user_id);
 
         $courses = $this->course->whereIn('id', $enrolled_course_ids)

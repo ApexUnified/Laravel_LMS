@@ -1,9 +1,14 @@
 import Card from '@/Components/Card'
 import PrimaryButton from '@/Components/PrimaryButton'
-import { Link } from '@inertiajs/react'
+import { Link, useForm } from '@inertiajs/react'
 import React from 'react'
 
-export default function CoursePlayerSidebar({ allLessons, lesson = null, course, course_progress, is_user_enrolled }) {
+export default function CoursePlayerSidebar({ allLessons, lesson = null, course, course_progress, is_user_enrolled, user = null }) {
+
+    const { data, setData, post, processing, errors, reset } = useForm({
+        course_id: course.id,
+        user_id: user?.id
+    });
 
     return (
         <Card
@@ -100,8 +105,8 @@ export default function CoursePlayerSidebar({ allLessons, lesson = null, course,
                                 <PrimaryButton
                                     Text={"Enroll Now"}
                                     Type={"button"}
-                                    Spinner={false}
-                                    Disabled={false}
+                                    Spinner={processing}
+                                    Disabled={processing}
                                     Icon={
                                         <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2l4-4M7 4h10a2 2 0 012 2v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2z" />
@@ -110,6 +115,8 @@ export default function CoursePlayerSidebar({ allLessons, lesson = null, course,
                                     }
                                     Action={() => {
                                         console.log("Enrolling");
+
+                                        post(route('purchase.course'))
                                     }}
                                 />
                             </div>

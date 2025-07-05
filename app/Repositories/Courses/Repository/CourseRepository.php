@@ -4,6 +4,7 @@ namespace App\Repositories\Courses\Repository;
 
 use App\Models\Category;
 use App\Models\Course;
+use App\Models\Currency;
 use App\Models\User;
 use App\Repositories\Courses\Interface\CoursesRepositoryInterface;
 use Cloudinary\Cloudinary;
@@ -20,7 +21,8 @@ class CourseRepository implements CoursesRepositoryInterface
         private User $user,
         private Role $role,
         private Category $category,
-        private Cloudinary $cloudinary
+        private Cloudinary $cloudinary,
+        private Currency $currency,
     ) {
         //
     }
@@ -50,7 +52,6 @@ class CourseRepository implements CoursesRepositoryInterface
         $courses->getCollection()->transform(function ($course) {
             $course->is_published = $course->is_published ? 'Published' : 'Not published';
             $course->is_approved = $course->is_approved ? 'Approved' : 'Not Approved';
-            $course->price = $course->price == 0 ? 'Free' : $course->price;
             $course->added_at = $course->created_at->format('Y-m-d g:i A');
 
             return $course;
@@ -194,10 +195,20 @@ class CourseRepository implements CoursesRepositoryInterface
 
     }
 
-    public function getCourse(string $slug)
+    public function getCourseBySlug(string $slug)
     {
-
         $course = $this->course->with(['lessons'])->where('slug', $slug)->first();
+
+        if (empty($course)) {
+            return ['status' => false, 'message' => 'Course not found!'];
+        }
+
+        return $course;
+    }
+
+    public function getCourseById($course_id)
+    {
+        $course = $this->course->with(['lessons'])->find($course_id);
 
         if (empty($course)) {
             return ['status' => false, 'message' => 'Course not found!'];
@@ -279,7 +290,7 @@ class CourseRepository implements CoursesRepositoryInterface
             $validated_req['learning_outcomes'] = json_encode($request->learning_outcomes);
         }
 
-        $course = $this->getCourse($slug);
+        $course = $this->getCourseBySlug($slug);
 
         if (isset($course['status']) && $course['status'] === false) {
             return ['status' => false, 'message' => $course['message']];

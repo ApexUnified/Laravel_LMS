@@ -1,12 +1,14 @@
 <?php
 
+use App\Http\Controllers\AllCourseController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\CoursePlayerController;
 use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\LessonController;
-use App\Http\Controllers\MyCoursesController;
+use App\Http\Controllers\MyCourseController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PurchaseCourseController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
@@ -55,7 +57,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/enrollments-destroybyselection', [EnrollmentController::class, 'destroyBySelection'])->name('enrollments.destroybyselection');
 
     // My Courses Routes
-    Route::get('/my-courses', MyCoursesController::class)->name('my.courses');
+    Route::get('/my-courses', MyCourseController::class)->name('my.courses');
+
+    // All  Courses Routes
+    Route::get('/all-courses', AllCourseController::class)->name('all.courses');
+
+    // Purchase Course Route
+    Route::post('/purchase-course', PurchaseCourseController::class)->name('purchase.course');
 
     // Profile Routes
     Route::controller(ProfileController::class)->group(function () {
@@ -85,6 +93,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/settings/roles/{id}', 'roleUpdate')->name('roles.update');
         Route::delete('/settings/roles/{id}', 'roleDestroy')->name('roles.destroy');
         Route::delete('/settings/roles-destroybyselection', 'roleDestroyBySelection')->name('roles.destroybyselection');
+
+        // Currency Routes
+        Route::get('/settings/currencies', 'currencyIndex')->name('currencies.index');
+        Route::get('/settings/currencies/create', 'currencyCreate')->name('currencies.create');
+        Route::post('/settings/currencies', 'currencyStore')->name('currencies.store');
+        Route::get('/settings/currencies/{id}/edit', 'currencyEdit')->name('currencies.edit');
+        Route::put('/settings/currencies/{id}', 'currencyUpdate')->name('currencies.update');
+        Route::put('/settings/currencies/toggle-status/{id}', 'toggleCurrencyStatus')->name('currencies.toggle.status');
+        Route::delete('/settings/currencies/{id}', 'currencyDestroy')->name('currencies.destroy');
+        Route::delete('/settings/currencies-destroybyselection', 'currencyDestroyBySelection')->name('currencies.destroybyselection');
     });
 });
 

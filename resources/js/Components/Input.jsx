@@ -16,6 +16,8 @@ export default function Input({ Name, Value, Action, Placeholder, Type, Error, R
                     value={Value}
                     onChange={Action}
                     required={Required}
+
+                    {...Type === 'password' ? { autoComplete: 'off' } : {}}
                     {...Type === "number" ? { min: 0 } : {}}
 
                 />

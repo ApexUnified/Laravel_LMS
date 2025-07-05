@@ -24,7 +24,7 @@ export default function edit({ course, categories, instructors }) {
         promo_video: null,
         is_thumbnail_removed: false,
         is_promo_video_removed: false,
-        price: course.price ?? 0,
+        price: course.actual_price ?? 0,
         discount: course.discount ?? 0,
         level: course.level || '',
         course_language: course.course_language || '',

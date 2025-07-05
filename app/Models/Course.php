@@ -62,6 +62,8 @@ class Course extends Model
     }
 
     // Attributes
+    protected $appends = ['actual_price'];
+
     public function getPromoVideoDurationAttribute()
     {
         if (empty($this->attributes['promo_video_duration'])) {
@@ -89,5 +91,23 @@ class Course extends Model
     public function getLearningOutcomesAttribute()
     {
         return ! empty($this->attributes['learning_outcomes']) ? json_decode($this->attributes['learning_outcomes']) : null;
+    }
+
+    public function getActualPriceAttribute()
+    {
+        return $this->getRawOriginal('price');
+    }
+
+    public function getPriceAttribute()
+    {
+
+        $price = (int) $this->attributes['price'];
+        $discount = $this->attributes['discount'];
+
+        if (empty($discount)) {
+            return $this->attributes['price'];
+        }
+
+        return round($price - ($price * $discount / 100), 2);
     }
 }

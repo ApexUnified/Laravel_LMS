@@ -61,6 +61,7 @@ export default function LessonPlayer({ course, lesson, course_progress, is_user_
                         course={course}
                         course_progress={course_progress}
                         is_user_enrolled={is_user_enrolled}
+                        user={user}
                     />
 
 

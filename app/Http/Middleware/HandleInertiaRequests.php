@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Currency;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Middleware;
@@ -46,6 +47,7 @@ class HandleInertiaRequests extends Middleware
 
             'generalSetting' => Cache::get('general_config'),
             'asset' => asset(''),
+            'currency' => Currency::where('is_active', 1)->first(),
         ];
     }
 }

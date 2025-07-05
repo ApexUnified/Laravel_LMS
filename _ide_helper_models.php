@@ -37,6 +37,31 @@ namespace App\Models{
  * 
  *
  * @property int $id
+ * @property string $cloudinary_cloud_name
+ * @property string $cloudinary_url
+ * @property string $cloudinary_api_key
+ * @property string $cloudinary_api_secret
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CloudinaryCredential newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CloudinaryCredential newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CloudinaryCredential query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CloudinaryCredential whereCloudinaryApiKey($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CloudinaryCredential whereCloudinaryApiSecret($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CloudinaryCredential whereCloudinaryCloudName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CloudinaryCredential whereCloudinaryUrl($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CloudinaryCredential whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CloudinaryCredential whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CloudinaryCredential whereUpdatedAt($value)
+ */
+	class CloudinaryCredential extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * 
+ *
+ * @property int $id
  * @property string $title
  * @property string $slug
  * @property string $short_description
@@ -63,6 +88,7 @@ namespace App\Models{
  * @property-read \App\Models\Category|null $category
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Enrollment> $enrollments
  * @property-read int|null $enrollments_count
+ * @property-read mixed $actual_price
  * @property-read \App\Models\User|null $instructor
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\LessonProgress> $lessonProgressCourse
  * @property-read int|null $lesson_progress_course_count
@@ -98,6 +124,31 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Course whereUpdatedAt($value)
  */
 	class Course extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * 
+ *
+ * @property int $id
+ * @property string $currency_name
+ * @property string $currency_code
+ * @property string $currency_symbol
+ * @property int $is_active
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Currency newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Currency newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Currency query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Currency whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Currency whereCurrencyCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Currency whereCurrencyName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Currency whereCurrencySymbol($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Currency whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Currency whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Currency whereUpdatedAt($value)
+ */
+	class Currency extends \Eloquent {}
 }
 
 namespace App\Models{
@@ -261,6 +312,27 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SmtpSetting whereUpdatedAt($value)
  */
 	class SmtpSetting extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * 
+ *
+ * @property int $id
+ * @property string $stripe_publishable_key
+ * @property string $stripe_secret_key
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StripeCredential newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StripeCredential newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StripeCredential query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StripeCredential whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StripeCredential whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StripeCredential whereStripePublishableKey($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StripeCredential whereStripeSecretKey($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StripeCredential whereUpdatedAt($value)
+ */
+	class StripeCredential extends \Eloquent {}
 }
 
 namespace App\Models{

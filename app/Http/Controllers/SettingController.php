@@ -17,6 +17,7 @@ class SettingController extends Controller
         return Inertia::render('Settings/index');
     }
 
+    // General Setting methods
     public function generalSetting()
     {
         $generalSetting = $this->setting->generalSetting();
@@ -34,6 +35,7 @@ class SettingController extends Controller
         }
     }
 
+    // SMTP Methods
     public function smtpSetting()
     {
         $smtpSetting = $this->setting->smtpSetting();
@@ -53,6 +55,7 @@ class SettingController extends Controller
 
     }
 
+    // Role Methods
     public function rolesIndex(Request $request)
     {
         $data = $this->setting->getRoles($request);
@@ -130,6 +133,82 @@ class SettingController extends Controller
             return back()->with('success', $deleted['message']);
         } else {
             return back()->with('error', $deleted['message']);
+        }
+    }
+
+    // Currency Methods
+    public function currencyIndex(Request $request)
+    {
+        $currencies = $this->setting->getCurrencies($request);
+
+        return Inertia::render('Settings/Currencies/index', compact('currencies'));
+    }
+
+    public function currencyCreate()
+    {
+        return Inertia::render('Settings/Currencies/create');
+    }
+
+    public function currencyStore(Request $request)
+    {
+        $created = $this->setting->currencyStore($request);
+        if ($created['status']) {
+            return to_route('settings.currencies.index')->with('success', $created['message']);
+        } else {
+            return back()->with('error', $created['message']);
+        }
+    }
+
+    public function currencyEdit(string $id)
+    {
+        $currency = $this->setting->getCurrency($id);
+
+        if (isset($currency['status']) && $currency['status'] == false) {
+            return back()->with('error', $currency['message']);
+        }
+
+        return Inertia::render('Settings/Currencies/edit', compact('currency'));
+    }
+
+    public function currencyUpdate(Request $request, string $id)
+    {
+        $updated = $this->setting->currencyUpdate($request, $id);
+        if ($updated['status']) {
+            return to_route('settings.currencies.index')->with('success', $updated['message']);
+        } else {
+            return back()->with('error', $updated['message']);
+        }
+    }
+
+    public function currencyDestroy(string $id)
+    {
+        $deleted = $this->setting->currencyDestroy($id);
+        if ($deleted['status']) {
+            return back()->with('success', $deleted['message']);
+        } else {
+            return back()->with('error', $deleted['message']);
+        }
+    }
+
+    public function currencyDestroyBySelection(Request $request)
+    {
+        $deleted = $this->setting->currencyDestroyBySelection($request);
+        if ($deleted['status']) {
+            return back()->with('success', $deleted['message']);
+        } else {
+            return back()->with('error', $deleted['message']);
+        }
+    }
+
+    public function toggleCurrencyStatus(Request $request, string $id)
+    {
+        $updated = $this->setting->ToggleCurrencyStatus($request, $id);
+
+        if ($updated['status']) {
+            return ['status' => true, 'message' => $updated['message']];
+        } else {
+            return ['status' => false, 'message' => $updated['message']];
+
         }
     }
 }

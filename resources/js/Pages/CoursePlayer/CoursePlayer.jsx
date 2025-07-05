@@ -2,13 +2,13 @@ import Card from '@/Components/Card'
 import VideoPlayer from '@/Components/VideoPlayer'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import CoursePlayerSidebar from '@/partials/CoursePlayerSidebar'
-import { Head, Link } from '@inertiajs/react'
+import { Head, Link, usePage } from '@inertiajs/react'
 
-import React, { useEffect } from 'react'
+import React from 'react'
 
 
 export default function CoursePlayer({ course, course_progress, is_user_enrolled }) {
-
+    const user = usePage().props.auth.user;
     return (
         <>
             <AuthenticatedLayout ManuallytoggleSidebar={true}>
@@ -29,6 +29,7 @@ export default function CoursePlayer({ course, course_progress, is_user_enrolled
                         lessonProgress={course.lessons.lesson_progress}
                         course_progress={course_progress}
                         is_user_enrolled={is_user_enrolled}
+                        user={user}
                     />
 
 

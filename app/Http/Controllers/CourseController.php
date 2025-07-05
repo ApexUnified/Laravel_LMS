@@ -54,7 +54,7 @@ class CourseController extends Controller
             return back()->with('error', 'Course Not Found!');
         }
 
-        $course = $this->course->getCourse($slug);
+        $course = $this->course->getCourseBySlug($slug);
 
         if (isset($course['status']) && $course['status'] === false) {
             return to_route('courses.index')->with('error', $course['message']);
