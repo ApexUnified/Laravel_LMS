@@ -14,7 +14,11 @@ class SettingController extends Controller
 
     public function index()
     {
-        return Inertia::render('Settings/index');
+
+        $cloudinary_credentials = $this->setting->getCloudinaryCredentials();
+        $stripe_credentials = $this->setting->getStripeCredentials();
+
+        return Inertia::render('Settings/index', compact('cloudinary_credentials', 'stripe_credentials'));
     }
 
     // General Setting methods
@@ -209,6 +213,29 @@ class SettingController extends Controller
         } else {
             return ['status' => false, 'message' => $updated['message']];
 
+        }
+    }
+
+    // Cloudinary Method
+    public function cloudinaryCredentialsSave(Request $request)
+    {
+        $saved = $this->setting->cloudinaryCredentialsSave($request);
+        if ($saved['status']) {
+            return back()->with('success', $saved['message']);
+        } else {
+            return back()->with('error', $saved['message']);
+        }
+    }
+
+    // Stripe Method
+    public function stripeCredentialsSave(Request $request)
+    {
+        $saved = $this->setting->stripeCredentialsSave($request);
+
+        if ($saved['status']) {
+            return back()->with('success', $saved['message']);
+        } else {
+            return back()->with('error', $saved['message']);
         }
     }
 }

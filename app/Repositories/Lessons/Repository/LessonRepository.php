@@ -2,10 +2,12 @@
 
 namespace App\Repositories\Lessons\Repository;
 
+use App\Models\CloudinaryCredential;
 use App\Models\Course;
 use App\Models\Lesson;
 use App\Repositories\Lessons\Interface\LessonRepositoryInterface;
 use Cloudinary\Cloudinary;
+use Cloudinary\Configuration\Configuration;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -13,11 +15,14 @@ use Illuminate\Validation\ValidationException;
 
 class LessonRepository implements LessonRepositoryInterface
 {
+    private $cloudinary_credentials;
+
     public function __construct(
         private Lesson $lesson,
-        private Cloudinary $cloudinary,
         private Course $course
-    ) {}
+    ) {
+        $this->cloudinary_credentials = CloudinaryCredential::first();
+    }
 
     public function getLessons(Request $request)
     {
@@ -84,14 +89,14 @@ class LessonRepository implements LessonRepositoryInterface
             'title' => 'required|string',
             'description' => 'required',
             'course_id' => 'required|exists:courses,id',
-            'thumbnail' => 'required|image|mimes:jpeg,png,jpg|max:2048|dimensions:min_width=1280,min_height=720,max_width:1280,max_height:1080',
+            'thumbnail' => 'required|image|mimes:jpeg,png,jpg|max:2048|dimensions:min_width=1280,min_height=720,max_width=1280,max_height=720',
             'video' => 'required|mimes:mp4,webm,ogg,avi|max:10485760',
             'attachments' => 'nullable|array',
             'is_published' => 'nullable|boolean',
             'is_approved' => 'nullable|boolean',
         ], [
             'thumbnail.max' => 'Thumbnail size should be less than Or Equal To 2MB',
-            'thumbnail.dimensions' => 'Thumbnail resolution should be Between 1280x720 and 1280x1080',
+            'thumbnail.dimensions' => 'Thumbnail resolution should be 1280x720 ',
             'video.max' => 'Video size should be less than Or Equal To 10GB',
             'course_id.exists' => 'Selected Course does not exist',
             'course_id.required' => 'Course is required',
@@ -107,10 +112,20 @@ class LessonRepository implements LessonRepositoryInterface
 
         if ($request->hasFile('video')) {
             try {
+
+                $url = optional($this->cloudinary_credentials)->cloudinary_url;
+
+                if (! $url) {
+                    throw new Exception('Please Set Cloudinary Credentials First From settings!');
+                }
+
+                $config = Configuration::instance($url);
+                $cloudinary = new Cloudinary($config);
+
                 $file = $request->file('video');
                 $renamedFile = time().uniqid();
 
-                $movedToCloudaniry = $this->cloudinary->uploadApi()->upload($file->getRealPath(), [
+                $movedToCloudaniry = $cloudinary->uploadApi()->upload($file->getRealPath(), [
                     'folder' => 'ApexUnified_LMS/Lessons/Videos',
                     'public_id' => $renamedFile,
                     'resource_type' => 'video',
@@ -130,6 +145,16 @@ class LessonRepository implements LessonRepositoryInterface
 
         if ($request->hasFile('attachments')) {
             try {
+
+                $url = optional($this->cloudinary_credentials)->cloudinary_url;
+
+                if (! $url) {
+                    throw new Exception('Please Set Cloudinary Credentials First From settings!');
+                }
+
+                $config = Configuration::instance($url);
+                $cloudinary = new Cloudinary($config);
+
                 $attachments = [];
                 $files = $request->file('attachments');
 
@@ -147,7 +172,7 @@ class LessonRepository implements LessonRepositoryInterface
 
                     $renamedFile = $originalName.'_'.$uniqueSuffix.'.'.$extension;
 
-                    $movedToCloudaniry = $this->cloudinary->uploadApi()->upload($file->getRealPath(), [
+                    $movedToCloudaniry = $cloudinary->uploadApi()->upload($file->getRealPath(), [
                         'folder' => 'ApexUnified_LMS/Lessons/Attachments',
                         'public_id' => $renamedFile,
                         'resource_type' => 'raw',
@@ -174,10 +199,20 @@ class LessonRepository implements LessonRepositoryInterface
 
         if ($request->hasFile('thumbnail')) {
             try {
+
+                $url = optional($this->cloudinary_credentials)->cloudinary_url;
+
+                if (! $url) {
+                    throw new Exception('Please Set Cloudinary Credentials First From settings!');
+                }
+
+                $config = Configuration::instance($url);
+                $cloudinary = new Cloudinary($config);
+
                 $file = $request->file('thumbnail');
                 $renamedFile = time().uniqid();
 
-                $movedToCloudaniry = $this->cloudinary->uploadApi()->upload($file->getRealPath(), [
+                $movedToCloudaniry = $cloudinary->uploadApi()->upload($file->getRealPath(), [
                     'folder' => 'ApexUnified_LMS/Lessons/Thumbnails',
                     'public_id' => $renamedFile,
                     'resource_type' => 'image',
@@ -219,7 +254,7 @@ class LessonRepository implements LessonRepositoryInterface
             'title' => 'required|string',
             'description' => 'required',
             'course_id' => 'required|exists:courses,id',
-            ...($request->hasFile('thumbnail') ? ['thumbnail' => 'nullable|image|mimes:jpeg,png,jpg|max:2048|dimensions:min_width=1280,min_height=720,max_width:1280,max_height:1080'] : []),
+            ...($request->hasFile('thumbnail') ? ['thumbnail' => 'nullable|image|mimes:jpeg,png,jpg|max:2048|dimensions:min_width=1280,min_height=720,max_width=1280,max_height=720'] : []),
             ...($request->hasFile('video') ? ['video' => 'nullable|mimes:mp4,webm,ogg,avi|max:10485760'] : []),
             ...($request->hasFile('attachments') ? [
                 'attachments' => 'nullable|array',
@@ -230,7 +265,7 @@ class LessonRepository implements LessonRepositoryInterface
             ...($request->hasFile('thumbnail') ?
             [
                 'thumbnail.max' => 'Thumbnail size should be less than Or Equal To 2MB',
-                'thumbnail.dimensions' => 'Thumbnail resolution should be Between 1280x720 and 1280x1080',
+                'thumbnail.dimensions' => 'Thumbnail resolution should be 1280x720',
             ]
 
             :
@@ -277,10 +312,20 @@ class LessonRepository implements LessonRepositoryInterface
 
         if ($request->hasFile('video')) {
             try {
+
+                $url = optional($this->cloudinary_credentials)->cloudinary_url;
+
+                if (! $url) {
+                    throw new Exception('Please Set Cloudinary Credentials First From settings!');
+                }
+
+                $config = Configuration::instance($url);
+                $cloudinary = new Cloudinary($config);
+
                 $file = $request->file('video');
                 $renamedFile = time().uniqid();
 
-                $movedToCloudaniry = $this->cloudinary->uploadApi()->upload($file->getRealPath(), [
+                $movedToCloudaniry = $cloudinary->uploadApi()->upload($file->getRealPath(), [
                     'folder' => 'ApexUnified_LMS/Lessons/Videos',
                     'public_id' => $renamedFile,
                     'resource_type' => 'video',
@@ -291,7 +336,7 @@ class LessonRepository implements LessonRepositoryInterface
                 }
 
                 if (! empty($lesson->video) && ! empty($lesson->video_public_id)) {
-                    $this->cloudinary->uploadApi()->destroy($lesson->video_public_id, [
+                    $cloudinary->uploadApi()->destroy($lesson->video_public_id, [
                         'resource_type' => 'video',
                     ]);
                 }
@@ -307,6 +352,15 @@ class LessonRepository implements LessonRepositoryInterface
         if ($request->filled('existing_attachments')) {
             try {
 
+                $url = optional($this->cloudinary_credentials)->cloudinary_url;
+
+                if (! $url) {
+                    throw new Exception('Please Set Cloudinary Credentials First From settings!');
+                }
+
+                $config = Configuration::instance($url);
+                $cloudinary = new Cloudinary($config);
+
                 $existing_attachments = $request->input('existing_attachments');
                 $remainingAttachments = collect($lesson->attachments)
                     ->filter(fn ($attachment) => in_array($attachment['secure_url'], $existing_attachments))
@@ -317,7 +371,7 @@ class LessonRepository implements LessonRepositoryInterface
                     ->values();
 
                 foreach ($deletedAttachments as $deletedAttachment) {
-                    $this->cloudinary->uploadApi()->destroy($deletedAttachment['public_id']);
+                    $cloudinary->uploadApi()->destroy($deletedAttachment['public_id']);
                 }
 
                 if ($request->hasFile('attachments')) {
@@ -346,6 +400,16 @@ class LessonRepository implements LessonRepositoryInterface
         if ($request->hasFile('attachments')) {
 
             try {
+
+                $url = optional($this->cloudinary_credentials)->cloudinary_url;
+
+                if (! $url) {
+                    throw new Exception('Please Set Cloudinary Credentials First From settings!');
+                }
+
+                $config = Configuration::instance($url);
+                $cloudinary = new Cloudinary($config);
+
                 $attachments = ! blank($GlobalremeaningAttachments) ? $GlobalremeaningAttachments : [];
                 $files = $request->file('attachments');
 
@@ -362,7 +426,7 @@ class LessonRepository implements LessonRepositoryInterface
 
                     $renamedFile = $originalName.'_'.$uniqueSuffix.'.'.$extension;
 
-                    $movedToCloudaniry = $this->cloudinary->uploadApi()->upload($file->getRealPath(), [
+                    $movedToCloudaniry = $cloudinary->uploadApi()->upload($file->getRealPath(), [
                         'folder' => 'ApexUnified_LMS/Lessons/Attachments',
                         'public_id' => $renamedFile,
                         'resource_type' => 'raw',
@@ -375,7 +439,7 @@ class LessonRepository implements LessonRepositoryInterface
                     if (! blank($lesson->attachments) && isset($lesson->attachments[0]['public_id']) && isset($lesson->attachments[0]['secure_url'])) {
                         foreach ($lesson->attachments as $attachment) {
                             if (isset($attachment['public_id']) && isset($attachment['secure_url'])) {
-                                $this->cloudinary->uploadApi()->destroy($attachment['public_id']);
+                                $cloudinary->uploadApi()->destroy($attachment['public_id']);
                             }
                         }
                     }
@@ -397,10 +461,20 @@ class LessonRepository implements LessonRepositoryInterface
 
         if ($request->hasFile('thumbnail')) {
             try {
+
+                $url = optional($this->cloudinary_credentials)->cloudinary_url;
+
+                if (! $url) {
+                    throw new Exception('Please Set Cloudinary Credentials First From settings!');
+                }
+
+                $config = Configuration::instance($url);
+                $cloudinary = new Cloudinary($config);
+
                 $file = $request->file('thumbnail');
                 $renamedFile = time().uniqid();
 
-                $movedToCloudaniry = $this->cloudinary->uploadApi()->upload($file->getRealPath(), [
+                $movedToCloudaniry = $cloudinary->uploadApi()->upload($file->getRealPath(), [
                     'folder' => 'ApexUnified_LMS/Lessons/Thumbnails',
                     'public_id' => $renamedFile,
                     'resource_type' => 'image',
@@ -417,7 +491,7 @@ class LessonRepository implements LessonRepositoryInterface
                 }
 
                 if (! empty($lesson->thumbnail) && ! empty($lesson->thumbnail_public_id)) {
-                    $this->cloudinary->uploadApi()->destroy($lesson->thumbnail_public_id);
+                    $cloudinary->uploadApi()->destroy($lesson->thumbnail_public_id);
                 }
 
                 $validated_req['thumbnail'] = $movedToCloudaniry['secure_url'];
@@ -443,6 +517,16 @@ class LessonRepository implements LessonRepositoryInterface
     public function destroyLesson(string $id)
     {
         try {
+
+            $url = optional($this->cloudinary_credentials)->cloudinary_url;
+
+            if (! $url) {
+                throw new Exception('Please Set Cloudinary Credentials First From settings!');
+            }
+
+            $config = Configuration::instance($url);
+            $cloudinary = new Cloudinary($config);
+
             $lesson = $this->lesson->find($id);
 
             if (empty($lesson)) {
@@ -450,7 +534,7 @@ class LessonRepository implements LessonRepositoryInterface
             }
 
             if (! empty($lesson->video) && ! empty($lesson->video_public_id)) {
-                $this->cloudinary->uploadApi()->destroy($lesson->video_public_id, [
+                $cloudinary->uploadApi()->destroy($lesson->video_public_id, [
                     'resource_type' => 'video',
                 ]);
             }
@@ -458,13 +542,13 @@ class LessonRepository implements LessonRepositoryInterface
             if (! blank($lesson->attachments) && isset($lesson->attachments[0]['public_id']) && isset($lesson->attachments[0]['secure_url'])) {
                 foreach ($lesson->attachments as $attachment) {
                     if (isset($attachment['public_id']) && isset($attachment['secure_url'])) {
-                        $this->cloudinary->uploadApi()->destroy($attachment['public_id']);
+                        $cloudinary->uploadApi()->destroy($attachment['public_id']);
                     }
                 }
             }
 
             if (! empty($lesson->thumbnail) && ! empty($lesson->thumbnail_public_id)) {
-                $this->cloudinary->uploadApi()->destroy($lesson->thumbnail_public_id);
+                $cloudinary->uploadApi()->destroy($lesson->thumbnail_public_id);
             }
 
             if ($lesson->delete()) {
@@ -482,6 +566,16 @@ class LessonRepository implements LessonRepositoryInterface
     public function destroyLessonBySelection(Request $request)
     {
         try {
+
+            $url = optional($this->cloudinary_credentials)->cloudinary_url;
+
+            if (! $url) {
+                throw new Exception('Please Set Cloudinary Credentials First From settings!');
+            }
+
+            $config = Configuration::instance($url);
+            $cloudinary = new Cloudinary($config);
+
             $ids = $request->array('ids');
             $deleted = 0;
             if (blank($ids)) {
@@ -492,7 +586,7 @@ class LessonRepository implements LessonRepositoryInterface
             foreach ($lessons as $lesson) {
 
                 if (! empty($lesson->video) && ! empty($lesson->video_public_id)) {
-                    $this->cloudinary->uploadApi()->destroy($lesson->video_public_id, [
+                    $cloudinary->uploadApi()->destroy($lesson->video_public_id, [
                         'resource_type' => 'video',
                     ]);
                 }
@@ -500,13 +594,13 @@ class LessonRepository implements LessonRepositoryInterface
                 if (! blank($lesson->attachments) && isset($lesson->attachments[0]['public_id']) && isset($lesson->attachments[0]['secure_url'])) {
                     foreach ($lesson->attachments as $attachment) {
                         if (isset($attachment['public_id']) && isset($attachment['secure_url'])) {
-                            $this->cloudinary->uploadApi()->destroy($attachment['public_id']);
+                            $cloudinary->uploadApi()->destroy($attachment['public_id']);
                         }
                     }
                 }
 
                 if (! empty($lesson->thumbnail) && ! empty($lesson->thumbnail_public_id)) {
-                    $this->cloudinary->uploadApi()->destroy($lesson->thumbnail_public_id);
+                    $cloudinary->uploadApi()->destroy($lesson->thumbnail_public_id);
                 }
 
                 $lesson->delete();

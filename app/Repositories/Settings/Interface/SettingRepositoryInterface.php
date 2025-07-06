@@ -39,4 +39,12 @@ interface SettingRepositoryInterface
     public function currencyDestroyBySelection(Request $request);
 
     public function ToggleCurrencyStatus(Request $request, string $id);
+
+    public function stripeCredentialsSave(Request $request);
+
+    public function cloudinaryCredentialsSave(Request $request);
+
+    public function getStripeCredentials();
+
+    public function getCloudinaryCredentials();
 }

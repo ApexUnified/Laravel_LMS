@@ -306,7 +306,7 @@ export default function create({ categories, instructors }) {
 
                                     <div className="px-4 mt-4 sm:px-6 ">
                                         <span className="text-center text-gray-800 dark:text-gray-200">
-                                            Note: Thumbnail Image Resolution Must Be Between 1280x720 to 1280x1080
+                                            Note: Thumbnail Image Resolution Must Be 1280x720
                                         </span>
                                         <FileUploaderInput
                                             Label={'Drag & Drop your Course Thumbnail Or <span class="filepond--label-action">Browse</span>'}
@@ -391,28 +391,30 @@ export default function create({ categories, instructors }) {
 
 
                 {progress && (
-                    <div className="fixed inset-0 flex items-center justify-center p-5 overflow-y-auto modal z-99999">
-                        <div className="modal-close-btn fixed inset-0 h-full w-full dark:bg-gray-900 backdrop-blur-[32px]"></div>
-                        <div className="flex flex-col px-4 py-4 overflow-y-auto no-scrollbar">
-                            <div className="relative w-full max-w-[507px] rounded-3xl bg-white p-6 dark:bg-gray-800 lg:p-10">
-                                <div className="flex flex-col items-center justify-center gap-3 text-center">
-                                    <Spinner
-                                        customSize={"w-12 h-12"}
-                                    />
-                                    <p className="text-lg leading-6 text-gray-500 dark:text-gray-400">
-                                        Upload in progress. Please wait while your file is being transferred to the server.
-                                    </p>
+                    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-5 bg-black/50">
+                        <div
+                            className="fixed inset-0 backdrop-blur-[32px] "
+                        ></div>
 
-                                    <h2 className="mt-2 text-sm leading-6 text-gray-500 dark:text-gray-400">
-                                        Do not close this window or refresh the page — doing so may interrupt the upload and result in data loss.
-                                    </h2>
+                        <div className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white dark:bg-gray-800 p-6 lg:p-10 shadow-xl ">
+                            <div className="flex flex-col items-center justify-center gap-3 text-center">
+                                <Spinner
+                                    customSize={"w-12 h-12"}
+                                />
+                                <p className="text-2xl leading-6 text-gray-500 dark:text-gray-400">
+                                    Upload in progress. Please wait while your file is being transferred to the server.
+                                </p>
+
+                                <h2 className="mt-2 text-sm leading-6 text-gray-500 dark:text-gray-400">
+                                    Do not close this window or refresh the page — doing so may interrupt the upload and result in data loss.
+                                </h2>
 
 
 
-                                </div>
                             </div>
                         </div>
                     </div>
+
 
                 )}
             </AuthenticatedLayout>

@@ -13,10 +13,7 @@ return new class extends Migration
     {
         Schema::create('cloudinary_credentials', function (Blueprint $table) {
             $table->id();
-            $table->string('cloudinary_cloud_name');
             $table->string('cloudinary_url');
-            $table->string('cloudinary_api_key');
-            $table->string('cloudinary_api_secret');
             $table->timestamps();
         });
     }

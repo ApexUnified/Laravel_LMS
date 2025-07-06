@@ -3,11 +3,11 @@ import LinkButton from '@/Components/LinkButton'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import BreadCrumb from '@/Components/BreadCrumb'
 import { Head, useForm } from '@inertiajs/react'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import PrimaryButton from '@/Components/PrimaryButton'
 import Input from '@/Components/Input'
 
-export default function index() {
+export default function index({ stripe_credentials, cloudinary_credentials }) {
 
     const [cloudinaryCredentialModalOpen, setCloudinaryCredentialModalOpen] = useState(false);
     const [stripeCredentialModalOpen, setStripeCredentialModalOpen] = useState(false);
@@ -34,10 +34,7 @@ export default function index() {
         processing: cloudinaryCredentialProcessing,
         errors: cloudinaryCredentialErrors
     } = useForm({
-        cloudinary_cloud_name: "",
-        cloudinary_url: "",
-        cloudinary_api_key: "",
-        cloudinary_api_secret: "",
+        cloudinary_url: cloudinary_credentials?.cloudinary_url || "",
     });
 
 
@@ -48,19 +45,29 @@ export default function index() {
         processing: stripeCredentialProcessing,
         errors: stripeCredentialErrors
     } = useForm({
-        stripe_publishable_key: "",
-        stripe_secret_key: "",
+        stripe_publishable_key: stripe_credentials?.stripe_publishable_key || "",
+        stripe_secret_key: stripe_credentials?.stripe_secret_key || "",
     });
 
 
 
     const stripeSubmit = (e) => {
         e.preventDefault();
+        putStripeCredentialData(route("settings.stripe.credentials.save"), {
+            onSuccess: () => {
+                setStripeCredentialModalOpen(false);
+            }
+
+        });
     }
-
-
     const cloudinarySubmit = (e) => {
         e.preventDefault();
+        putCloudinaryCredentialData(route('settings.cloudinary.credentials.save'), {
+            onSuccess: () => {
+                setCloudinaryCredentialModalOpen(false);
+            }
+        });
+
     }
 
     return (
@@ -333,7 +340,7 @@ export default function index() {
             />
 
 
-
+            {/* Cloudinary Credentials Modal */}
             {cloudinaryCredentialModalOpen && (
                 <div className="fixed inset-0 z-[99999] flex items-center justify-center p-5 bg-black/50">
                     <div
@@ -353,17 +360,6 @@ export default function index() {
 
                         <form onSubmit={cloudinarySubmit} className="mt-6 space-y-6">
                             <div className="grid grid-cols-1 gap-4">
-                                <Input
-                                    InputName={"Cloudinary Cloud Name"}
-                                    Id={'cloudinary_cloud_name'}
-                                    Name={'cloudinary_cloud_name'}
-                                    Required={true}
-                                    Type={'text'}
-                                    Error={cloudinaryCredentialErrors.cloudinary_cloud_name}
-                                    Value={cloudinaryCredentialData.cloudinary_cloud_name}
-                                    Action={(e) => setCloudinaryCredentialData('cloudinary_cloud_name', e.target.value)}
-                                    Placeholder={'Enter Cloudinary Cloud Name'}
-                                />
 
                                 <Input
                                     InputName={"Cloudinary URL"}
@@ -377,40 +373,20 @@ export default function index() {
                                     Placeholder={'Enter Cloudinary URL'}
                                 />
 
-                                <Input
-                                    InputName={"Cloudinary Api Key"}
-                                    Id={'cloudinary_api_key'}
-                                    Name={'cloudinary_api_key'}
-                                    Required={true}
-                                    Type={'password'}
-                                    Error={cloudinaryCredentialErrors.cloudinary_api_key}
-                                    Value={cloudinaryCredentialData.cloudinary_api_key}
-                                    Action={(e) => setCloudinaryCredentialData('cloudinary_api_key', e.target.value)}
-                                    Placeholder={'Enter Cloudinary Api Key'}
-                                    ShowPasswordToggle={apiKeyToggle}
-                                    setShowPasswordToggle={setApiKeyToggle}
-                                />
-
-                                <Input
-                                    InputName={"Cloudinary Api Secret"}
-                                    Id={'cloudinary_api_secret'}
-                                    Name={'cloudinary_api_secret'}
-                                    Required={true}
-                                    Type={'password'}
-                                    Error={cloudinaryCredentialErrors.cloudinary_api_secret}
-                                    Value={cloudinaryCredentialData.cloudinary_api_secret}
-                                    Action={(e) => setCloudinaryCredentialData('cloudinary_api_secret', e.target.value)}
-                                    Placeholder={'Enter Cloudinary Api Secret'}
-                                    ShowPasswordToggle={apiSecretToggle}
-                                    setShowPasswordToggle={setApiSecretToggle}
-                                />
                             </div>
 
                             <div className="flex flex-wrap justify-center gap-4">
                                 <PrimaryButton
                                     Text={"Save Changes"}
                                     CustomClass={"w-[200px]"}
-                                    Type={"button"}
+                                    Spinner={cloudinaryCredentialProcessing}
+                                    Disabled={
+                                        cloudinaryCredentialProcessing ||
+                                        cloudinaryCredentialData.cloudinary_url === "" ||
+                                        cloudinaryCredentialData.cloudinary_url === cloudinary_credentials?.cloudinary_url
+
+                                    }
+                                    Type={"submit"}
                                     Icon={
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
@@ -422,6 +398,7 @@ export default function index() {
                                     Text={"Close"}
                                     CustomClass={"w-[200px]"}
                                     Type={"button"}
+                                    disabled={cloudinaryCredentialProcessing}
                                     Action={() => setCloudinaryCredentialModalOpen(false)}
                                     Icon={
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
@@ -437,7 +414,7 @@ export default function index() {
 
 
 
-
+            {/* Stripe Credentials Modal */}
             {stripeCredentialModalOpen && (
                 <div className="fixed inset-0 z-[99999] flex items-center justify-center p-5 bg-black/50">
                     <div
@@ -490,8 +467,20 @@ export default function index() {
                             <div className="flex flex-wrap justify-center gap-4">
                                 <PrimaryButton
                                     Text={"Save Changes"}
+                                    Spinner={
+                                        stripeCredentialProcessing
+                                    }
+                                    Disabled={
+                                        stripeCredentialProcessing ||
+                                        stripeCredentialData.stripe_publishable_key === '' ||
+                                        stripeCredentialData.stripe_secret_key === '' ||
+
+                                        stripeCredentialData.stripe_publishable_key === stripe_credentials?.stripe_publishable_key &&
+                                        stripeCredentialData.stripe_secret_key === stripe_credentials?.stripe_secret_key
+
+                                    }
                                     CustomClass={"w-[200px]"}
-                                    Type={"button"}
+                                    Type={"submit"}
                                     Icon={
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
@@ -502,7 +491,8 @@ export default function index() {
                                 <PrimaryButton
                                     Text={"Close"}
                                     CustomClass={"w-[200px]"}
-                                    Type={"button"}
+                                    Type={"submit"}
+                                    Disabled={stripeCredentialProcessing}
                                     Action={() => setStripeCredentialModalOpen(false)}
                                     Icon={
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">

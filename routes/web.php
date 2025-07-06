@@ -64,6 +64,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Purchase Course Route
     Route::post('/purchase-course', PurchaseCourseController::class)->name('purchase.course');
+    Route::get('/purchase-success', [PurchaseCourseController::class, 'success'])->name('purchase.success');
+    Route::get('/purchase-cancel', [PurchaseCourseController::class, 'cancel'])->name('purchase.cancel');
 
     // Profile Routes
     Route::controller(ProfileController::class)->group(function () {
@@ -103,6 +105,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/settings/currencies/toggle-status/{id}', 'toggleCurrencyStatus')->name('currencies.toggle.status');
         Route::delete('/settings/currencies/{id}', 'currencyDestroy')->name('currencies.destroy');
         Route::delete('/settings/currencies-destroybyselection', 'currencyDestroyBySelection')->name('currencies.destroybyselection');
+
+        // Stripe Credentials Route
+        Route::put('/settings/stripe-credentials-save', 'stripeCredentialsSave')->name('stripe.credentials.save');
+
+        // Cloudinary Credentials Route
+        Route::put('/settings/cloudinary-credentials-save', 'cloudinaryCredentialsSave')->name('cloudinary.credentials.save');
     });
 });
 

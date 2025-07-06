@@ -52,7 +52,7 @@ export default function index({ courses }) {
                                                 <img
                                                     src={course?.thumbnail}
                                                     alt={course?.title}
-                                                    className="object-cover w-full h-48 rounded-t-2xl"
+                                                    className="object-cover w-full h-58 rounded-t-2xl"
                                                     loading="lazy"
                                                 />
 

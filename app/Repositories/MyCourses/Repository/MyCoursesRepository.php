@@ -23,9 +23,10 @@ class MyCoursesRepository implements MyCourseRepositoryInterface
 
         $user = $this->user->find($user_id);
 
-        $courses = $this->course->whereIn('id', $enrolled_course_ids)
-            ->when($user->hasRole('Student'), function ($query) {
-                $query->where('is_published', true)
+        $courses = $this->course
+            ->when($user->hasRole('Student'), function ($query) use ($enrolled_course_ids) {
+                $query->whereIn('id', $enrolled_course_ids)
+                    ->where('is_published', true)
                     ->where('is_approved', true);
             })
             ->with('instructor')

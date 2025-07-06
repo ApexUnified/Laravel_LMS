@@ -2,9 +2,11 @@
 
 namespace App\Repositories\Settings\Repository;
 
+use App\Models\CloudinaryCredential;
 use App\Models\Currency;
 use App\Models\GeneralSetting;
 use App\Models\SmtpSetting;
+use App\Models\StripeCredential;
 use App\Repositories\Settings\Interface\SettingRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -17,6 +19,8 @@ class SettingRepository implements SettingRepositoryInterface
         private SmtpSetting $smtpSetting,
         private Role $role,
         private Currency $currency,
+        private StripeCredential $stripe_credential,
+        private CloudinaryCredential $cloudinary_credential
     ) {}
 
     public function generalSetting()
@@ -381,5 +385,56 @@ class SettingRepository implements SettingRepositoryInterface
         $currency->update(['is_active' => 1]);
 
         return ['status' => true, 'message' => 'Currency Status Updated Successfully'];
+    }
+
+    public function stripeCredentialsSave(Request $request)
+    {
+        $validated_req = $request->validate([
+
+            'stripe_publishable_key' => 'required|starts_with:pk_,',
+            'stripe_secret_key' => 'required|starts_with:sk_',
+        ], [
+            'stripe_publishable_key.required' => 'Stripe Publishable Key is Required',
+            'stripe_publishable_key.starts_with' => 'Invalid Stripe Publishable Key',
+            'stripe_secret_key.required' => 'Stripe Secret Key is Required',
+            'stripe_secret_key.starts_with' => 'Invalid Stripe Secret Key',
+        ]);
+
+        if ($this->stripe_credential->exists()) {
+            $this->stripe_credential->first()->update($validated_req);
+        } else {
+            $this->stripe_credential->create($validated_req);
+        }
+
+        return ['status' => true, 'message' => 'Stripe Credentials Saved Successfully'];
+
+    }
+
+    public function cloudinaryCredentialsSave(Request $request)
+    {
+        $validated_req = $request->validate([
+            'cloudinary_url' => 'required|starts_with:cloudinary://',
+        ], [
+            'cloudinary_url.required' => 'Cloudinary URL is Required',
+            'cloudinary_url.starts_with' => 'Invalid Cloudinary URL',
+        ]);
+
+        if ($this->cloudinary_credential->exists()) {
+            $this->cloudinary_credential->first()->update($validated_req);
+        } else {
+            $this->cloudinary_credential->create($validated_req);
+        }
+
+        return ['status' => true, 'message' => 'Cloudinary Credentials Saved Successfully'];
+    }
+
+    public function getStripeCredentials()
+    {
+        return $this->stripe_credential->first();
+    }
+
+    public function getCloudinaryCredentials()
+    {
+        return $this->cloudinary_credential->first();
     }
 }

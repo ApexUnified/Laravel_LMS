@@ -16,8 +16,7 @@ class EnrollmentRepository implements EnrollmentRepositoryInterface
     public function __construct(
         private Enrollment $enrollment,
         private Course $course,
-        private User $user
-
+        private User $user,
     ) {}
 
     public function getEnrollments(Request $request)

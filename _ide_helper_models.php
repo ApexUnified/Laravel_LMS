@@ -37,18 +37,12 @@ namespace App\Models{
  * 
  *
  * @property int $id
- * @property string $cloudinary_cloud_name
  * @property string $cloudinary_url
- * @property string $cloudinary_api_key
- * @property string $cloudinary_api_secret
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CloudinaryCredential newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CloudinaryCredential newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CloudinaryCredential query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CloudinaryCredential whereCloudinaryApiKey($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CloudinaryCredential whereCloudinaryApiSecret($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CloudinaryCredential whereCloudinaryCloudName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CloudinaryCredential whereCloudinaryUrl($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CloudinaryCredential whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CloudinaryCredential whereId($value)

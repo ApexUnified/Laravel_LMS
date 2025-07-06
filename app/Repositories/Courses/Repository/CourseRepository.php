@@ -3,11 +3,13 @@
 namespace App\Repositories\Courses\Repository;
 
 use App\Models\Category;
+use App\Models\CloudinaryCredential;
 use App\Models\Course;
 use App\Models\Currency;
 use App\Models\User;
 use App\Repositories\Courses\Interface\CoursesRepositoryInterface;
 use Cloudinary\Cloudinary;
+use Cloudinary\Configuration\Configuration;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -16,15 +18,18 @@ use Spatie\Permission\Models\Role;
 
 class CourseRepository implements CoursesRepositoryInterface
 {
+    private $cloudinary_credentials;
+
     public function __construct(
         private Course $course,
         private User $user,
         private Role $role,
         private Category $category,
-        private Cloudinary $cloudinary,
         private Currency $currency,
+
     ) {
-        //
+
+        $this->cloudinary_credentials = CloudinaryCredential::first();
     }
 
     public function getCourses(Request $request)
@@ -78,7 +83,7 @@ class CourseRepository implements CoursesRepositoryInterface
             'title' => 'required|string|min:5|max:150',
             'short_description' => 'required|string|min:10',
             'description' => 'required',
-            'thumbnail' => 'required|image|max:2048|dimensions:min_width=1280,min_height=720,max_width:1280,max_height:1080',
+            'thumbnail' => 'required|image|max:2048|dimensions:min_width=1280,min_height=720,max_width=1280,max_height=720',
             'promo_video' => 'nullable|mimes:mp4,webm,ogg,avi|max:10485760',
             'instructor_id' => 'required|exists:users,id',
             'category_id' => 'required|exists:categories,id',
@@ -92,7 +97,7 @@ class CourseRepository implements CoursesRepositoryInterface
             'learning_outcomes' => 'nullable',
         ], [
             'thumbnail.max' => 'Thumbnail size should be less than Or Equal To 2MB',
-            'thumbnail.dimensions' => 'Thumbnail resolution should be Between 1280x720 and 1280x1080',
+            'thumbnail.dimensions' => 'Thumbnail resolution should be 1280x720 ',
             'promo_video.max' => 'Promo video size should be less than Or Equal To 10GB',
             'category_id.exists' => 'Selected Category does not exist',
             'instructor_id.exists' => 'Selected Instructor does not exist',
@@ -134,10 +139,19 @@ class CourseRepository implements CoursesRepositoryInterface
         if ($request->hasFile('promo_video')) {
             try {
 
+                $url = optional($this->cloudinary_credentials)->cloudinary_url;
+
+                if (! $url) {
+                    throw new Exception('Please Set Cloudinary Credentials First From settings!');
+                }
+
+                $config = Configuration::instance($url);
+                $cloudinary = new Cloudinary($config);
+
                 $file = $request->file('promo_video');
                 $renamedFile = time().uniqid();
 
-                $movedToCloudaniry = $this->cloudinary->uploadApi()->upload($file->getRealPath(), [
+                $movedToCloudaniry = $cloudinary->uploadApi()->upload($file->getRealPath(), [
                     'folder' => 'ApexUnified_LMS/Courses/PromoVideos',
                     'public_id' => $renamedFile,
                     'resource_type' => 'video',
@@ -156,9 +170,19 @@ class CourseRepository implements CoursesRepositoryInterface
 
         if ($request->hasFile('thumbnail')) {
             try {
+
+                $url = optional($this->cloudinary_credentials)->cloudinary_url;
+
+                if (! $url) {
+                    throw new Exception('Please Set Cloudinary Credentials First From settings!');
+                }
+
+                $config = Configuration::instance($url);
+                $cloudinary = new Cloudinary($config);
+
                 $file = $request->file('thumbnail');
                 $renamedFile = time().uniqid();
-                $movedToCloudaniry = $this->cloudinary->uploadApi()->upload($file->getRealPath(), [
+                $movedToCloudaniry = $cloudinary->uploadApi()->upload($file->getRealPath(), [
                     'folder' => 'ApexUnified_LMS/Courses/Thumbnails',
                     'public_id' => $renamedFile,
                     'resource_type' => 'image',
@@ -224,7 +248,7 @@ class CourseRepository implements CoursesRepositoryInterface
             'title' => 'required|string|min:5|max:150',
             'short_description' => 'required|string|min:10',
             'description' => 'required',
-            ...($request->hasFile('thumbnail') ? ['thumbnail' => 'nullable|image|max:2048|dimensions:min_width=1280,min_height=720,max_width:1280,max_height:1080'] : []),
+            ...($request->hasFile('thumbnail') ? ['thumbnail' => 'nullable|image|max:2048|dimensions:min_width=1280,min_height=720,max_width=1280,max_height=720'] : []),
             ...($request->hasFile('promo_video') ? ['promo_video' => 'nullable|mimes:mp4,webm,ogg,avi|max:10485760'] : []),
             'instructor_id' => 'required|exists:users,id',
             'category_id' => 'required|exists:categories,id',
@@ -241,7 +265,7 @@ class CourseRepository implements CoursesRepositoryInterface
             ?
             [
                 'thumbnail.max' => 'Thumbnail size should be less than Or Equal To 2MB',
-                'thumbnail.dimensions' => 'Thumbnail resolution should be Between 1280x720 and 1280x1080',
+                'thumbnail.dimensions' => 'Thumbnail resolution should be 1280x720 ',
             ]
             :
             []
@@ -298,7 +322,16 @@ class CourseRepository implements CoursesRepositoryInterface
 
         if ($request->boolean('is_promo_video_removed') && ! empty($course->promo_video) && ! empty($course->promo_video_public_id)) {
             try {
-                $this->cloudinary->uploadApi()->destroy($course->promo_video_public_id, [
+                $url = optional($this->cloudinary_credentials)->cloudinary_url;
+
+                if (! $url) {
+                    throw new Exception('Please Set Cloudinary Credentials First From settings!');
+                }
+
+                $config = Configuration::instance($url);
+                $cloudinary = new Cloudinary($config);
+
+                $cloudinary->uploadApi()->destroy($course->promo_video_public_id, [
                     'resource_type' => 'video',
                 ]);
                 $validated_req['promo_video'] = null;
@@ -320,10 +353,20 @@ class CourseRepository implements CoursesRepositoryInterface
         if ($request->hasFile('promo_video')) {
 
             try {
+
+                $url = optional($this->cloudinary_credentials)->cloudinary_url;
+
+                if (! $url) {
+                    throw new Exception('Please Set Cloudinary Credentials First From settings!');
+                }
+
+                $config = Configuration::instance($url);
+                $cloudinary = new Cloudinary($config);
+
                 $file = $request->file('promo_video');
                 $renamedFile = time().uniqid();
 
-                $movedToCloudaniry = $this->cloudinary->uploadApi()->upload($file->getRealPath(), [
+                $movedToCloudaniry = $cloudinary->uploadApi()->upload($file->getRealPath(), [
                     'folder' => 'ApexUnified_LMS/Courses/PromoVideos',
                     'public_id' => $renamedFile,
                     'resource_type' => 'video',
@@ -334,7 +377,7 @@ class CourseRepository implements CoursesRepositoryInterface
                 }
 
                 if (! empty($course->promo_video) && ! empty($course->promo_video_public_id)) {
-                    $this->cloudinary->uploadApi()->destroy($course->promo_video_public_id, [
+                    $cloudinary->uploadApi()->destroy($course->promo_video_public_id, [
                         'resource_type' => 'video',
                     ]);
                 }
@@ -351,10 +394,19 @@ class CourseRepository implements CoursesRepositoryInterface
         if ($request->hasFile('thumbnail')) {
 
             try {
+                $url = optional($this->cloudinary_credentials)->cloudinary_url;
+
+                if (! $url) {
+                    throw new Exception('Please Set Cloudinary Credentials First From settings!');
+                }
+
+                $config = Configuration::instance($url);
+                $cloudinary = new Cloudinary($config);
+
                 $file = $request->file('thumbnail');
                 $renamedFile = time().uniqid();
 
-                $movedToCloudaniry = $this->cloudinary->uploadApi()->upload($file->getRealPath(), [
+                $movedToCloudaniry = $cloudinary->uploadApi()->upload($file->getRealPath(), [
                     'folder' => 'ApexUnified_LMS/Courses/Thumbnails',
                     'public_id' => $renamedFile,
                     'resource_type' => 'image',
@@ -371,7 +423,7 @@ class CourseRepository implements CoursesRepositoryInterface
                 }
 
                 if (! empty($course->thumbnail) && ! empty($course->thumbnail_public_id)) {
-                    $this->cloudinary->uploadApi()->destroy($course->thumbnail_public_id);
+                    $cloudinary->uploadApi()->destroy($course->thumbnail_public_id);
                 }
 
                 $validated_req['thumbnail'] = $movedToCloudaniry['secure_url'];
@@ -401,6 +453,16 @@ class CourseRepository implements CoursesRepositoryInterface
     public function destroyCourse(string $id)
     {
         try {
+
+            $url = optional($this->cloudinary_credentials)->cloudinary_url;
+
+            if (! $url) {
+                throw new Exception('Please Set Cloudinary Credentials First From settings!');
+            }
+
+            $config = Configuration::instance($url);
+            $cloudinary = new Cloudinary($config);
+
             $course = $this->course->find($id);
 
             if (empty($course)) {
@@ -408,13 +470,13 @@ class CourseRepository implements CoursesRepositoryInterface
             }
 
             if (! empty($course->promo_video) && ! empty($course->promo_video_public_id)) {
-                $this->cloudinary->uploadApi()->destroy($course->promo_video_public_id, [
+                $cloudinary->uploadApi()->destroy($course->promo_video_public_id, [
                     'resource_type' => 'video',
                 ]);
             }
 
             if (! empty($course->thumbnail) && ! empty($course->thumbnail_public_id)) {
-                $this->cloudinary->uploadApi()->destroy($course->thumbnail_public_id);
+                $cloudinary->uploadApi()->destroy($course->thumbnail_public_id);
             }
 
             return $course->delete() ?
@@ -447,14 +509,23 @@ class CourseRepository implements CoursesRepositoryInterface
 
             foreach ($courses as $course) {
 
+                $url = optional($this->cloudinary_credentials)->cloudinary_url;
+
+                if (! $url) {
+                    throw new Exception('Please Set Cloudinary Credentials First From settings!');
+                }
+
+                $config = Configuration::instance($url);
+                $cloudinary = new Cloudinary($config);
+
                 if (! empty($course->promo_video) && ! empty($course->promo_video_public_id)) {
-                    $this->cloudinary->uploadApi()->destroy($course->promo_video_public_id, [
+                    $cloudinary->uploadApi()->destroy($course->promo_video_public_id, [
                         'resource_type' => 'video',
                     ]);
                 }
 
                 if (! empty($course->thumbnail) && ! empty($course->thumbnail_public_id)) {
-                    $this->cloudinary->uploadApi()->destroy($course->thumbnail_public_id);
+                    $cloudinary->uploadApi()->destroy($course->thumbnail_public_id);
                 }
 
                 $course->delete();

@@ -1,19 +1,24 @@
 import Card from '@/Components/Card'
 import PrimaryButton from '@/Components/PrimaryButton'
-import { Link, useForm } from '@inertiajs/react'
-import React from 'react'
+import Toast from '@/Components/Toast'
+import { Link, router, useForm } from '@inertiajs/react'
+import axios from 'axios'
+import React, { useState } from 'react'
 
 export default function CoursePlayerSidebar({ allLessons, lesson = null, course, course_progress, is_user_enrolled, user = null }) {
 
-    const { data, setData, post, processing, errors, reset } = useForm({
-        course_id: course.id,
-        user_id: user?.id
-    });
+    const [enrolling, setEnrolling] = useState(false);
 
+    const [flash, setFlash] = useState(null);
     return (
         <Card
             Content={
                 <>
+                    {
+                        flash && <Toast
+                            flash={flash}
+                        />
+                    }
                     <div
                         className="flex items-center justify-center gap-3 p-3 transition-all duration-300 bg-gray-100 rounded-lg shadow-sm dark:bg-white/[0.03]"
                     >
@@ -105,8 +110,8 @@ export default function CoursePlayerSidebar({ allLessons, lesson = null, course,
                                 <PrimaryButton
                                     Text={"Enroll Now"}
                                     Type={"button"}
-                                    Spinner={processing}
-                                    Disabled={processing}
+                                    Spinner={enrolling}
+                                    Disabled={enrolling}
                                     Icon={
                                         <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2l4-4M7 4h10a2 2 0 012 2v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2z" />
@@ -114,9 +119,38 @@ export default function CoursePlayerSidebar({ allLessons, lesson = null, course,
 
                                     }
                                     Action={() => {
-                                        console.log("Enrolling");
+                                        setEnrolling(true);
+                                        axios.post(route('purchase.course'), {
+                                            course_id: course.id,
+                                            user_id: user?.id
+                                        }).then(response => {
 
-                                        post(route('purchase.course'))
+                                            if (!response.data.status) {
+                                                setFlash({ error: response.data.message })
+                                                setEnrolling(false);
+                                                return;
+                                            }
+
+                                            if (response.data?.enrollment) {
+                                                setFlash({ success: response.data.message })
+                                                setEnrolling(false);
+                                                router.reload();
+                                                return
+                                            }
+
+                                            if (response.data?.url) {
+                                                setFlash({ success: "Please Wait While We Redirect You To Checkout Page" })
+                                                window.location.href = response.data.url;
+                                                setEnrolling(false);
+                                                return
+
+                                            }
+
+                                        }).catch(error => {
+                                            setFlash({ error: error.message })
+                                            setEnrolling(false);
+
+                                        });
                                     }}
                                 />
                             </div>

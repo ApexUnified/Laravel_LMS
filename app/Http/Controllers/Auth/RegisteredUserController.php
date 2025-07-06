@@ -47,9 +47,20 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
+        // After Registeration The Verification Mail Will be Sent By Default
+        event(new Registered($user));
+
+        $role = Role::where('name', 'Student')->first();
+
+        if (empty($role)) {
+            $role = Role::create(['name' => 'Student']);
+
+        }
+
+        $user->syncRoles($role);
+
         // Checking User Model Implements_MustVerifyEmail Inerface
         if ($user instanceof MustVerifyEmail) {
-
             // Checking Does SMTP Setting Exists In Cache  If Exists Than After Registeration Instantly The Verification Mail Will be Sent If Not Than If Block Will Run
             if (empty(Cache::get('smtp_config'))) {
                 return redirect(route('verification.notice', absolute: false))
@@ -57,18 +68,6 @@ class RegisteredUserController extends Controller
                     ? 'Registration successful! You Havent Configured SMTP Settings Yet Please Remove MustVerifyEmail Interface From User Model'
                     : 'Registeration Successfull But Something Went Wrong While Sending Verification Mail Please Try Again Later');
             }
-
-            // After Registeration The Verification Mail Will be Sent By Default
-            event(new Registered($user));
-
-            $role = Role::where('name', 'Student')->first();
-
-            if (empty($role)) {
-                $role = Role::create(['name' => 'Student']);
-
-            }
-
-            $user->syncRoles($role);
 
             return redirect(route('verification.notice', absolute: false))
                 ->with('success', 'Registration successful! Please Check Your Inbox For Verification Mail');

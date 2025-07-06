@@ -6,6 +6,8 @@ use App\Repositories\AllCourses\AllCourseRepository;
 use App\Repositories\AllCourses\Interface\AllCourseRepositoryInterface;
 use App\Repositories\Categories\Interface\CategoryRepositoryInterface;
 use App\Repositories\Categories\Repository\CategoryRepository;
+use App\Repositories\Checkouts\Interface\CheckoutRepositoryInterface;
+use App\Repositories\Checkouts\Repository\CheckoutRepository;
 use App\Repositories\CoursePlayer\Interface\CoursePlayerRepositoryInterface;
 use App\Repositories\CoursePlayer\Repository\CoursePlayerRepository;
 use App\Repositories\Courses\Interface\CoursesRepositoryInterface;
@@ -41,6 +43,7 @@ class RepositoryServiceBinderProvider extends ServiceProvider
         $this->app->bind(EnrollmentRepositoryInterface::class, EnrollmentRepository::class);
         $this->app->bind(MyCourseRepositoryInterface::class, MyCoursesRepository::class);
         $this->app->bind(AllCourseRepositoryInterface::class, AllCourseRepository::class);
+        $this->app->bind(CheckoutRepositoryInterface::class, CheckoutRepository::class);
     }
 
     /**

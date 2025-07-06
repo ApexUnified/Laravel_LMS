@@ -37,8 +37,8 @@ export default function index({ enrollments, users, courses }) {
                 label: 'Course', render: (item) => {
                     return (
                         <div className="flex items-center">
-                            <div className="flex-shrink-0 w-12 h-12">
-                                <img className="w-12 h-12 rounded-full" src={item.enrolled_courses.thumbnail} alt="" />
+                            <div className="w-16 h-16 overflow-hidden rounded-full">
+                                <img className="object-cover w-full h-full" src={item.enrolled_courses.thumbnail} alt="" />
                             </div>
                             <div className="ml-4 ">
                                 <div className="text-sm font-medium text-gray-800 dark:text-white">
@@ -46,7 +46,7 @@ export default function index({ enrollments, users, courses }) {
                                         <span className='p-2 text-white bg-gray-500 rounded-lg '>
                                             Course Title:
 
-                                            <Link className='text-blue-200 underline ' href={route('courses.player', { course_slug: item.enrolled_courses.slug })}>
+                                            <Link className='text-blue-200 underline' href={route('courses.player', { course_slug: item.enrolled_courses.slug })}>
                                                 {item.enrolled_courses.title}
                                             </Link>
                                         </span>
@@ -77,14 +77,14 @@ export default function index({ enrollments, users, courses }) {
                 label: 'User', render: (item) => {
                     return (
                         <div className="flex items-center justify-center">
-                            <div className="flex-shrink-0 w-12 h-12">
+                            <div className="w-16 h-16 overflow-hidden rounded-full">
                                 {item.enrolled_students?.profile ?
                                     (
-                                        <img className="w-12 h-12 rounded-full" src={item.enrolled_students?.profile_url} alt="" />
+                                        <img className="object-cover w-full h-full" src={item.enrolled_students?.profile_url} alt="" />
                                     )
                                     :
                                     (
-                                        <span className="flex items-center justify-center w-12 h-12 text-2xl text-white bg-gray-500 rounded-full">
+                                        <span className="flex items-center justify-center w-full h-full text-3xl text-white bg-gray-500 rounded-full">
                                             {item.enrolled_students?.avatar ?? item.enrolled_students?.name.charAt(0)}
                                         </span>
                                     )
