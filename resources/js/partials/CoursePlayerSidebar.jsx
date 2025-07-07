@@ -89,8 +89,8 @@ export default function CoursePlayerSidebar({ allLessons, lesson = null, course,
 
 
 
-                                        <div className="flex-1">
-                                            <h4 className="text-sm font-semibold text-gray-800 dark:text-white group-hover:text-blue-600 dark:group-hover:text-white line-clamp-2">
+                                        <div className="flex-1 w-full overflow-hidden">
+                                            <h4 className="w-full text-sm font-semibold text-gray-800 break-words dark:text-white group-hover:text-blue-600 dark:group-hover:text-white">
                                                 {c_lesson.title}
                                             </h4>
                                             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">

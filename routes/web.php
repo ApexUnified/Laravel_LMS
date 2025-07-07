@@ -7,6 +7,7 @@ use App\Http\Controllers\CoursePlayerController;
 use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\MyCourseController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PurchaseCourseController;
 use App\Http\Controllers\SettingController;
@@ -66,6 +67,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/purchase-course', PurchaseCourseController::class)->name('purchase.course');
     Route::get('/purchase-success', [PurchaseCourseController::class, 'success'])->name('purchase.success');
     Route::get('/purchase-cancel', [PurchaseCourseController::class, 'cancel'])->name('purchase.cancel');
+
+    // Notification Routes
+    Route::controller(NotificationController::class)->as('notifications.')->group(function () {
+        Route::get('/notifications', 'index')->name('index');
+
+        Route::get('/notifications/get-notifications-for-dashboard', 'getNotificationsForDashboard')
+            ->name('get.notifications.for.dashboard');
+
+        Route::put('/notifications/mark-as-read', 'notificationMarkAsRead')->name('mark.as.read');
+
+        Route::delete('/notifications/{notification_id}', 'destroyNotification')->name('destroy');
+
+        Route::delete('/notifications-destroy-all-notifications', 'destroyAllNotifications')
+            ->name('destroyallnotifications');
+    });
 
     // Profile Routes
     Route::controller(ProfileController::class)->group(function () {

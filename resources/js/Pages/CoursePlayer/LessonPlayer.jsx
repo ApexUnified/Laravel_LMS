@@ -154,7 +154,7 @@ export default function LessonPlayer({ course, lesson, course_progress, is_user_
                                             <>
                                                 <h2 className="my-2 text-2xl font-semibold text-gray-700 dark:text-white">Lesson Description:</h2>
                                                 <div
-                                                    className="text-gray-600 dark:text-gray-300 [&>ul]:list-disc [&>ul]:ml-6 [&>ol]:list-decimal [&>ol]:ml-6"
+                                                    className="text-gray-600 dark:text-gray-300 [&>ul]:list-disc [&>ul]:ml-6 [&>ol]:list-decimal [&>ol]:ml-6 break-words overflow-hidden"
                                                     dangerouslySetInnerHTML={{ __html: lesson.description }}
                                                 />
                                             </>

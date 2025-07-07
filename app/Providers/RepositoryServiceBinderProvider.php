@@ -18,6 +18,8 @@ use App\Repositories\Lessons\Interface\LessonRepositoryInterface;
 use App\Repositories\Lessons\Repository\LessonRepository;
 use App\Repositories\MyCourses\Interface\MyCourseRepositoryInterface;
 use App\Repositories\MyCourses\Repository\MyCoursesRepository;
+use App\Repositories\Notifications\Interface\NotificationRepositoryInterface;
+use App\Repositories\Notifications\Repository\NotificationRepository;
 use App\Repositories\Profile\Interface\ProfileRepositoryInterface;
 use App\Repositories\Profile\Repository\ProfileRepository;
 use App\Repositories\Settings\Interface\SettingRepositoryInterface;
@@ -44,6 +46,7 @@ class RepositoryServiceBinderProvider extends ServiceProvider
         $this->app->bind(MyCourseRepositoryInterface::class, MyCoursesRepository::class);
         $this->app->bind(AllCourseRepositoryInterface::class, AllCourseRepository::class);
         $this->app->bind(CheckoutRepositoryInterface::class, CheckoutRepository::class);
+        $this->app->bind(NotificationRepositoryInterface::class, NotificationRepository::class);
     }
 
     /**

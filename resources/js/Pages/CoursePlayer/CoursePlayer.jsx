@@ -97,7 +97,7 @@ export default function CoursePlayer({ course, course_progress, is_user_enrolled
                                             <>
                                                 <h2 className="my-2 text-2xl font-semibold text-gray-700 dark:text-white">Course Description:</h2>
                                                 <div
-                                                    className="text-gray-600 dark:text-gray-300 [&>ul]:list-disc [&>ul]:ml-6 [&>ol]:list-decimal [&>ol]:ml-6"
+                                                    className="text-gray-600 dark:text-gray-300 [&>ul]:list-disc [&>ul]:ml-6 [&>ol]:list-decimal [&>ol]:ml-6 break-words overflow-hidden"
                                                     dangerouslySetInnerHTML={{ __html: course.description }}
                                                 />
                                             </>
@@ -113,7 +113,7 @@ export default function CoursePlayer({ course, course_progress, is_user_enrolled
                                             <>
                                                 <h2 className="my-2 text-2xl font-semibold text-indigo-600 dark:text-indigo-400">What You'll Learn</h2>
                                                 <div
-                                                    className="text-gray-600 dark:text-gray-300 [&>ul]:list-disc [&>ul]:ml-6 [&>ol]:list-decimal [&>ol]:ml-6"
+                                                    className="text-gray-600 dark:text-gray-300 [&>ul]:list-disc [&>ul]:ml-6 [&>ol]:list-decimal [&>ol]:ml-6 break-words overflow-hidden"
                                                     dangerouslySetInnerHTML={{ __html: course.learning_outcomes }}
                                                 />
                                             </>
@@ -129,7 +129,7 @@ export default function CoursePlayer({ course, course_progress, is_user_enrolled
                                             <>
                                                 <h2 className="my-2 text-2xl font-semibold text-rose-600 dark:text-rose-400">Requirements</h2>
                                                 <div
-                                                    className="text-gray-600 dark:text-gray-300 [&>ul]:list-disc [&>ul]:ml-6 [&>ol]:list-decimal [&>ol]:ml-6"
+                                                    className="text-gray-600 dark:text-gray-300 [&>ul]:list-disc [&>ul]:ml-6 [&>ol]:list-decimal [&>ol]:ml-6 break-words overflow-hidden"
                                                     dangerouslySetInnerHTML={{ __html: course.requirements }}
                                                 />
                                             </>

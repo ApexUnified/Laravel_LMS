@@ -1,12 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react'
 
 
-import not1 from 'asset/assets/images/user/user-01.jpg';
-import not2 from 'asset/assets/images/user/user-02.jpg';
-import not3 from 'asset/assets/images/user/user-03.jpg';
-import not4 from 'asset/assets/images/user/user-04.jpg';
-import { Link, useForm } from '@inertiajs/react';
+import { Link, router, useForm } from '@inertiajs/react';
 import Spinner from '@/Components/Spinner';
+import PrimaryButton from '@/Components/PrimaryButton';
+import Toast from '@/Components/Toast';
 
 
 export default function Header({
@@ -16,6 +14,7 @@ export default function Header({
     setDarkMode,
     ApplicationLogoLight,
     ApplicationLogoDark,
+    Favicon,
     user
 }) {
 
@@ -29,18 +28,25 @@ export default function Header({
     // Show Notificaiton Dropdown State
     const [NotificationDropdown, setNotificationDropdown] = useState(false);
 
+    // Showing Custom Message From Frontend
+    const [flash, setFlash] = useState(null);
+
+    // Notifications State
+    const [notifications, setNotifications] = useState([]);
+    const [notificationsLoading, setNotificationsLoading] = useState(false);
+
+
     // Show Profile Dropdown State
     const [profileDropdown, setProfileDropdown] = useState(false);
 
     // Show Notifiction Badge State
-    const [notifying, setNotifying] = useState(true);
+    const [notifying, setNotifying] = useState(false);
 
 
     // For Managing  References
     const dropdownRef = useRef(null);
     const profileDropdownRef = useRef(null);
     const searchInputRef = useRef(null);
-
 
 
     // Toggle Mode Dark + Light
@@ -71,8 +77,8 @@ export default function Header({
                 setProfileDropdown(false);
             }
         }
-
         document.addEventListener('mousedown', handleClickOutside);
+
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
@@ -110,8 +116,74 @@ export default function Header({
 
     }, []);
 
+
+
+    // Fecthing NotificationsFecthing Notifications
+    useEffect(() => {
+        fetchNotifications();
+
+
+        const unlisten = router.on('navigate', () => {
+            fetchNotifications();
+        });
+
+        return () => {
+            unlisten();
+        };
+
+    }, []);
+
+
+    // Checking If Any Notification Has Read At Null Than Show Notifying on Notification icon
+    useEffect(() => {
+
+        if (notifications.length > 0) {
+            if (notifications.some(n => n.read_at === null)) {
+                setNotifying(true);
+            } else {
+                setNotifying(false);
+            }
+        }
+
+
+    }, [notifications]);
+
+
+    const fetchNotifications = async () => {
+        setNotificationsLoading(true);
+        const response = await axios.get(route('notifications.get.notifications.for.dashboard'));
+
+        if (response.data.status) {
+            setNotifications(response.data.notifications);
+            setNotificationsLoading(false);
+        } else {
+            setNotificationsLoading(false);
+        }
+
+    }
+
+    // Makring notification as Read
+    const markAsReadNotification = async (id) => {
+        const response = await axios.put(route('notifications.mark.as.read'), {
+            data: {
+                notification_id: id
+            }
+        });
+
+        if (response.data.status) {
+            setFlash({ success: response.data.message });
+            fetchNotifications();
+
+        } else {
+            setFlash({ error: response.data.message });
+        }
+    }
     return (
         <>
+
+            {flash && (
+                <Toast flash={flash} />
+            )}
 
             <header
                 className="flex w-full bg-white border-gray-200 lg:border-b dark:border-gray-800 dark:bg-gray-900"
@@ -285,7 +357,6 @@ export default function Header({
                                 <button
                                     className="relative flex items-center justify-center text-gray-500 transition-colors bg-white border border-gray-200 rounded-full hover:text-dark-900 h-11 w-11 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
                                     onClick={() => {
-                                        setNotifying(false);
                                         setNotificationDropdown(prev => !prev);
                                     }}
                                 >
@@ -314,7 +385,7 @@ export default function Header({
 
                                 {NotificationDropdown && (
                                     <div
-                                        className="shadow-2xl dark:bg-gray-900 absolute z-[1]  mt-[17px] flex h-[300px] w-[250px] flex-col rounded-2xl border border-gray-200 bg-white p-3 sm:w-[361px] lg:right-0 dark:border-gray-800"
+                                        className="shadow-2xl dark:bg-gray-900 absolute z-[1]  mt-[17px] flex h-[400px] w-[280px] flex-col rounded-2xl border border-gray-200 bg-white p-3 sm:w-[361px] lg:right-0 dark:border-gray-800"
                                     >
                                         <div
                                             className="flex items-center justify-between pb-3 mb-3 border-b border-gray-100 dark:border-gray-800"
@@ -348,188 +419,119 @@ export default function Header({
                                         </div>
 
 
+                                        {(notifications.length > 0 && !notificationsLoading) && (
 
-                                        <ul className="flex flex-col h-auto overflow-y-auto custom-scrollbar">
-                                            <li>
-                                                <a
-                                                    className="flex gap-3 rounded-lg border-b border-gray-100 p-3 px-4.5 py-3 hover:bg-gray-100 dark:border-gray-800 dark:hover:bg-white/5"
-                                                    href="#"
+                                            <>
+                                                <ul className="flex flex-col h-auto overflow-y-auto custom-scrollbar">
+
+                                                    {notifications.map((notification, index) => {
+
+                                                        return (
+                                                            <li key={index}>
+
+                                                                <div className="flex items-center justify-between">
+                                                                    <Link
+                                                                        className="flex gap-3 rounded-lg border-b border-gray-100 p-3 px-4.5 py-3 hover:bg-gray-100 dark:border-gray-800 dark:hover:bg-white/5"
+                                                                        href={
+
+                                                                            notification.data.route?.name ?
+                                                                                route(notification.data.route.name, [...notification.data.route.params || []])
+                                                                                : route('notifications.index')
+                                                                        }
+                                                                    >
+                                                                        <span
+                                                                            className="relative block w-full h-10 rounded-full z-1 max-w-10"
+                                                                        >
+                                                                            <img
+                                                                                src={Favicon}
+                                                                                alt="User"
+                                                                                className="overflow-hidden rounded-full"
+                                                                            />
+
+                                                                        </span>
+
+                                                                        <span className="block">
+                                                                            <span
+                                                                                className="text-theme-sm mb-1.5 block text-gray-500 dark:text-gray-400"
+                                                                            >
+                                                                                <span className="font-medium text-gray-800 dark:text-white/90"
+                                                                                >
+                                                                                    {notification.data.title}
+
+                                                                                </span>
+                                                                            </span>
+
+
+                                                                            <span
+                                                                                className="text-theme-sm mb-1.5 block text-gray-500 dark:text-gray-400"
+                                                                            >
+                                                                                <span className="font-medium text-gray-800 dark:text-white/90"
+                                                                                >
+                                                                                    {notification.data.message}
+
+                                                                                </span>
+                                                                            </span>
+
+                                                                            <span
+                                                                                className="flex items-center gap-2 text-gray-500 text-theme-xs dark:text-gray-400"
+                                                                            >
+                                                                                <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
+                                                                                <span>{notification.added_at}</span>
+                                                                            </span>
+                                                                        </span>
+                                                                    </Link>
+
+                                                                    {notification['read_at'] === null && (
+                                                                        <svg onClick={() => markAsReadNotification(notification.id)} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={"size-6 dark:text-white cursor-pointer"}>
+                                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+                                                                        </svg>
+                                                                    )}
+
+
+                                                                    {notification['read_at'] !== null && (
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={"size-6 dark:text-white"}>
+                                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 9v.906a2.25 2.25 0 0 1-1.183 1.981l-6.478 3.488M2.25 9v.906a2.25 2.25 0 0 0 1.183 1.981l6.478 3.488m8.839 2.51-4.66-2.51m0 0-1.023-.55a2.25 2.25 0 0 0-2.134 0l-1.022.55m0 0-4.661 2.51m16.5 1.615a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V8.844a2.25 2.25 0 0 1 1.183-1.981l7.5-4.039a2.25 2.25 0 0 1 2.134 0l7.5 4.039a2.25 2.25 0 0 1 1.183 1.98V19.5Z" />
+                                                                        </svg>
+
+                                                                    )}
+                                                                </div>
+                                                            </li>
+                                                        )
+                                                    })}
+
+
+                                                </ul>
+
+                                                <Link
+                                                    href={route('notifications.index')}
+                                                    className="text-theme-sm shadow-theme-xs mt-4 flex justify-center rounded-lg border border-gray-300 bg-white p-3 font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
                                                 >
-                                                    <span
-                                                        className="relative block w-full h-10 rounded-full z-1 max-w-10"
-                                                    >
-                                                        <img
-                                                            src={not1}
-                                                            alt="User"
-                                                            className="overflow-hidden rounded-full"
-                                                        />
-                                                        <span
-                                                            className="bg-success-500 absolute right-0 bottom-0 z-10 h-2.5 w-full max-w-2.5 rounded-full border-[1.5px] border-white dark:border-gray-900"
-                                                        ></span>
-                                                    </span>
+                                                    View All Notification
+                                                </Link>
+                                            </>
+                                        )}
 
-                                                    <span className="block">
-                                                        <span
-                                                            className="text-theme-sm mb-1.5 block text-gray-500 dark:text-gray-400"
-                                                        >
-                                                            <span className="font-medium text-gray-800 dark:text-white/90"
-                                                            >Terry Franci</span
-                                                            >
-                                                            requests permission to change
-                                                            <span className="font-medium text-gray-800 dark:text-white/90"
-                                                            >Project - Nganter App</span
-                                                            >
-                                                        </span>
 
-                                                        <span
-                                                            className="flex items-center gap-2 text-gray-500 text-theme-xs dark:text-gray-400"
-                                                        >
-                                                            <span>Project</span>
-                                                            <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
-                                                            <span>5 min ago</span>
+                                        {(notifications.length === 0 && !notificationsLoading) && (
+                                            <div className="flex flex-col h-auto overflow-y-auto custom-scrollbar">
+                                                <div className="flex flex-col h-auto overflow-y-auto custom-scrollbar">
+                                                    <span className="text-theme-sm text-center mb-1.5 block text-gray-500 dark:text-gray-400">
+                                                        <span className="font-medium text-gray-800 dark:text-white/90">
+                                                            No Notification
                                                         </span>
                                                     </span>
-                                                </a>
-                                            </li>
+                                                </div>
+                                            </div>
+                                        )}
 
-                                            <li>
-                                                <a
-                                                    className="flex gap-3 rounded-lg border-b border-gray-100 p-3 px-4.5 py-3 hover:bg-gray-100 dark:border-gray-800 dark:hover:bg-white/5"
-                                                    href="#"
-                                                >
-                                                    <span
-                                                        className="relative block w-full h-10 rounded-full z-1 max-w-10"
-                                                    >
-                                                        <img
-                                                            src={not2}
-                                                            alt="User"
-                                                            className="overflow-hidden rounded-full"
-                                                        />
-                                                        <span
-                                                            className="bg-success-500 absolute right-0 bottom-0 z-10 h-2.5 w-full max-w-2.5 rounded-full border-[1.5px] border-white dark:border-gray-900"
-                                                        ></span>
-                                                    </span>
-
-                                                    <span className="block">
-                                                        <span
-                                                            className="text-theme-sm mb-1.5 block text-gray-500 dark:text-gray-400"
-                                                        >
-                                                            <span className="font-medium text-gray-800 dark:text-white/90"
-                                                            >Alena Franci</span
-                                                            >
-                                                            requests permission to change
-                                                            <span className="font-medium text-gray-800 dark:text-white/90"
-                                                            >Project - Nganter App</span
-                                                            >
-                                                        </span>
-
-                                                        <span
-                                                            className="flex items-center gap-2 text-gray-500 text-theme-xs dark:text-gray-400"
-                                                        >
-                                                            <span>Project</span>
-                                                            <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
-                                                            <span>8 min ago</span>
-                                                        </span>
-                                                    </span>
-                                                </a>
-                                            </li>
-
-                                            <li>
-                                                <a
-                                                    className="flex gap-3 rounded-lg border-b border-gray-100 p-3 px-4.5 py-3 hover:bg-gray-100 dark:border-gray-800 dark:hover:bg-white/5"
-                                                    href="#"
-                                                >
-                                                    <span
-                                                        className="relative block w-full h-10 rounded-full z-1 max-w-10"
-                                                    >
-                                                        <img
-                                                            src={not3}
-                                                            alt="User"
-                                                            className="overflow-hidden rounded-full"
-                                                        />
-                                                        <span
-                                                            className="bg-success-500 absolute right-0 bottom-0 z-10 h-2.5 w-full max-w-2.5 rounded-full border-[1.5px] border-white dark:border-gray-900"
-                                                        ></span>
-                                                    </span>
-
-                                                    <span className="block">
-                                                        <span
-                                                            className="text-theme-sm mb-1.5 block text-gray-500 dark:text-gray-400"
-                                                        >
-                                                            <span className="font-medium text-gray-800 dark:text-white/90"
-                                                            >Jocelyn Kenter</span
-                                                            >
-                                                            requests permission to change
-                                                            <span className="font-medium text-gray-800 dark:text-white/90"
-                                                            >Project - Nganter App</span
-                                                            >
-                                                        </span>
-
-                                                        <span
-                                                            className="flex items-center gap-2 text-gray-500 text-theme-xs dark:text-gray-400"
-                                                        >
-                                                            <span>Project</span>
-                                                            <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
-                                                            <span>15 min ago</span>
-                                                        </span>
-                                                    </span>
-                                                </a>
-                                            </li>
-
-
-
-                                            <li>
-                                                <a
-                                                    className="flex gap-3 rounded-lg border-b border-gray-100 p-3 px-4.5 py-3 hover:bg-gray-100 dark:border-gray-800 dark:hover:bg-white/5"
-                                                    href="#"
-                                                >
-                                                    <span
-                                                        className="relative block w-full h-10 rounded-full z-1 max-w-10"
-                                                    >
-                                                        <img
-                                                            src={not4}
-                                                            alt="User"
-                                                            className="overflow-hidden rounded-full"
-                                                        />
-                                                        <span
-                                                            className="bg-success-500 absolute right-0 bottom-0 z-10 h-2.5 w-full max-w-2.5 rounded-full border-[1.5px] border-white dark:border-gray-900"
-                                                        ></span>
-                                                    </span>
-
-                                                    <span className="block">
-                                                        <span
-                                                            className="text-theme-sm mb-1.5 block text-gray-500 dark:text-gray-400"
-                                                        >
-                                                            <span className="font-medium text-gray-800 dark:text-white/90"
-                                                            >Jocelyn Kenter</span
-                                                            >
-                                                            requests permission to change
-                                                            <span className="font-medium text-gray-800 dark:text-white/90"
-                                                            >Project - Nganter App</span
-                                                            >
-                                                        </span>
-
-                                                        <span
-                                                            className="flex items-center gap-2 text-gray-500 text-theme-xs dark:text-gray-400"
-                                                        >
-                                                            <span>Project</span>
-                                                            <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
-                                                            <span>15 min ago</span>
-                                                        </span>
-                                                    </span>
-                                                </a>
-                                            </li>
-
-
-
-                                        </ul>
-
-                                        <a
-                                            href="#"
-                                            className="text-theme-sm shadow-theme-xs mt-3 flex justify-center rounded-lg border border-gray-300 bg-white p-3 font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
-                                        >
-                                            View All Notification
-                                        </a>
+                                        {notificationsLoading && (
+                                            <div className="flex flex-col items-center justify-center gap-5">
+                                                <p className='text-sm text-gray-800 dark:text-white'>Please Wait Your Notifications Are Loading</p>
+                                                <Spinner
+                                                    customSize={'w-10 h-10'}
+                                                />
+                                            </div>
+                                        )}
                                     </div>
                                 )}
 

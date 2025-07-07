@@ -4,7 +4,10 @@ namespace App\Repositories\Lessons\Repository;
 
 use App\Models\CloudinaryCredential;
 use App\Models\Course;
+use App\Models\Enrollment;
 use App\Models\Lesson;
+use App\Models\User;
+use App\Notifications\NotifyEnrolledUsersAboutNewLessonNotification;
 use App\Repositories\Lessons\Interface\LessonRepositoryInterface;
 use Cloudinary\Cloudinary;
 use Cloudinary\Configuration\Configuration;
@@ -19,7 +22,9 @@ class LessonRepository implements LessonRepositoryInterface
 
     public function __construct(
         private Lesson $lesson,
-        private Course $course
+        private Course $course,
+        private Enrollment $enrollment,
+        private User $user,
     ) {
         $this->cloudinary_credentials = CloudinaryCredential::first();
     }
@@ -238,8 +243,30 @@ class LessonRepository implements LessonRepositoryInterface
         $validated_req['slug'] = Str::slug($validated_req['title']).substr(uniqid(), 2, 5);
 
         $validated_req['description'] = json_encode($request->description);
+        $lesson = $this->lesson->create($validated_req);
 
-        if ($this->lesson->create($validated_req)) {
+        if (! empty($lesson)) {
+
+            if ($lesson->is_published == 1 && $lesson->is_approved == 1) {
+                $user_ids = $this->enrollment
+                    ->where('course_id', $lesson->course_id)
+                    ->pluck('user_id')
+                    ->unique();
+
+                if ($user_ids->isNotEmpty()) {
+
+                    $users = $this->user->whereIn('id', $user_ids)->get();
+
+                    if ($users->isNotEmpty()) {
+
+                        foreach ($users as $user) {
+                            $user->notify(new NotifyEnrolledUsersAboutNewLessonNotification($lesson?->course, $lesson->slug));
+                        }
+
+                    }
+                }
+            }
+
             return ['status' => true, 'message' => 'Lesson created successfully.'];
         } else {
             return ['status' => false, 'message' => 'Something went wrong! While creating Lesson.'];

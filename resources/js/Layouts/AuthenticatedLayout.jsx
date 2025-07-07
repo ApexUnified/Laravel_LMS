@@ -18,6 +18,7 @@ export default function AuthenticatedLayout({ children, ManuallytoggleSidebar })
     // Application Logo Sate With Default Images
     const [ApplicationLogoLight, setApplicationLogoLight] = useState(asset + "assets/images/Logo/ApplicationLogoLight.png");
     const [ApplicationLogoDark, setApplicationLogoDark] = useState(asset + "assets/images/Logo/ApplicationLogoDark.png");
+    const [Favicon, setFavicon] = useState(asset + "assets/images/Logo/Favicon.png");
 
 
     // Global Auth user Prop
@@ -46,6 +47,11 @@ export default function AuthenticatedLayout({ children, ManuallytoggleSidebar })
 
         if (generalSetting?.app_main_logo_dark) {
             setApplicationLogoDark(asset + "assets/images/Logo/" + generalSetting?.app_main_logo_dark);
+        }
+
+
+        if (generalSetting?.app_favicon) {
+            setFavicon(asset + "assets/images/Logo/" + generalSetting?.app_favicon);
         }
 
 
@@ -79,7 +85,7 @@ export default function AuthenticatedLayout({ children, ManuallytoggleSidebar })
 
 
 
-                    <Header sidebarToggle={sidebarToggle} setSidebarToggle={setSidebarToggle} darkMode={darkMode} setDarkMode={setDarkMode} ApplicationLogoLight={ApplicationLogoLight} ApplicationLogoDark={ApplicationLogoDark} user={user} />
+                    <Header sidebarToggle={sidebarToggle} Favicon={Favicon} setSidebarToggle={setSidebarToggle} darkMode={darkMode} setDarkMode={setDarkMode} ApplicationLogoLight={ApplicationLogoLight} ApplicationLogoDark={ApplicationLogoDark} user={user} />
 
 
 
