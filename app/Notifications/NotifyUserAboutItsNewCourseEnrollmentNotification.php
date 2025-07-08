@@ -8,7 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class NotifyEnrolledUsersAboutNewLessonNotification extends Notification implements ShouldQueue
+class NotifyUserAboutItsNewCourseEnrollmentNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -16,8 +16,7 @@ class NotifyEnrolledUsersAboutNewLessonNotification extends Notification impleme
      * Create a new notification instance.
      */
     public function __construct(
-        private Course $course,
-        private string $lesson_slug
+        private Course $course
     ) {}
 
     /**
@@ -30,13 +29,16 @@ class NotifyEnrolledUsersAboutNewLessonNotification extends Notification impleme
         return ['mail', 'database'];
     }
 
+    /**
+     * Get the mail representation of the notification.
+     */
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('🎉 New Lesson Published: '.$this->course->title)
+            ->subject('🎉 Enrollment New Course: '.$this->course->title)
             ->greeting('Hi '.$notifiable->name)
-            ->line('You have a new lesson in '.$this->course->title)
-            ->action('Check out Your New Lesson', route('lessons.player', [$this->course->slug, $this->lesson_slug]))
+            ->line('You have been enrolled in a new course '.$this->course->title)
+            ->action('Check out Your New Course', route('courses.player', $this->course->slug))
             ->line('Thank you for using our application!');
     }
 
@@ -48,14 +50,12 @@ class NotifyEnrolledUsersAboutNewLessonNotification extends Notification impleme
     public function toArray(object $notifiable): array
     {
         return [
-
             'route' => [
-                'name' => 'lessons.player',
-                'params' => [$this->course->slug, $this->lesson_slug],
+                'name' => 'courses.player',
+                'params' => [$this->course->slug],
             ],
-
-            'title' => 'New Lesson Added',
-            'message' => "You have a new lesson in {$this->course->title}",
+            'title' => 'You have been enrolled in a new course',
+            'message' => 'You have been enrolled in a new course '.$this->course->title,
         ];
     }
 }

@@ -140,6 +140,88 @@ class SettingController extends Controller
         }
     }
 
+    // Permission Methods
+
+    public function rolePermissions(string $id)
+    {
+        $permissions = $this->setting->getRolesPermissions($id);
+
+        if ($permissions->isEmpty()) {
+            return to_route('settings.roles.index')->with('error', 'Permissions Not Found');
+        }
+
+        return Inertia::render('Settings/Permissions/rolePermissions', compact('permissions'));
+
+    }
+
+    public function permissionIndex(Request $request)
+    {
+        $permissions = $this->setting->getPermissions();
+
+        return Inertia::render('Settings/Permissions/index', compact('permissions'));
+    }
+
+    public function permissionCreate()
+    {
+
+        return Inertia::render('Settings/Permissions/create');
+    }
+
+    public function permissionStore(Request $request)
+    {
+        $created = $this->setting->storePermission($request);
+
+        if ($created['status']) {
+            return back()->with('success', $created['message']);
+        } else {
+            return back()->with('error', $created['message']);
+        }
+    }
+
+    public function permissionEdit(string $id)
+    {
+        $permission = $this->setting->getPermission($id);
+
+        if (empty($permission)) {
+            return back()->with('error', 'Permission Not Found');
+        }
+
+        return Inertia::render('Settings/Permissions/edit', compact('permission'));
+    }
+
+    public function permissionupdate(Request $request, string $id)
+    {
+        $updated = $this->setting->updatePermission($request, $id);
+
+        if ($updated['status']) {
+            return to_route('settings.permissions.index')->with('success', $updated['message']);
+        } else {
+            return back()->with('error', $updated['message']);
+        }
+    }
+
+    public function permissionDestroy(string $id)
+    {
+        $deleted = $this->setting->destroyPermission($id);
+
+        if ($deleted['status']) {
+            return back()->with('success', $deleted['message']);
+        } else {
+            return back()->with('error', $deleted['message']);
+        }
+    }
+
+    public function permissionDestroyBySelection(Request $request)
+    {
+        $deleted = $this->setting->destroyPermissionBySelection($request);
+
+        if ($deleted['status']) {
+            return back()->with('success', $deleted['message']);
+        } else {
+            return back()->with('error', $deleted['message']);
+        }
+    }
+
     // Currency Methods
     public function currencyIndex(Request $request)
     {

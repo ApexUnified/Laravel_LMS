@@ -50,12 +50,12 @@ export default function index({ courses }) {
                                                 {/* Content */}
                                                 <div className="p-5 space-y-3">
                                                     {/* Title */}
-                                                    <h2 className="text-xl font-bold text-gray-900 dark:text-white line-clamp-1">
+                                                    <h2 className="overflow-hidden text-xl font-bold text-gray-900 break-words line-clamp-2 dark:text-white">
                                                         {course?.title}
                                                     </h2>
 
                                                     {/* Short Description */}
-                                                    <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
+                                                    <p className="text-sm text-gray-600 break-words dark:text-gray-300 line-clamp-2">
                                                         {course?.short_description}
                                                     </p>
 
@@ -149,7 +149,7 @@ export default function index({ courses }) {
                                 <>
 
                                     {courses.data.length > 0 && (
-                                        <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-800">
+                                        <div className="px-6 py-4 mt-5 border-t border-gray-200 dark:border-gray-800">
                                             <div className="flex items-center justify-between">
                                                 <PrimaryButton
                                                     Text={

@@ -89,9 +89,11 @@ export default function AuthenticatedLayout({ children, ManuallytoggleSidebar })
 
 
 
-                    <Toast
-                        flash={flash}
-                    />
+                    {flash && (
+                        <Toast
+                            flash={flash}
+                        />
+                    )}
 
 
 

@@ -9,10 +9,12 @@ import { Head, router, useForm, usePage } from '@inertiajs/react'
 import debounce from 'lodash.debounce';
 import React, { use, useCallback, useEffect, useState } from 'react'
 
-export default function index({ courses, users, categories, instructors }) {
+export default function index({ courses, categories, instructors }) {
 
     // Bulk Delete Form Data
     const { props } = usePage();
+
+
     const { data: BulkselectedIds, setData: setBulkSelectedIds, delete: BulkDelete, reset: resetBulkSelectedIds } = useForm({
         ids: [],
     });

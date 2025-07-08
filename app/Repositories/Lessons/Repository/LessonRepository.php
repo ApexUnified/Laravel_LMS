@@ -97,14 +97,17 @@ class LessonRepository implements LessonRepositoryInterface
             'thumbnail' => 'required|image|mimes:jpeg,png,jpg|max:2048|dimensions:min_width=1280,min_height=720,max_width=1280,max_height=720',
             'video' => 'required|mimes:mp4,webm,ogg,avi|max:10485760',
             'attachments' => 'nullable|array',
-            'is_published' => 'nullable|boolean',
-            'is_approved' => 'nullable|boolean',
+            'is_published' => 'required|boolean',
+            'is_approved' => 'required|boolean',
         ], [
             'thumbnail.max' => 'Thumbnail size should be less than Or Equal To 2MB',
             'thumbnail.dimensions' => 'Thumbnail resolution should be 1280x720 ',
             'video.max' => 'Video size should be less than Or Equal To 10GB',
             'course_id.exists' => 'Selected Course does not exist',
             'course_id.required' => 'Course is required',
+
+            'is_published.boolean' => 'Lesson Publish Status is required',
+            'is_approved.boolean' => 'Lesson Approval is required',
         ]);
 
         $description = trim(strip_tags($validated_req['description']));
@@ -286,8 +289,8 @@ class LessonRepository implements LessonRepositoryInterface
             ...($request->hasFile('attachments') ? [
                 'attachments' => 'nullable|array',
             ] : []),
-            'is_published' => 'nullable|boolean',
-            'is_approved' => 'nullable|boolean',
+            'is_published' => 'required|boolean',
+            'is_approved' => 'required|boolean',
         ], [
             ...($request->hasFile('thumbnail') ?
             [
@@ -301,6 +304,9 @@ class LessonRepository implements LessonRepositoryInterface
             ...($request->hasFile('video') ? ['video.max' => 'Video size should be less than Or Equal To 10GB'] : []),
             'course_id.exists' => 'Selected Course does not exist',
             'course_id.required' => 'Course is required',
+
+            'is_published.boolean' => 'Lesson Publish Status is required',
+            'is_approved.boolean' => 'Lesson Approval is required',
         ]);
 
         if ($request->boolean('is_video_removed') && ! $request->hasFile('video')) {
@@ -646,6 +652,16 @@ class LessonRepository implements LessonRepositoryInterface
 
     public function getCourses()
     {
-        return $this->course->all();
+        $courses = $this->course->with(['instructor'])
+            ->where('is_approved', 1)
+            ->get()
+            ->map(function ($course) {
+
+                $course->title = $course->title.' By '.$course->instructor->name;
+
+                return $course;
+            });
+
+        return $courses;
     }
 }

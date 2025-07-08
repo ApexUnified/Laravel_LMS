@@ -2,13 +2,12 @@
 
 namespace App\Notifications;
 
-use App\Models\Course;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class NotifyEnrolledUsersAboutNewLessonNotification extends Notification implements ShouldQueue
+class NotifyInstructorHisCourseApprovedByAdminNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -16,8 +15,7 @@ class NotifyEnrolledUsersAboutNewLessonNotification extends Notification impleme
      * Create a new notification instance.
      */
     public function __construct(
-        private Course $course,
-        private string $lesson_slug
+        private $data
     ) {}
 
     /**
@@ -30,13 +28,16 @@ class NotifyEnrolledUsersAboutNewLessonNotification extends Notification impleme
         return ['mail', 'database'];
     }
 
+    /**
+     * Get the mail representation of the notification.
+     */
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('🎉 New Lesson Published: '.$this->course->title)
+            ->subject('Course Approved By Admin')
             ->greeting('Hi '.$notifiable->name)
-            ->line('You have a new lesson in '.$this->course->title)
-            ->action('Check out Your New Lesson', route('lessons.player', [$this->course->slug, $this->lesson_slug]))
+            ->line("Your Course {$this->data['title']} Has Been Approved By Admin")
+            ->action('Start Adding Lessons', route('lessons.index'))
             ->line('Thank you for using our application!');
     }
 
@@ -48,14 +49,11 @@ class NotifyEnrolledUsersAboutNewLessonNotification extends Notification impleme
     public function toArray(object $notifiable): array
     {
         return [
-
             'route' => [
-                'name' => 'lessons.player',
-                'params' => [$this->course->slug, $this->lesson_slug],
+                'name' => 'lessons.index',
             ],
-
-            'title' => 'New Lesson Added',
-            'message' => "You have a new lesson in {$this->course->title}",
+            'title' => 'Your Course Approval',
+            'message' => "Your Course {$this->data['title']} Has Been Approved By Admin",
         ];
     }
 }

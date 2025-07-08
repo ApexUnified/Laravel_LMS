@@ -61,6 +61,11 @@ class Course extends Model
         return $this->hasMany(LessonProgress::class, 'course_id', 'id');
     }
 
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(Transaction::class, 'course_id', 'id');
+    }
+
     // Attributes
     protected $appends = ['actual_price'];
 

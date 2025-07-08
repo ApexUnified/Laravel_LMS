@@ -14,8 +14,10 @@ export default function Table({
     BulkDeleteMethod,
     SingleSelectedId,
     BulkDeleteRoute,
+    Search = true,
     SearchRoute,
     EditRoute,
+    DeleteAction = true,
     columns,
     items,
     props,
@@ -24,7 +26,8 @@ export default function Table({
     customSearch,
     searchProps = {},
     ParentSearched = false,
-    RouteParameterKey
+    RouteParameterKey,
+
 
 }) {
 
@@ -131,15 +134,19 @@ export default function Table({
     }, [search]);
 
     useEffect(() => {
-        if (selectedIds.length === 0) {
-            setBulkActionDropdown(false);
-            setBulkSelectedIds('ids', []);
-            setSingleSelectedId('id', null);
-        } else {
-            setBulkActionDropdown(true);
-            setBulkSelectedIds('ids', selectedIds);
-            setSingleSelectedId('id', selectedIds[0]);
+
+        if (setBulkSelectedIds !== undefined) {
+            if (selectedIds.length === 0) {
+                setBulkActionDropdown(false);
+                setBulkSelectedIds('ids', []);
+                setSingleSelectedId('id', null);
+            } else {
+                setBulkActionDropdown(true);
+                setBulkSelectedIds('ids', selectedIds);
+                setSingleSelectedId('id', selectedIds[0]);
+            }
         }
+
     }, [selectedIds]);
 
     // New function to render cell content
@@ -225,31 +232,33 @@ export default function Table({
                         </>
                     )}
                 </div>
-                <div className="flex flex-wrap gap-3 sm:flex-row sm:items-center">
-                    <div className="relative">
-                        <Input
-                            InputRef={searchInputRef}
-                            InputName={"Search"}
-                            Id={"search"}
-                            Placeholder={"Search Here.. Related Data"}
-                            Type={"search"}
-                            Name={"search"}
-                            Value={search}
-                            Action={(e) => {
-                                const value = e.target.value;
-                                setSearch(value);
-                                if (debouncedSearch.current) {
-                                    debouncedSearch.current(value);
-                                }
-                            }}
-                        />
+                {Search && (
+                    <div className="flex flex-wrap gap-3 sm:flex-row sm:items-center">
+                        <div className="relative">
+                            <Input
+                                InputRef={searchInputRef}
+                                InputName={"Search"}
+                                Id={"search"}
+                                Placeholder={"Search Here.. Related Data"}
+                                Type={"search"}
+                                Name={"search"}
+                                Value={search}
+                                Action={(e) => {
+                                    const value = e.target.value;
+                                    setSearch(value);
+                                    if (debouncedSearch.current) {
+                                        debouncedSearch.current(value);
+                                    }
+                                }}
+                            />
 
+                        </div>
+
+
+
+                        {customSearch}
                     </div>
-
-
-
-                    {customSearch}
-                </div>
+                )}
             </div>
 
             {/* Table */}
@@ -258,17 +267,19 @@ export default function Table({
                     <table className="min-w-full min-h-[200px]">
                         <thead className="py-3 border-gray-100 border-y dark:border-gray-800">
                             <tr>
-                                <th className="py-3 pr-5 font-normal whitespace-nowrap sm:pr-6">
-                                    <div className="flex items-center me-4">
-                                        <input
-                                            onChange={() => handleSelectAll()}
-                                            type="checkbox"
-                                            value=""
-                                            className="w-6 h-6 mx-2 text-blue-600 rounded-lg cursor-pointer border-slate-300 bg-slate-50 focus:ring-blue-500 dark:focus:ring-white dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                                            checked={selectedIds.length === items.data.length && items.data.length !== 0}
-                                        />
-                                    </div>
-                                </th>
+                                {BulkDeleteMethod && (
+                                    <th className="py-3 pr-5 font-normal whitespace-nowrap sm:pr-6">
+                                        <div className="flex items-center me-4">
+                                            <input
+                                                onChange={() => handleSelectAll()}
+                                                type="checkbox"
+                                                value=""
+                                                className="w-6 h-6 mx-2 text-blue-600 rounded-lg cursor-pointer border-slate-300 bg-slate-50 focus:ring-blue-500 dark:focus:ring-white dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                                                checked={selectedIds.length === items.data.length && items.data.length !== 0}
+                                            />
+                                        </div>
+                                    </th>
+                                )}
                                 {columns.map((column, index) => (
                                     <th key={index} className="py-3 pr-5 font-normal whitespace-nowrap sm:pr-6">
                                         <div className="flex items-center">
@@ -276,29 +287,36 @@ export default function Table({
                                         </div>
                                     </th>
                                 ))}
-                                <th className="px-5 py-3 font-normal whitespace-nowrap sm:px-6">
-                                    <div className="flex items-center">
-                                        <p className="text-gray-500 text-theme-sm dark:text-gray-400">Action</p>
-                                    </div>
-                                </th>
+
+                                {(customActions.length > 0 || DeleteAction || EditRoute) && (
+                                    <th className="px-5 py-3 font-normal whitespace-nowrap sm:px-6">
+                                        <div className="flex items-center">
+                                            <p className="text-gray-500 text-theme-sm dark:text-gray-400">Action</p>
+                                        </div>
+                                    </th>
+                                )}
+
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                             {items.data.map((item, index) => (
                                 <tr key={index}>
-                                    <td className="py-3 pr-5 whitespace-nowrap sm:pr-5">
-                                        <div className="flex items-center col-span-3">
-                                            <div className="flex items-center me-4">
-                                                <input
-                                                    type="checkbox"
-                                                    value={item.id}
-                                                    className="w-6 h-6 mx-2 text-blue-600 rounded-lg cursor-pointer singleSelect border-slate-300 bg-slate-50 focus:ring-blue-500 dark:focus:ring-white dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                                                    onChange={() => handleSelect(item.id)}
-                                                    checked={selectedIds.includes(item.id)}
-                                                />
+                                    {BulkDeleteMethod && (
+                                        <td className="py-3 pr-5 whitespace-nowrap sm:pr-5">
+                                            <div className="flex items-center col-span-3">
+                                                <div className="flex items-center me-4">
+                                                    <input
+                                                        type="checkbox"
+                                                        value={item.id}
+                                                        className="w-6 h-6 mx-2 text-blue-600 rounded-lg cursor-pointer singleSelect border-slate-300 bg-slate-50 focus:ring-blue-500 dark:focus:ring-white dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                                                        onChange={() => handleSelect(item.id)}
+                                                        checked={selectedIds.includes(item.id)}
+                                                    />
+                                                </div>
                                             </div>
-                                        </div>
-                                    </td>
+                                        </td>
+                                    )}
+
                                     {columns.map((column, index) => (
                                         <td key={index} className="py-3 pr-5 whitespace-nowrap sm:pr-5 ">
                                             <div className="flex items-center col-span-3">
@@ -306,88 +324,94 @@ export default function Table({
                                             </div>
                                         </td>
                                     ))}
-                                    <td className="px-5 py-3 whitespace-nowrap sm:px-6">
-                                        <div className="flex items-center justify-start">
-                                            <div ref={(el) => (dropdownRefs.current[item.id] = el)} className="relative">
-                                                <button
-                                                    onClick={() => setOpenDropdownId((prev) => (prev === item.id ? null : item.id))}
-                                                    className="text-white transition bg-blue-700 dark:bg-white/5 dark:text-white/90 dark:hover:bg-white/10 shadow-lg hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 inline-flex items-center dark:focus:ring-gray-800"
-                                                >
-                                                    Action
-                                                    <svg
-                                                        className="w-2.5 h-2.5 ms-3"
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        fill="none"
-                                                        viewBox="0 0 10 6"
+
+                                    {(customActions.length > 0 || DeleteAction || EditRoute) && (
+                                        <td className="px-5 py-3 whitespace-nowrap sm:px-6">
+                                            <div className="flex items-center justify-start">
+                                                <div ref={(el) => (dropdownRefs.current[item.id] = el)} className="relative">
+                                                    <button
+                                                        onClick={() => setOpenDropdownId((prev) => (prev === item.id ? null : item.id))}
+                                                        className="text-white transition bg-blue-700 dark:bg-white/5 dark:text-white/90 dark:hover:bg-white/10 shadow-lg hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 inline-flex items-center dark:focus:ring-gray-800"
                                                     >
-                                                        <path
-                                                            stroke="currentColor"
-                                                            strokeLinecap="round"
-                                                            strokeLinejoin="round"
-                                                            strokeWidth="2"
-                                                            d="m1 1 4 4 4-4"
-                                                        />
-                                                    </svg>
-                                                </button>
-                                                {openDropdownId === item.id && (
-                                                    <div
-                                                        className={`relative right-0 mt-2 rounded-lg bg-slate-50 w-44 dark:bg-white/10 dark:text-white/90 dark:hover:bg-white/10 shadow-lg z-[9999] ${openDropdownId === 1 ? 'mt-0 mb-5' : ''
-                                                            }`}
-                                                    >
-                                                        <ul className="py-2 text-sm text-gray-700 dark:text-gray-200">
-                                                            {EditRoute && (
-                                                                <li>
-                                                                    <Link
-                                                                        href={route(EditRoute, RouteParameterKey ? item[RouteParameterKey] : item.id)}
-                                                                        className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                                                                    >
-                                                                        Edit
-                                                                    </Link>
-                                                                </li>
-                                                            )}
-
-                                                            <li>
-                                                                <button
-                                                                    type="button"
-                                                                    className="block w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                                                                    onClick={() => {
-                                                                        setSelectedIds([]);
-                                                                        setSelectedIds([item.id]);
-                                                                        setDeleteSingleConfirmationModal(true);
-                                                                    }}
-                                                                >
-                                                                    Delete
-                                                                </button>
-                                                            </li>
-                                                            {/* Custom Actions */}
-                                                            {customActions.map((action, idx) => (
-                                                                <li key={idx}>
-                                                                    {action.type === 'button' && (
-                                                                        <button
-                                                                            onClick={() => action.onClick(item)}
-                                                                            className="block w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                                                                        >
-                                                                            {action.label}
-                                                                        </button>
-                                                                    )}
-
-
-                                                                    {action.type === 'link' && (
+                                                        Action
+                                                        <svg
+                                                            className="w-2.5 h-2.5 ms-3"
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            fill="none"
+                                                            viewBox="0 0 10 6"
+                                                        >
+                                                            <path
+                                                                stroke="currentColor"
+                                                                strokeLinecap="round"
+                                                                strokeLinejoin="round"
+                                                                strokeWidth="2"
+                                                                d="m1 1 4 4 4-4"
+                                                            />
+                                                        </svg>
+                                                    </button>
+                                                    {openDropdownId === item.id && (
+                                                        <div
+                                                            className={`relative right-0 mt-2 rounded-lg bg-slate-50 w-44 dark:bg-white/10 dark:text-white/90 dark:hover:bg-white/10 shadow-lg z-[9999] ${openDropdownId === 1 ? 'mt-0 mb-5' : ''
+                                                                }`}
+                                                        >
+                                                            <ul className="py-2 text-sm text-gray-700 dark:text-gray-200">
+                                                                {EditRoute && (
+                                                                    <li>
                                                                         <Link
-                                                                            href={action.href(item)}
-                                                                            className="block w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                                                                            href={route(EditRoute, RouteParameterKey ? item[RouteParameterKey] : item.id)}
+                                                                            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
                                                                         >
-                                                                            {action.label}
+                                                                            Edit
                                                                         </Link>
-                                                                    )}
-                                                                </li>
-                                                            ))}
-                                                        </ul>
-                                                    </div>
-                                                )}
+                                                                    </li>
+                                                                )}
+
+                                                                {DeleteAction && (
+                                                                    <li>
+                                                                        <button
+                                                                            type="button"
+                                                                            className="block w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                                                                            onClick={() => {
+                                                                                setSelectedIds([]);
+                                                                                setSelectedIds([item.id]);
+                                                                                setDeleteSingleConfirmationModal(true);
+                                                                            }}
+                                                                        >
+                                                                            Delete
+                                                                        </button>
+                                                                    </li>
+                                                                )}
+                                                                {/* Custom Actions */}
+                                                                {customActions.map((action, idx) => (
+                                                                    <li key={idx}>
+                                                                        {action.type === 'button' && (
+                                                                            <button
+                                                                                onClick={() => action.onClick(item)}
+                                                                                className="block w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                                                                            >
+                                                                                {action.label}
+                                                                            </button>
+                                                                        )}
+
+
+                                                                        {action.type === 'link' && (
+                                                                            <Link
+                                                                                href={action.href(item)}
+                                                                                className="block w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                                                                            >
+                                                                                {action.label}
+                                                                            </Link>
+                                                                        )}
+                                                                    </li>
+                                                                ))}
+                                                            </ul>
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </div>
-                                        </div>
-                                    </td>
+                                        </td>
+                                    )}
+
                                 </tr>
                             ))}
                         </tbody>

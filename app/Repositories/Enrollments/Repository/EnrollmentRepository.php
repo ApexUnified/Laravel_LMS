@@ -5,6 +5,7 @@ namespace App\Repositories\Enrollments\Repository;
 use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\User;
+use App\Notifications\NotifyUserAboutItsNewCourseEnrollmentNotification;
 use App\Repositories\Enrollments\Interface\EnrollmentRepositoryInterface;
 use Illuminate\Http\Request;
 
@@ -71,7 +72,19 @@ class EnrollmentRepository implements EnrollmentRepositoryInterface
         $validated_req['is_enrolled'] = true;
         $validated_req['enrolled_at'] = now();
 
-        if ($this->enrollment->create($validated_req)) {
+        $enrollment = $this->enrollment->create($validated_req);
+
+        if (! empty($enrollment)) {
+
+            $user = $this->user->find($enrollment->user_id);
+            if (! empty($user)) {
+                $course = $this->course->find($enrollment->course_id);
+
+                if (! empty($course)) {
+                    $user->notify(new NotifyUserAboutItsNewCourseEnrollmentNotification($course));
+                }
+            }
+
             return ['status' => true, 'message' => 'Enrollment created successfully'];
         } else {
             return ['status' => false, 'message' => 'Something Went Wrong, Enrollment could not be created'];
@@ -119,13 +132,17 @@ class EnrollmentRepository implements EnrollmentRepositoryInterface
 
     public function getUsers()
     {
-        return $this->user->all();
+        return $this->user->whereHas('roles', fn ($query) => $query->where('name', 'Student'))->get();
     }
 
     public function getCoursesRelatedToUser(string $id)
     {
 
-        $user = $this->user->find($id);
+        $user = $this->user->whereHas('roles', function ($query) {
+            $query->where('name', 'Student');
+        })
+            ->where('id', $id)
+            ->first();
 
         if (empty($user)) {
             return ['status' => false, 'message' => 'User not found'];

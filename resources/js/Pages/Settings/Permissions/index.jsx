@@ -5,8 +5,9 @@ import Table from '@/Components/Table'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import { Head, useForm, usePage } from '@inertiajs/react'
 import React, { useEffect, useState } from 'react'
+import * as LucideIcons from 'lucide-react';
 
-export default function index({ roles }) {
+export default function index({ permissions }) {
 
     // Bulk Delete Form Data
     const { props } = usePage();
@@ -26,6 +27,18 @@ export default function index({ roles }) {
         const columns = [
             { key: 'name', label: 'Role Name' },
             { key: 'guard_name', label: 'Guard Name' },
+            {
+                label: "Icon",
+                render: (item) => {
+                    const IconComponent = LucideIcons[item.icon] || LucideIcons.HelpCircle;
+
+                    return (
+                        <>
+                            <IconComponent size={20} />
+                        </>
+                    );
+                }
+            },
             { key: 'added_at', label: 'Created At' },
         ];
 
@@ -35,16 +48,17 @@ export default function index({ roles }) {
     }, []);
 
 
+
     return (
         <AuthenticatedLayout>
 
-            <Head title='Roles' />
+            <Head title='Permissions' />
 
             <BreadCrumb
-                header={"Roles"}
-                parent={"Settings"}
-                parent_link={route("settings.index")}
-                child={"Roles"}
+                header={"Permissions"}
+                parent={"Roles"}
+                parent_link={route("settings.roles.index")}
+                child={"Permissions"}
             />
 
 
@@ -53,11 +67,11 @@ export default function index({ roles }) {
                     <>
                         <div className="flex flex-wrap justify-end gap-5 my-3">
                             <LinkButton
-                                Text={"Permissions"}
-                                URL={route("settings.permissions.index")}
+                                Text={"Back To Roles"}
+                                URL={route("settings.roles.index")}
                                 Icon={
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 10.5V6.75a4.5 4.5 0 1 1 9 0v3.75M3.75 21.75h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H3.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
                                     </svg>
 
 
@@ -66,8 +80,8 @@ export default function index({ roles }) {
 
 
                             <LinkButton
-                                Text={"Create Role"}
-                                URL={route("settings.roles.create")}
+                                Text={"Create Permission"}
+                                URL={route("settings.permissions.create")}
                                 Icon={
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -85,20 +99,11 @@ export default function index({ roles }) {
                             resetSingleSelectedId={resetSingleSelectedId}
                             BulkDeleteMethod={BulkDelete}
                             SingleDeleteMethod={SingleDelete}
-                            EditRoute={"settings.roles.edit"}
-                            BulkDeleteRoute={"settings.roles.destroybyselection"}
-                            SearchRoute={"settings.roles.index"}
-                            SingleDeleteRoute={"settings.roles.destroy"}
-                            customActions={
-                                [
-                                    {
-                                        label: "Permissions",
-                                        type: "link",
-                                        href: (item) => route("settings.roles.permissions", item.id),
-                                    }
-                                ]
-                            }
-                            items={roles}
+                            EditRoute={"settings.permissions.edit"}
+                            BulkDeleteRoute={"settings.permissions.destroybyselection"}
+                            Search={false}
+                            SingleDeleteRoute={"settings.permissions.destroy"}
+                            items={permissions}
                             props={props}
                             columns={columns}
                         />

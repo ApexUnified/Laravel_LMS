@@ -9,7 +9,7 @@ import RichTextEditor from '@/Components/RichTextEditor'
 import SelectInput from '@/Components/SelectInput'
 import Spinner from '@/Components/Spinner'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
-import { Head, useForm } from '@inertiajs/react'
+import { Head, useForm, usePage } from '@inertiajs/react'
 import React, { useEffect, useState } from 'react'
 
 export default function create({ categories, instructors }) {
@@ -31,6 +31,8 @@ export default function create({ categories, instructors }) {
         requirements: '',
         learning_outcomes: '',
     });
+
+    const { role } = usePage().props.auth;
 
     const [levels, setLevels] = useState([]);
 
@@ -272,6 +274,7 @@ export default function create({ categories, instructors }) {
 
 
 
+
                                     <div className="grid grid-cols-1 gap-4 px-5 mb-4 sm:grid-cols-2 sm:px-6">
                                         <SelectInput
                                             InputName={"Course Published Status"}
@@ -287,19 +290,21 @@ export default function create({ categories, instructors }) {
                                         />
 
 
+                                        {role === 'Admin' && (
+                                            <SelectInput
+                                                InputName={"Course Approval Status"}
+                                                Id={"is_approved"}
+                                                Name={"is_approved"}
+                                                Error={errors.is_approved}
+                                                items={[{ id: 1, name: "Approved" }, { id: 0, name: "Not Approved" }]}
+                                                itemKey={"name"}
+                                                Value={data.is_approved}
+                                                Action={
+                                                    (e) => setData("is_approved", e.target.value)
+                                                }
+                                            />
+                                        )}
 
-                                        <SelectInput
-                                            InputName={"Course Approval Status"}
-                                            Id={"is_approved"}
-                                            Name={"is_approved"}
-                                            Error={errors.is_approved}
-                                            items={[{ id: 1, name: "Approved" }, { id: 0, name: "Not Approved" }]}
-                                            itemKey={"name"}
-                                            Value={data.is_approved}
-                                            Action={
-                                                (e) => setData("is_approved", e.target.value)
-                                            }
-                                        />
                                     </div>
 
                                     {/* FileUploader */}

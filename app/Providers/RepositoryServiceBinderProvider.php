@@ -24,6 +24,8 @@ use App\Repositories\Profile\Interface\ProfileRepositoryInterface;
 use App\Repositories\Profile\Repository\ProfileRepository;
 use App\Repositories\Settings\Interface\SettingRepositoryInterface;
 use App\Repositories\Settings\Repository\SettingRepository;
+use App\Repositories\Transactions\Interface\TransactionRepositoryInterface;
+use App\Repositories\Transactions\Repository\TransactionRepository;
 use App\Repositories\Users\Interface\UserRepositoryInterface;
 use App\Repositories\Users\Repository\UserRepository;
 use Illuminate\Support\ServiceProvider;
@@ -47,6 +49,7 @@ class RepositoryServiceBinderProvider extends ServiceProvider
         $this->app->bind(AllCourseRepositoryInterface::class, AllCourseRepository::class);
         $this->app->bind(CheckoutRepositoryInterface::class, CheckoutRepository::class);
         $this->app->bind(NotificationRepositoryInterface::class, NotificationRepository::class);
+        $this->app->bind(TransactionRepositoryInterface::class, TransactionRepository::class);
     }
 
     /**

@@ -59,18 +59,18 @@ export default function index({ courses }) {
                                                 {/* Content */}
                                                 <div className="p-4 space-y-3">
                                                     {/* Title */}
-                                                    <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
+                                                    <h2 className="text-xl font-semibold text-gray-800 break-words line-clamp-2 dark:text-white">
                                                         {course?.title}
                                                     </h2>
 
                                                     {/* Description */}
-                                                    <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
+                                                    <p className="text-sm text-gray-600 break-words dark:text-gray-300 line-clamp-2">
                                                         {course?.short_description}
                                                     </p>
 
                                                     {/* Tags */}
                                                     <div className="flex flex-wrap gap-2 mt-2 text-sm">
-                                                        <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
+                                                        <span className="bg-blue-100 text-blue-800 break-words overflow-hidden  px-2 py-0.5 rounded-full">
                                                             {course?.course_language}
                                                         </span>
                                                         <span className="bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full">
@@ -137,7 +137,7 @@ export default function index({ courses }) {
                                 <>
 
                                     {courses.data.length > 0 && (
-                                        <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-800">
+                                        <div className="px-6 py-4 mt-5 border-t border-gray-200 dark:border-gray-800">
                                             <div className="flex items-center justify-between">
                                                 <PrimaryButton
                                                     Text={

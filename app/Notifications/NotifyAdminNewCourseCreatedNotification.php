@@ -3,12 +3,13 @@
 namespace App\Notifications;
 
 use App\Models\Course;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class NotifyEnrolledUsersAboutNewLessonNotification extends Notification implements ShouldQueue
+class NotifyAdminNewCourseCreatedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -17,8 +18,10 @@ class NotifyEnrolledUsersAboutNewLessonNotification extends Notification impleme
      */
     public function __construct(
         private Course $course,
-        private string $lesson_slug
-    ) {}
+        private User $user
+    ) {
+        //
+    }
 
     /**
      * Get the notification's delivery channels.
@@ -30,14 +33,16 @@ class NotifyEnrolledUsersAboutNewLessonNotification extends Notification impleme
         return ['mail', 'database'];
     }
 
+    /**
+     * Get the mail representation of the notification.
+     */
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('🎉 New Lesson Published: '.$this->course->title)
-            ->greeting('Hi '.$notifiable->name)
-            ->line('You have a new lesson in '.$this->course->title)
-            ->action('Check out Your New Lesson', route('lessons.player', [$this->course->slug, $this->lesson_slug]))
-            ->line('Thank you for using our application!');
+            ->subject('New Course Created')
+            ->greeting('Hi Admin! '.$notifiable->name)
+            ->line("New Course Has Been Created By ( {$this->user->name}  ) in The Application Please Review it And Approve It.")
+            ->action('Review The Course', route('courses.player', $this->course->slug));
     }
 
     /**
@@ -48,14 +53,13 @@ class NotifyEnrolledUsersAboutNewLessonNotification extends Notification impleme
     public function toArray(object $notifiable): array
     {
         return [
-
             'route' => [
-                'name' => 'lessons.player',
-                'params' => [$this->course->slug, $this->lesson_slug],
+                'name' => 'courses.player',
+                'params' => [$this->course->slug],
             ],
 
-            'title' => 'New Lesson Added',
-            'message' => "You have a new lesson in {$this->course->title}",
+            'title' => "New Course Created By ( {$this->user->name} ) Please Review It",
+            'message' => 'New Course Has Been Created in The Application Please Review it And Approve It.',
         ];
     }
 }

@@ -10,6 +10,7 @@ use App\Models\StripeCredential;
 use App\Repositories\Settings\Interface\SettingRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 class SettingRepository implements SettingRepositoryInterface
@@ -18,6 +19,7 @@ class SettingRepository implements SettingRepositoryInterface
         private GeneralSetting $generalSetting,
         private SmtpSetting $smtpSetting,
         private Role $role,
+        private Permission $permission,
         private Currency $currency,
         private StripeCredential $stripe_credential,
         private CloudinaryCredential $cloudinary_credential
@@ -249,6 +251,94 @@ class SettingRepository implements SettingRepositoryInterface
         :
         ['status' => false, 'message' => 'Something went wrong While Deleting Role'];
 
+    }
+
+    public function getRolesPermissions(string $id)
+    {
+        //
+    }
+
+    public function getPermissions()
+    {
+        $permissions = $this->permission->latest()->paginate(10);
+
+        $permissions->getCollection()->transform(function ($permission) {
+
+            $permission->added_at = $permission->created_at->format('Y-m-d g:i A');
+
+            return $permission;
+        });
+
+        return $permissions;
+    }
+
+    public function getPermission(string $id)
+    {
+        return $this->permission->find($id);
+    }
+
+    public function storePermission(Request $request)
+    {
+        $validated_req = $request->validate([
+            'name' => 'required|min:4|unique:permissions,name',
+            'icon' => 'required',
+        ]);
+
+        $validated_req['guard_name'] = 'web';
+
+        return $this->permission->create($validated_req)
+        ?
+        ['status' => true, 'message' => 'Permission Created Successfully']
+        :
+         ['status' => false, 'message' => 'Something went wrong While Creating Permission'];
+    }
+
+    public function updatePermission(Request $request, string $id)
+    {
+        $validated_req = $request->validate([
+            'name' => 'required|min:4|unique:permissions,name,'.$id,
+            'icon' => 'required',
+        ]);
+
+        $permission = $this->getPermission($id);
+
+        if (empty($permission)) {
+            return ['status' => false, 'message' => 'Permission Not Found'];
+        }
+
+        return $permission->update($validated_req)
+        ?
+        ['status' => true, 'message' => 'Permission Updated Successfully']
+        :
+         ['status' => false, 'message' => 'Something went wrong While Updating Permission'];
+    }
+
+    public function destroyPermission(string $id)
+    {
+        $permission = $this->getPermission($id);
+
+        if (empty($permission)) {
+            return ['status' => false, 'message' => 'Permission Not Found'];
+        }
+
+        return $permission->delete() ?
+        ['status' => true, 'message' => 'Permission Deleted Successfully']
+        :
+        ['status' => false, 'message' => 'Something went wrong While Deleting Permission'];
+    }
+
+    public function destroyPermissionBySelection(Request $request)
+    {
+        $ids = $request->array('ids');
+
+        if (blank($ids)) {
+            return ['status' => false, 'message' => 'Please Select Atleast One Permission'];
+        }
+
+        return $this->permission->whereIn('id', $ids)->delete() > 0 ?
+        ['status' => true, 'message' => 'Permission Deleted Successfully']
+        :
+        ['status' => false, 'message' => 'Something went wrong While Deleting Permission'];
     }
 
     public function getCurrencies(Request $request)

@@ -7,11 +7,14 @@ use App\Models\CloudinaryCredential;
 use App\Models\Course;
 use App\Models\Currency;
 use App\Models\User;
+use App\Notifications\NotifyAdminNewCourseCreatedNotification;
+use App\Notifications\NotifyInstructorHisCourseApprovedByAdminNotification;
 use App\Repositories\Courses\Interface\CoursesRepositoryInterface;
 use Cloudinary\Cloudinary;
 use Cloudinary\Configuration\Configuration;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Spatie\Permission\Models\Role;
@@ -78,7 +81,6 @@ class CourseRepository implements CoursesRepositoryInterface
 
     public function storeCourse(Request $request)
     {
-
         $validated_req = $request->validate([
             'title' => 'required|string|min:5|max:150',
             'short_description' => 'required|string|min:10',
@@ -91,16 +93,28 @@ class CourseRepository implements CoursesRepositoryInterface
             'discount' => 'required|numeric|min:0',
             'level' => 'required|string|in:Beginner,Intermediate,Advanced',
             'course_language' => 'required|string',
-            'is_published' => 'nullable|boolean',
-            'is_approved' => 'nullable|boolean',
+            'is_published' => 'required|boolean',
+            'is_approved' => 'required|boolean',
             'requirements' => 'nullable',
             'learning_outcomes' => 'nullable',
         ], [
             'thumbnail.max' => 'Thumbnail size should be less than Or Equal To 2MB',
             'thumbnail.dimensions' => 'Thumbnail resolution should be 1280x720 ',
             'promo_video.max' => 'Promo video size should be less than Or Equal To 10GB',
+
             'category_id.exists' => 'Selected Category does not exist',
             'instructor_id.exists' => 'Selected Instructor does not exist',
+            'is_approved.required' => 'Course Approval is required',
+            'is_published.required' => 'Course Publish Status is required',
+            'instructor_id.required' => 'Instructor is required',
+            'category_id.required' => 'Category is required',
+            'price.required' => 'Course Price is required',
+            'discount.required' => 'Course Discount is required And Minimum its value should be 0',
+            'level.required' => 'Course Level is required',
+            'course_language.required' => 'Course Language is required',
+
+            'is_published.boolean' => 'Course Publish Status is required',
+            'is_approved.boolean' => 'Course Approval is required',
         ]);
 
         if ($validated_req['price'] == 0 && $validated_req['discount'] > 0) {
@@ -211,7 +225,21 @@ class CourseRepository implements CoursesRepositoryInterface
         $validated_req['meta_title'] = $validated_req['slug'];
         $validated_req['meta_description'] = $validated_req['short_description'];
 
-        if ($this->course->create($validated_req)) {
+        $course = $this->course->create($validated_req);
+        if (! empty($course)) {
+
+            if (! Auth::user()->hasRole('Admin')) {
+                $admins = $this->user->whereHas('roles', function ($query) {
+                    $query->where('name', 'Admin');
+                })->get();
+
+                if ($admins->isNotEmpty()) {
+                    foreach ($admins as $admin) {
+                        $admin->notify(new NotifyAdminNewCourseCreatedNotification($course, Auth::user()));
+                    }
+                }
+            }
+
             return ['status' => true, 'message' => 'Course created successfully!'];
         } else {
             return ['status' => false, 'message' => 'Course Creation Failed Something went wrong!'];
@@ -256,8 +284,8 @@ class CourseRepository implements CoursesRepositoryInterface
             'discount' => 'required|numeric|min:0',
             'level' => 'required|string|in:Beginner,Intermediate,Advanced',
             'course_language' => 'required|string',
-            'is_published' => 'nullable|boolean',
-            'is_approved' => 'nullable|boolean',
+            'is_published' => 'required|boolean',
+            'is_approved' => 'required|boolean',
             'requirements' => 'nullable',
             'learning_outcomes' => 'nullable',
         ], [
@@ -270,9 +298,27 @@ class CourseRepository implements CoursesRepositoryInterface
             :
             []
             ),
-            ...($request->hasFile('promo_video') ? ['promo_video.max' => 'Video size should be less than Or Equal To 10GB'] : []),
+            ...($request->hasFile('promo_video')
+            ?
+            ['promo_video.max' => 'Video size should be less than Or Equal To 10GB']
+            :
+             []
+            ),
+
             'category_id.exists' => 'Selected Category does not exist',
             'instructor_id.exists' => 'Selected Instructor does not exist',
+            'is_approved.required' => 'Course Approval is required',
+            'is_published.required' => 'Course Publish Status is required',
+            'instructor_id.required' => 'Instructor is required',
+            'category_id.required' => 'Category is required',
+            'price.required' => 'Course Price is required',
+            'discount.required' => 'Course Discount is required And Minimum its value should be 0',
+            'level.required' => 'Course Level is required',
+            'course_language.required' => 'Course Language is required',
+
+            'is_published.boolean' => 'Course Publish Status is required',
+            'is_approved.boolean' => 'Course Approval is required',
+
         ]);
 
         if ($request->boolean('is_thumbnail_removed') && ! $request->hasFile('thumbnail')) {
@@ -443,6 +489,12 @@ class CourseRepository implements CoursesRepositoryInterface
         $validated_req['description'] = json_encode($request->description);
 
         $validated_req['meta_description'] = $validated_req['short_description'];
+
+        if ($course->is_approved == 0 && $validated_req['is_approved'] == 1) {
+
+            $instructor = $this->user->find($validated_req['instructor_id']);
+            $instructor->notify(new NotifyInstructorHisCourseApprovedByAdminNotification($validated_req));
+        }
 
         return $course->update($validated_req) ?
         ['status' => true, 'message' => 'Course updated successfully!']

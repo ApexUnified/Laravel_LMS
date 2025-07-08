@@ -8,7 +8,7 @@ import RichTextEditor from '@/Components/RichTextEditor'
 import SelectInput from '@/Components/SelectInput'
 import Spinner from '@/Components/Spinner'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
-import { Head, useForm } from '@inertiajs/react'
+import { Head, useForm, usePage } from '@inertiajs/react'
 import React, { useEffect, useState } from 'react'
 
 export default function edit({ course, categories, instructors }) {
@@ -33,6 +33,8 @@ export default function edit({ course, categories, instructors }) {
         requirements: course.requirements || '',
         learning_outcomes: course.learning_outcomes || '',
     });
+
+    const { role } = usePage().props.auth;
 
     const [levels, setLevels] = useState([]);
 
@@ -286,18 +288,20 @@ export default function edit({ course, categories, instructors }) {
 
 
 
-                                        <SelectInput
-                                            InputName={"Course Approval Status"}
-                                            Id={"is_approved"}
-                                            Name={"is_approved"}
-                                            Error={errors.is_approved}
-                                            items={[{ id: 1, name: "Approved" }, { id: 0, name: "Not Approved" }]}
-                                            itemKey={"name"}
-                                            Value={data.is_approved}
-                                            Action={
-                                                (e) => setData("is_approved", e.target.value)
-                                            }
-                                        />
+                                        {role === 'Admin' && (
+                                            <SelectInput
+                                                InputName={"Course Approval Status"}
+                                                Id={"is_approved"}
+                                                Name={"is_approved"}
+                                                Error={errors.is_approved}
+                                                items={[{ id: 1, name: "Approved" }, { id: 0, name: "Not Approved" }]}
+                                                itemKey={"name"}
+                                                Value={data.is_approved}
+                                                Action={
+                                                    (e) => setData("is_approved", e.target.value)
+                                                }
+                                            />
+                                        )}
                                     </div>
 
                                     {/* FileUploader */}

@@ -26,6 +26,20 @@ interface SettingRepositoryInterface
 
     public function roleDestroyBySelection(Request $request);
 
+    public function getRolesPermissions(string $id);
+
+    public function getPermissions();
+
+    public function getPermission(string $id);
+
+    public function storePermission(Request $request);
+
+    public function updatePermission(Request $request, string $id);
+
+    public function destroyPermission(string $id);
+
+    public function destroyPermissionBySelection(Request $request);
+
     public function getCurrencies(Request $request);
 
     public function currencyStore(Request $request);

@@ -11,6 +11,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PurchaseCourseController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -83,6 +84,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('destroyallnotifications');
     });
 
+    // Transactions Routes
+
+    Route::get('/transactions', TransactionController::class)->name('transactions.index');
+
     // Profile Routes
     Route::controller(ProfileController::class)->group(function () {
         Route::get('/profile', 'index')->name('profile.index');
@@ -103,14 +108,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/settings/smtp-setting', 'smtpSetting')->name('smtp.setting');
         Route::put('/settings/smtp-setting-update', 'updateSmtpSetting')->name('smtp.setting.update');
 
-        // Role Permission Routes
+        // Role Routes
         Route::get('/settings/roles', 'rolesIndex')->name('roles.index');
         Route::get('/settings/roles/create', 'roleCreate')->name('roles.create');
         Route::post('/settings/roles', 'roleStore')->name('roles.store');
         Route::get('/settings/roles/{id}/edit', 'roleEdit')->name('roles.edit');
+        Route::get('/settings/roles-permissions/{id}', 'rolePermissions')->name('roles.permissions');
         Route::put('/settings/roles/{id}', 'roleUpdate')->name('roles.update');
         Route::delete('/settings/roles/{id}', 'roleDestroy')->name('roles.destroy');
         Route::delete('/settings/roles-destroybyselection', 'roleDestroyBySelection')->name('roles.destroybyselection');
+
+        // Permission Routes
+        Route::get('/settings/permissions', 'permissionIndex')->name('permissions.index');
+        Route::get('/settings/permissions/create', 'permissionCreate')->name('permissions.create');
+        Route::post('/settings/permissions', 'permissionStore')->name('permissions.store');
+        Route::get('/settings/permissions/{id}/edit', 'permissionEdit')->name('permissions.edit');
+        Route::put('/settings/permissions/{id}', 'permissionUpdate')->name('permissions.update');
+        Route::delete('/settings/permissions/{id}', 'permissionDestroy')->name('permissions.destroy');
+        Route::delete('/settings/permissions-destroybyselection', 'permissionDestroyBySelection')->name('permissions.destroybyselection');
 
         // Currency Routes
         Route::get('/settings/currencies', 'currencyIndex')->name('currencies.index');
