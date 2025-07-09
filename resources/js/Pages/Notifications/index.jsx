@@ -58,6 +58,13 @@ export default function index({ notifications }) {
         router.reload();
     }
 
+
+    const handlePagination = (link) => {
+        if (link) {
+            router.visit(link, { preserveScroll: true, preserveState: true });
+        }
+    }
+
     return (
         <AuthenticatedLayout>
 

@@ -12,6 +12,8 @@ use App\Repositories\CoursePlayer\Interface\CoursePlayerRepositoryInterface;
 use App\Repositories\CoursePlayer\Repository\CoursePlayerRepository;
 use App\Repositories\Courses\Interface\CoursesRepositoryInterface;
 use App\Repositories\Courses\Repository\CourseRepository;
+use App\Repositories\Dashboard\Interface\DashboardRepositoryInterface;
+use App\Repositories\Dashboard\Repository\DashboardRepository;
 use App\Repositories\Enrollments\Interface\EnrollmentRepositoryInterface;
 use App\Repositories\Enrollments\Repository\EnrollmentRepository;
 use App\Repositories\Lessons\Interface\LessonRepositoryInterface;
@@ -50,6 +52,7 @@ class RepositoryServiceBinderProvider extends ServiceProvider
         $this->app->bind(CheckoutRepositoryInterface::class, CheckoutRepository::class);
         $this->app->bind(NotificationRepositoryInterface::class, NotificationRepository::class);
         $this->app->bind(TransactionRepositoryInterface::class, TransactionRepository::class);
+        $this->app->bind(DashboardRepositoryInterface::class, DashboardRepository::class);
     }
 
     /**

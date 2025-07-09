@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function Input({ Name, Value, Action, Placeholder, Type, Error, Required = false, Id, InputName, CustomCss = null, ShowPasswordToggle, setShowPasswordToggle, InputRef }) {
+export default function Input({ Name, Value, Action = () => { }, Placeholder, Type, Error, Required = false, Id, InputName, CustomCss = null, ShowPasswordToggle, setShowPasswordToggle, InputRef }) {
     return (
         <div className={CustomCss || "w-full"}>
             <label htmlFor={Id} className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">

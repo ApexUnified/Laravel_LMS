@@ -3,6 +3,8 @@ import Card from '@/Components/Card'
 import LinkButton from '@/Components/LinkButton'
 import PrimaryButton from '@/Components/PrimaryButton'
 import Toast from '@/Components/Toast'
+import Can from '@/Hooks/Can'
+import useCan from '@/Hooks/UseCan'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import { Head, Link, usePage } from '@inertiajs/react'
 import React from 'react'
@@ -38,7 +40,10 @@ export default function index({ courses }) {
                                     CustomCss="transform transition duration-300 hover:scale-105 shadow-md hover:shadow-xl bg-white dark:bg-gray-800 rounded-2xl overflow-hidden"
                                     Content={
                                         <>
-                                            <Link href={route('courses.player', { course_slug: course.slug })}>
+                                            <Link href={useCan("Course Player") ?
+                                                route('courses.player', { course_slug: course.slug })
+                                                : ""
+                                            }>
                                                 {/* Thumbnail */}
                                                 <img
                                                     src={course?.thumbnail}
@@ -99,34 +104,36 @@ export default function index({ courses }) {
                                                 </div>
                                             </Link>
 
-                                            {/* Button */}
-                                            <div className="px-5 pb-5">
-                                                <LinkButton
-                                                    Text="View Course"
-                                                    URL={route("courses.player", { course_slug: course.slug })}
-                                                    Icon={
-                                                        <svg
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            fill="none"
-                                                            viewBox="0 0 24 24"
-                                                            strokeWidth={1.5}
-                                                            stroke="currentColor"
-                                                            className="w-5 h-5"
-                                                        >
-                                                            <path
-                                                                strokeLinecap="round"
-                                                                strokeLinejoin="round"
-                                                                d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-                                                            />
-                                                            <path
-                                                                strokeLinecap="round"
-                                                                strokeLinejoin="round"
-                                                                d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                                                            />
-                                                        </svg>
-                                                    }
-                                                />
-                                            </div>
+                                            <Can permission={"Course Player"}>
+                                                {/* Button */}
+                                                <div className="px-5 pb-5">
+                                                    <LinkButton
+                                                        Text="View Course"
+                                                        URL={route("courses.player", { course_slug: course.slug })}
+                                                        Icon={
+                                                            <svg
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                fill="none"
+                                                                viewBox="0 0 24 24"
+                                                                strokeWidth={1.5}
+                                                                stroke="currentColor"
+                                                                className="w-5 h-5"
+                                                            >
+                                                                <path
+                                                                    strokeLinecap="round"
+                                                                    strokeLinejoin="round"
+                                                                    d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+                                                                />
+                                                                <path
+                                                                    strokeLinecap="round"
+                                                                    strokeLinejoin="round"
+                                                                    d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                                                                />
+                                                            </svg>
+                                                        }
+                                                    />
+                                                </div>
+                                            </Can>
                                         </>
                                     }
                                 />
@@ -185,6 +192,7 @@ export default function index({ courses }) {
                                                         </li>
                                                     ))}
                                                 </ul>
+
                                                 <PrimaryButton
                                                     Text={
                                                         <>
@@ -203,6 +211,7 @@ export default function index({ courses }) {
                                                     CustomClass="w-[140px] h-[40px] mx-2"
                                                     Type="button"
                                                 />
+
                                             </div>
                                         </div>
                                     )}

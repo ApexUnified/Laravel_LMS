@@ -4,11 +4,22 @@ namespace App\Http\Controllers;
 
 use App\Repositories\CoursePlayer\Interface\CoursePlayerRepositoryInterface;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
-class CoursePlayerController extends Controller
+class CoursePlayerController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:Course Player', ['only' => 'coursePlayer']),
+            new Middleware('permission:Course Player', ['only' => 'lessonPlayer']),
+            new Middleware('permission:Course Player', ['only' => 'UpdateLessonProgress']),
+        ];
+    }
+
     public function __construct(
         private CoursePlayerRepositoryInterface $coursePlayer
     ) {}

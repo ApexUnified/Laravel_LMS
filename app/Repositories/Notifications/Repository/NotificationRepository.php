@@ -11,7 +11,7 @@ class NotificationRepository implements NotificationRepositoryInterface
         private User $user
     ) {}
 
-    public function getAllNotifications(string $user_id)
+    public function getAllNotifications(string $user_id, ?int $length = null)
     {
         $user = $this->user->find($user_id);
 
@@ -19,7 +19,7 @@ class NotificationRepository implements NotificationRepositoryInterface
             return ['status' => false, 'message' => 'User Not Found'];
         }
 
-        $notifications = $user->notifications()->paginate(10);
+        $notifications = $user->notifications()->paginate($length ?? 10);
 
         if ($user->notifications->where('read_at', null)->count() > 0) {
             $user->notifications()->where('read_at', null)->update(['read_at' => now()]);

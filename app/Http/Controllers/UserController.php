@@ -4,10 +4,26 @@ namespace App\Http\Controllers;
 
 use App\Repositories\Users\Interface\UserRepositoryInterface;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Inertia\Inertia;
 
-class UserController extends Controller
+class UserController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:User View', ['only' => 'index']),
+            new Middleware('permission:User View', ['only' => 'show']),
+            new Middleware('permission:User Create', ['only' => 'create']),
+            new Middleware('permission:User Create', ['only' => 'store']),
+            new Middleware('permission:User Edit', ['only' => 'edit']),
+            new Middleware('permission:User Edit', ['only' => 'update']),
+            new Middleware('permission:User Delete', ['only' => 'destroy']),
+            new Middleware('permission:User Delete', ['only' => 'destroyBySelection']),
+        ];
+    }
+
     public function __construct(private UserRepositoryInterface $user) {}
 
     public function index(Request $request)

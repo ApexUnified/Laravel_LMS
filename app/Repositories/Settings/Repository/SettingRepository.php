@@ -255,7 +255,59 @@ class SettingRepository implements SettingRepositoryInterface
 
     public function getRolesPermissions(string $id)
     {
-        //
+        $permissions = $this->permission->all();
+
+        if ($permissions->isEmpty()) {
+            return ['status' => false, 'message' => 'Permissions Not Found'];
+        }
+
+        $groupedPermissions = $permissions->groupBy(function ($permission) {
+            $prefix = explode(' ', $permission->name)[0];
+
+            return $prefix.'|'.$permission->icon;
+        });
+
+        $finalGroups = [];
+
+        foreach ($groupedPermissions as $key => $group) {
+            [$groupName, $icon] = explode('|', $key);
+
+            $finalGroups[] = [
+                'group' => $groupName,
+                'icon' => $icon,
+                'permissions' => $group,
+            ];
+        }
+
+        $role = $this->role->find($id);
+
+        if (empty($role)) {
+            return ['status' => false, 'message' => 'Role Not Found'];
+        }
+
+        $role_permissions = $role->permissions->pluck('id')->toArray();
+
+        return ['role' => $role, 'groupedPermissions' => $finalGroups, 'role_permissions' => $role_permissions];
+
+    }
+
+    public function AssignPermissions(Request $request)
+    {
+        $validated_req = $request->validate([
+            'role_id' => 'required|exists:roles,id',
+            'permissions' => 'required',
+        ]);
+
+        $role = $this->role->find($validated_req['role_id']);
+
+        if (empty($role)) {
+            return ['status' => false, 'message' => 'Role Not Found'];
+        }
+        if ($role->syncPermissions($validated_req['permissions'])) {
+            return ['status' => true, 'message' => 'Permissions Updated Successfully'];
+        } else {
+            return ['status' => false, 'message' => 'Something went wrong While Updating Permissions'];
+        }
     }
 
     public function getPermissions()

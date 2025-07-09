@@ -4,6 +4,7 @@ use App\Http\Controllers\AllCourseController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\CoursePlayerController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\MyCourseController;
@@ -28,9 +29,7 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', DashboardController::class)->name('dashboard');
 
     // Category Routes
     Route::resource('/category', CategoryController::class)->except(['show']);
@@ -97,52 +96,56 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     // Setting Routes
-    Route::controller(SettingController::class)->as('settings.')->group(function () {
-        Route::get('/settings', 'index')->name('index');
+    Route::controller(SettingController::class)
+        ->as('settings.')
+        ->middleware('permission:Setting View')
+        ->group(function () {
+            Route::get('/settings', 'index')->name('index');
 
-        // General Setting Routess
-        Route::get('/settings/general-setting', 'generalSetting')->name('general.setting');
-        Route::put('/settings/general-setting-update', 'updateGeneralSetting')->name('general.setting.update');
+            // General Setting Routess
+            Route::get('/settings/general-setting', 'generalSetting')->name('general.setting');
+            Route::put('/settings/general-setting-update', 'updateGeneralSetting')->name('general.setting.update');
 
-        // SMTP Setting Routes
-        Route::get('/settings/smtp-setting', 'smtpSetting')->name('smtp.setting');
-        Route::put('/settings/smtp-setting-update', 'updateSmtpSetting')->name('smtp.setting.update');
+            // SMTP Setting Routes
+            Route::get('/settings/smtp-setting', 'smtpSetting')->name('smtp.setting');
+            Route::put('/settings/smtp-setting-update', 'updateSmtpSetting')->name('smtp.setting.update');
 
-        // Role Routes
-        Route::get('/settings/roles', 'rolesIndex')->name('roles.index');
-        Route::get('/settings/roles/create', 'roleCreate')->name('roles.create');
-        Route::post('/settings/roles', 'roleStore')->name('roles.store');
-        Route::get('/settings/roles/{id}/edit', 'roleEdit')->name('roles.edit');
-        Route::get('/settings/roles-permissions/{id}', 'rolePermissions')->name('roles.permissions');
-        Route::put('/settings/roles/{id}', 'roleUpdate')->name('roles.update');
-        Route::delete('/settings/roles/{id}', 'roleDestroy')->name('roles.destroy');
-        Route::delete('/settings/roles-destroybyselection', 'roleDestroyBySelection')->name('roles.destroybyselection');
+            // Role Routes
+            Route::get('/settings/roles', 'rolesIndex')->name('roles.index');
+            Route::get('/settings/roles/create', 'roleCreate')->name('roles.create');
+            Route::post('/settings/roles', 'roleStore')->name('roles.store');
+            Route::get('/settings/roles/{id}/edit', 'roleEdit')->name('roles.edit');
+            Route::get('/settings/roles-permissions/{id}', 'rolePermissions')->name('roles.permissions');
+            Route::put('/settings/roles-permissions-assign', 'rolePermissionsAssign')->name('roles.permissions.assign');
+            Route::put('/settings/roles/{id}', 'roleUpdate')->name('roles.update');
+            Route::delete('/settings/roles/{id}', 'roleDestroy')->name('roles.destroy');
+            Route::delete('/settings/roles-destroybyselection', 'roleDestroyBySelection')->name('roles.destroybyselection');
 
-        // Permission Routes
-        Route::get('/settings/permissions', 'permissionIndex')->name('permissions.index');
-        Route::get('/settings/permissions/create', 'permissionCreate')->name('permissions.create');
-        Route::post('/settings/permissions', 'permissionStore')->name('permissions.store');
-        Route::get('/settings/permissions/{id}/edit', 'permissionEdit')->name('permissions.edit');
-        Route::put('/settings/permissions/{id}', 'permissionUpdate')->name('permissions.update');
-        Route::delete('/settings/permissions/{id}', 'permissionDestroy')->name('permissions.destroy');
-        Route::delete('/settings/permissions-destroybyselection', 'permissionDestroyBySelection')->name('permissions.destroybyselection');
+            // Permission Routes
+            Route::get('/settings/permissions', 'permissionIndex')->name('permissions.index');
+            Route::get('/settings/permissions/create', 'permissionCreate')->name('permissions.create');
+            Route::post('/settings/permissions', 'permissionStore')->name('permissions.store');
+            Route::get('/settings/permissions/{id}/edit', 'permissionEdit')->name('permissions.edit');
+            Route::put('/settings/permissions/{id}', 'permissionUpdate')->name('permissions.update');
+            Route::delete('/settings/permissions/{id}', 'permissionDestroy')->name('permissions.destroy');
+            Route::delete('/settings/permissions-destroybyselection', 'permissionDestroyBySelection')->name('permissions.destroybyselection');
 
-        // Currency Routes
-        Route::get('/settings/currencies', 'currencyIndex')->name('currencies.index');
-        Route::get('/settings/currencies/create', 'currencyCreate')->name('currencies.create');
-        Route::post('/settings/currencies', 'currencyStore')->name('currencies.store');
-        Route::get('/settings/currencies/{id}/edit', 'currencyEdit')->name('currencies.edit');
-        Route::put('/settings/currencies/{id}', 'currencyUpdate')->name('currencies.update');
-        Route::put('/settings/currencies/toggle-status/{id}', 'toggleCurrencyStatus')->name('currencies.toggle.status');
-        Route::delete('/settings/currencies/{id}', 'currencyDestroy')->name('currencies.destroy');
-        Route::delete('/settings/currencies-destroybyselection', 'currencyDestroyBySelection')->name('currencies.destroybyselection');
+            // Currency Routes
+            Route::get('/settings/currencies', 'currencyIndex')->name('currencies.index');
+            Route::get('/settings/currencies/create', 'currencyCreate')->name('currencies.create');
+            Route::post('/settings/currencies', 'currencyStore')->name('currencies.store');
+            Route::get('/settings/currencies/{id}/edit', 'currencyEdit')->name('currencies.edit');
+            Route::put('/settings/currencies/{id}', 'currencyUpdate')->name('currencies.update');
+            Route::put('/settings/currencies/toggle-status/{id}', 'toggleCurrencyStatus')->name('currencies.toggle.status');
+            Route::delete('/settings/currencies/{id}', 'currencyDestroy')->name('currencies.destroy');
+            Route::delete('/settings/currencies-destroybyselection', 'currencyDestroyBySelection')->name('currencies.destroybyselection');
 
-        // Stripe Credentials Route
-        Route::put('/settings/stripe-credentials-save', 'stripeCredentialsSave')->name('stripe.credentials.save');
+            // Stripe Credentials Route
+            Route::put('/settings/stripe-credentials-save', 'stripeCredentialsSave')->name('stripe.credentials.save');
 
-        // Cloudinary Credentials Route
-        Route::put('/settings/cloudinary-credentials-save', 'cloudinaryCredentialsSave')->name('cloudinary.credentials.save');
-    });
+            // Cloudinary Credentials Route
+            Route::put('/settings/cloudinary-credentials-save', 'cloudinaryCredentialsSave')->name('cloudinary.credentials.save');
+        });
 });
 
 require __DIR__.'/auth.php';

@@ -21,7 +21,6 @@ export default function Table({
     columns,
     items,
     props,
-    ViewRoute,
     customActions = [],
     customSearch,
     searchProps = {},
@@ -32,7 +31,7 @@ export default function Table({
 }) {
 
     // State and logic remain unchanged from your original code
-    const [search, setSearch] = useState(props.search ?? '');
+    const [search, setSearch] = useState(props?.search ?? '');
     const [openDropdownId, setOpenDropdownId] = useState(null);
     const [BulkActionDropdown, setBulkActionDropdown] = useState(false);
     const [openBulkActionDropdownOptions, setOpenBulkActionDropdownOptions] = useState(false);
@@ -185,7 +184,7 @@ export default function Table({
     };
 
     return (
-        <div className="rounded-2xl border border-gray-200 bg-white pt-4 dark:border-gray-800 dark:bg-white/[0.03]">
+        <div className="rounded-2xl border border-gray-200 bg-white pt-4 dark:border-gray-900/10 dark:bg-gray-800/10">
             {/* Search and Bulk Actions (unchanged) */}
             <div className="flex flex-col gap-2 px-5 mb-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
                 <div ref={dropdownRefs.current['00000']}>
@@ -280,7 +279,7 @@ export default function Table({
                                         </div>
                                     </th>
                                 )}
-                                {columns.map((column, index) => (
+                                {columns?.map((column, index) => (
                                     <th key={index} className="py-3 pr-5 font-normal whitespace-nowrap sm:pr-6">
                                         <div className="flex items-center">
                                             <p className="text-gray-500 text-theme-sm dark:text-gray-400">{column.label}</p>
@@ -299,7 +298,7 @@ export default function Table({
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                            {items.data.map((item, index) => (
+                            {items?.data?.map((item, index) => (
                                 <tr key={index}>
                                     {BulkDeleteMethod && (
                                         <td className="py-3 pr-5 whitespace-nowrap sm:pr-5">
@@ -416,7 +415,7 @@ export default function Table({
                             ))}
                         </tbody>
                     </table>
-                    {items.data.length === 0 && (
+                    {items?.data?.length === 0 && (
                         <p className="flex justify-center p-5 mb-20 text-center text-gray-900 bg-blue-200 dark:bg-white/5 dark:text-white align-center">
                             No data found
                         </p>
@@ -425,7 +424,7 @@ export default function Table({
             </div>
 
             {/* Pagination (unchanged) */}
-            {items.data.length > 0 && (
+            {items?.data?.length > 0 && (
                 <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-800">
                     <div className="flex items-center justify-between">
                         <PrimaryButton

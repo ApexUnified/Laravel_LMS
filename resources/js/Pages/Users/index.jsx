@@ -2,6 +2,8 @@ import BreadCrumb from '@/Components/BreadCrumb'
 import Card from '@/Components/Card'
 import LinkButton from '@/Components/LinkButton'
 import Table from '@/Components/Table'
+import Can from '@/Hooks/Can'
+import useCan from '@/Hooks/UseCan'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'
 import { Head, useForm, usePage } from '@inertiajs/react'
 import React, { useEffect, useState } from 'react'
@@ -51,18 +53,20 @@ export default function index({ users }) {
                 <Card
                     Content={
                         <>
-                            <div className="flex flex-wrap justify-end my-3">
-                                <LinkButton
-                                    Text={"Create User"}
-                                    URL={route("users.create")}
-                                    Icon={
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                                        </svg>
+                            <Can permission={"User Create"}>
+                                <div className="flex flex-wrap justify-end my-3">
+                                    <LinkButton
+                                        Text={"Create User"}
+                                        URL={route("users.create")}
+                                        Icon={
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                            </svg>
 
-                                    }
-                                />
-                            </div>
+                                        }
+                                    />
+                                </div>
+                            </Can>
 
                             <Table
                                 setBulkSelectedIds={setBulkSelectedIds}
@@ -70,16 +74,16 @@ export default function index({ users }) {
                                 SingleSelectedId={SingleSelectedId}
                                 resetBulkSelectedIds={resetBulkSelectedIds}
                                 resetSingleSelectedId={resetSingleSelectedId}
-                                BulkDeleteMethod={BulkDelete}
+                                BulkDeleteMethod={useCan("User Delete") ? BulkDelete : null}
                                 SingleDeleteMethod={SingleDelete}
-                                EditRoute={"users.edit"}
+                                EditRoute={useCan("User Edit") ? "users.edit" : null}
                                 BulkDeleteRoute={"users.destroybyselection"}
                                 SearchRoute={"users.index"}
                                 SingleDeleteRoute={"users.destroy"}
-                                ViewRoute={"users.show"}
                                 items={users}
                                 props={props}
                                 columns={columns}
+                                DeleteAction={useCan("User Delete")}
                             />
                         </>
                     }

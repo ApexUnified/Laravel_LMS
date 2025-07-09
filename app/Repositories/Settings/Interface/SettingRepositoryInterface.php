@@ -28,6 +28,8 @@ interface SettingRepositoryInterface
 
     public function getRolesPermissions(string $id);
 
+    public function AssignPermissions(Request $request);
+
     public function getPermissions();
 
     public function getPermission(string $id);

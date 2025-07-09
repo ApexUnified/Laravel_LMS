@@ -4,10 +4,23 @@ namespace App\Http\Controllers;
 
 use App\Repositories\Enrollments\Interface\EnrollmentRepositoryInterface;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Inertia\Inertia;
 
-class EnrollmentController extends Controller
+class EnrollmentController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:Enrollment View', ['only' => 'index']),
+            new Middleware('permission:Enrollment Create', ['only' => 'create']),
+            new Middleware('permission:Enrollment Create', ['only' => 'store']),
+            new Middleware('permission:Enrollment Delete', ['only' => 'destroy']),
+            new Middleware('permission:Enrollment Delete', ['only' => 'destroyBySelection']),
+        ];
+    }
+
     public function __construct(
         private EnrollmentRepositoryInterface $enrollment
     ) {}

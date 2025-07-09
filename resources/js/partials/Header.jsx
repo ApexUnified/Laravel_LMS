@@ -5,6 +5,8 @@ import { Link, router, useForm } from '@inertiajs/react';
 import Spinner from '@/Components/Spinner';
 import PrimaryButton from '@/Components/PrimaryButton';
 import Toast from '@/Components/Toast';
+import useCan from '@/Hooks/UseCan';
+import Can from '@/Hooks/Can';
 
 
 export default function Header({
@@ -20,6 +22,9 @@ export default function Header({
 
     // Logout Form Data
     const { post: logout, processing: logoutProcessing } = useForm({});
+
+
+
 
 
     // Toggle Header Menu State
@@ -46,7 +51,7 @@ export default function Header({
     // For Managing  References
     const dropdownRef = useRef(null);
     const profileDropdownRef = useRef(null);
-    const searchInputRef = useRef(null);
+
 
 
     // Toggle Mode Dark + Light
@@ -83,43 +88,15 @@ export default function Header({
     }, []);
 
 
-    // Handle Key Press For opening Search And Focusing it
-    useEffect(() => {
-        const handleCtrlK = (event) => {
-            if ((event.metaKey || event.ctrlKey) && event.key === "k") {
-                event.preventDefault();
-                if (searchInputRef.current) {
-                    searchInputRef.current.focus();
-                }
-            }
-        }
-
-
-        const handleSlash = (event) => {
-            if (event.key === "/" && document.activeElement !== searchInputRef.current) {
-                event.preventDefault();
-                if (searchInputRef.current) {
-                    searchInputRef.current.focus();
-                }
-            }
-        }
-
-
-        document.addEventListener("keydown", handleCtrlK);
-        document.addEventListener("keydown", handleSlash);
-
-
-        return () => {
-            document.removeEventListener("keydown", handleCtrlK);
-            document.removeEventListener("keydown", handleSlash);
-        };
-
-    }, []);
 
 
 
+    const canViewNotifications = useCan('Notification View');
     // Fecthing NotificationsFecthing Notifications
     useEffect(() => {
+
+        if (!canViewNotifications) return;
+
         fetchNotifications();
 
 
@@ -136,7 +113,7 @@ export default function Header({
 
     // Checking If Any Notification Has Read At Null Than Show Notifying on Notification icon
     useEffect(() => {
-
+        if (!canViewNotifications) return;
         if (notifications.length > 0) {
             if (notifications.some(n => n.read_at === null)) {
                 setNotifying(true);
@@ -263,48 +240,7 @@ export default function Header({
                         </button >
 
 
-                        <div className="hidden lg:block">
-                            <form>
-                                <div className="relative">
-                                    <span className="absolute -translate-y-1/2 top-1/2 left-4">
-                                        <svg
-                                            className="fill-gray-500 dark:fill-gray-400"
-                                            width="20"
-                                            height="20"
-                                            viewBox="0 0 20 20"
-                                            fill="none"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                            <path
-                                                fillRule="evenodd"
-                                                clipRule="evenodd"
-                                                d="M3.04175 9.37363C3.04175 5.87693 5.87711 3.04199 9.37508 3.04199C12.8731 3.04199 15.7084 5.87693 15.7084 9.37363C15.7084 12.8703 12.8731 15.7053 9.37508 15.7053C5.87711 15.7053 3.04175 12.8703 3.04175 9.37363ZM9.37508 1.54199C5.04902 1.54199 1.54175 5.04817 1.54175 9.37363C1.54175 13.6991 5.04902 17.2053 9.37508 17.2053C11.2674 17.2053 13.003 16.5344 14.357 15.4176L17.177 18.238C17.4699 18.5309 17.9448 18.5309 18.2377 18.238C18.5306 17.9451 18.5306 17.4703 18.2377 17.1774L15.418 14.3573C16.5365 13.0033 17.2084 11.2669 17.2084 9.37363C17.2084 5.04817 13.7011 1.54199 9.37508 1.54199Z"
-                                                fill=""
-                                            />
-                                        </svg>
-                                    </span>
-                                    <input
-                                        type="search"
-                                        ref={searchInputRef}
-                                        placeholder="Search ..."
-                                        id="search-input"
-                                        className="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-200 bg-transparent py-2.5 pr-14 pl-12 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden xl:w-[430px] dark:border-gray-800 dark:bg-gray-900 dark:bg-white/[0.03] dark:text-white/90 dark:placeholder:text-white/30"
-                                    />
 
-                                    <button
-                                        id="search-button"
-                                        className="absolute top-1/2 right-2.5 inline-flex -translate-y-1/2 items-center gap-0.5 rounded-lg border border-gray-200 bg-gray-50 px-[7px] py-[4.5px] text-xs -tracking-[0.2px] text-gray-500 dark:border-gray-800 dark:bg-white/[0.03] dark:text-gray-400"
-                                    >
-                                        <span> ⌘ </span>
-                                        <span> K </span>
-
-                                        <span> | </span>
-
-                                        <span> / </span>
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
                     </div >
 
                     <div className={`${menuToggle ? 'flex' : 'hidden'} shadow-theme-md w-full items-center justify-between gap-4 px-5 py-4 lg:flex lg:justify-end lg:px-0 lg:shadow-none  `}
@@ -350,195 +286,197 @@ export default function Header({
 
 
 
-                            <div
-                                className="relative"
-                                ref={dropdownRef}
-                            >
-                                <button
-                                    className="relative flex items-center justify-center text-gray-500 transition-colors bg-white border border-gray-200 rounded-full hover:text-dark-900 h-11 w-11 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
-                                    onClick={() => {
-                                        setNotificationDropdown(prev => !prev);
-                                    }}
+                            <Can permission={"Notification View"}>
+                                <div
+                                    className="relative"
+                                    ref={dropdownRef}
                                 >
-                                    <span className={`${!notifying ? 'hidden' : 'flex'} absolute top-0.5 right-0 z-1 h-2 w-2 rounded-full bg-orange-400 `}
+                                    <button
+                                        className="relative flex items-center justify-center text-gray-500 transition-colors bg-white border border-gray-200 rounded-full hover:text-dark-900 h-11 w-11 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
+                                        onClick={() => {
+                                            setNotificationDropdown(prev => !prev);
+                                        }}
                                     >
-                                        <span
-                                            className="absolute inline-flex w-full h-full bg-orange-400 rounded-full opacity-75 -z-1 animate-ping"
-                                        ></span>
-                                    </span >
-                                    <svg
-                                        className="fill-current"
-                                        width="20"
-                                        height="20"
-                                        viewBox="0 0 20 20"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                        <path
-                                            fillRule="evenodd"
-                                            clipRule="evenodd"
-                                            d="M10.75 2.29248C10.75 1.87827 10.4143 1.54248 10 1.54248C9.58583 1.54248 9.25004 1.87827 9.25004 2.29248V2.83613C6.08266 3.20733 3.62504 5.9004 3.62504 9.16748V14.4591H3.33337C2.91916 14.4591 2.58337 14.7949 2.58337 15.2091C2.58337 15.6234 2.91916 15.9591 3.33337 15.9591H4.37504H15.625H16.6667C17.0809 15.9591 17.4167 15.6234 17.4167 15.2091C17.4167 14.7949 17.0809 14.4591 16.6667 14.4591H16.375V9.16748C16.375 5.9004 13.9174 3.20733 10.75 2.83613V2.29248ZM14.875 14.4591V9.16748C14.875 6.47509 12.6924 4.29248 10 4.29248C7.30765 4.29248 5.12504 6.47509 5.12504 9.16748V14.4591H14.875ZM8.00004 17.7085C8.00004 18.1228 8.33583 18.4585 8.75004 18.4585H11.25C11.6643 18.4585 12 18.1228 12 17.7085C12 17.2943 11.6643 16.9585 11.25 16.9585H8.75004C8.33583 16.9585 8.00004 17.2943 8.00004 17.7085Z"
-                                            fill=""
-                                        />
-                                    </svg>
-                                </button >
-
-                                {NotificationDropdown && (
-                                    <div
-                                        className="shadow-2xl dark:bg-gray-900 absolute z-[1]  mt-[17px] flex h-[400px] w-[280px] flex-col rounded-2xl border border-gray-200 bg-white p-3 sm:w-[361px] lg:right-0 dark:border-gray-800"
-                                    >
-                                        <div
-                                            className="flex items-center justify-between pb-3 mb-3 border-b border-gray-100 dark:border-gray-800"
+                                        <span className={`${!notifying ? 'hidden' : 'flex'} absolute top-0.5 right-0 z-1 h-2 w-2 rounded-full bg-orange-400 `}
                                         >
-                                            <h5
-                                                className="text-lg font-semibold text-gray-800 dark:text-white/90"
-                                            >
-                                                Notification
-                                            </h5>
+                                            <span
+                                                className="absolute inline-flex w-full h-full bg-orange-400 rounded-full opacity-75 -z-1 animate-ping"
+                                            ></span>
+                                        </span >
+                                        <svg
+                                            className="fill-current"
+                                            width="20"
+                                            height="20"
+                                            viewBox="0 0 20 20"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                            <path
+                                                fillRule="evenodd"
+                                                clipRule="evenodd"
+                                                d="M10.75 2.29248C10.75 1.87827 10.4143 1.54248 10 1.54248C9.58583 1.54248 9.25004 1.87827 9.25004 2.29248V2.83613C6.08266 3.20733 3.62504 5.9004 3.62504 9.16748V14.4591H3.33337C2.91916 14.4591 2.58337 14.7949 2.58337 15.2091C2.58337 15.6234 2.91916 15.9591 3.33337 15.9591H4.37504H15.625H16.6667C17.0809 15.9591 17.4167 15.6234 17.4167 15.2091C17.4167 14.7949 17.0809 14.4591 16.6667 14.4591H16.375V9.16748C16.375 5.9004 13.9174 3.20733 10.75 2.83613V2.29248ZM14.875 14.4591V9.16748C14.875 6.47509 12.6924 4.29248 10 4.29248C7.30765 4.29248 5.12504 6.47509 5.12504 9.16748V14.4591H14.875ZM8.00004 17.7085C8.00004 18.1228 8.33583 18.4585 8.75004 18.4585H11.25C11.6643 18.4585 12 18.1228 12 17.7085C12 17.2943 11.6643 16.9585 11.25 16.9585H8.75004C8.33583 16.9585 8.00004 17.2943 8.00004 17.7085Z"
+                                                fill=""
+                                            />
+                                        </svg>
+                                    </button >
 
-                                            <button
-                                                onClick={() => setNotificationDropdown(false)}
-                                                className="text-gray-500 dark:text-gray-400"
+                                    {NotificationDropdown && (
+                                        <div
+                                            className="shadow-2xl dark:bg-gray-900 absolute z-[1]  mt-[17px] flex h-[400px] w-[280px] flex-col rounded-2xl border border-gray-200 bg-white p-3 sm:w-[361px] lg:right-0 dark:border-gray-800"
+                                        >
+                                            <div
+                                                className="flex items-center justify-between pb-3 mb-3 border-b border-gray-100 dark:border-gray-800"
                                             >
-                                                <svg
-                                                    className="fill-current"
-                                                    width="24"
-                                                    height="24"
-                                                    viewBox="0 0 24 24"
-                                                    fill="none"
-                                                    xmlns="http://www.w3.org/2000/svg"
+                                                <h5
+                                                    className="text-lg font-semibold text-gray-800 dark:text-white/90"
                                                 >
-                                                    <path
-                                                        fillRule="evenodd"
-                                                        clipRule="evenodd"
-                                                        d="M6.21967 7.28131C5.92678 6.98841 5.92678 6.51354 6.21967 6.22065C6.51256 5.92775 6.98744 5.92775 7.28033 6.22065L11.999 10.9393L16.7176 6.22078C17.0105 5.92789 17.4854 5.92788 17.7782 6.22078C18.0711 6.51367 18.0711 6.98855 17.7782 7.28144L13.0597 12L17.7782 16.7186C18.0711 17.0115 18.0711 17.4863 17.7782 17.7792C17.4854 18.0721 17.0105 18.0721 16.7176 17.7792L11.999 13.0607L7.28033 17.7794C6.98744 18.0722 6.51256 18.0722 6.21967 17.7794C5.92678 17.4865 5.92678 17.0116 6.21967 16.7187L10.9384 12L6.21967 7.28131Z"
-                                                        fill=""
-                                                    />
-                                                </svg>
-                                            </button>
-                                        </div>
+                                                    Notification
+                                                </h5>
+
+                                                <button
+                                                    onClick={() => setNotificationDropdown(false)}
+                                                    className="text-gray-500 dark:text-gray-400"
+                                                >
+                                                    <svg
+                                                        className="fill-current"
+                                                        width="24"
+                                                        height="24"
+                                                        viewBox="0 0 24 24"
+                                                        fill="none"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                    >
+                                                        <path
+                                                            fillRule="evenodd"
+                                                            clipRule="evenodd"
+                                                            d="M6.21967 7.28131C5.92678 6.98841 5.92678 6.51354 6.21967 6.22065C6.51256 5.92775 6.98744 5.92775 7.28033 6.22065L11.999 10.9393L16.7176 6.22078C17.0105 5.92789 17.4854 5.92788 17.7782 6.22078C18.0711 6.51367 18.0711 6.98855 17.7782 7.28144L13.0597 12L17.7782 16.7186C18.0711 17.0115 18.0711 17.4863 17.7782 17.7792C17.4854 18.0721 17.0105 18.0721 16.7176 17.7792L11.999 13.0607L7.28033 17.7794C6.98744 18.0722 6.51256 18.0722 6.21967 17.7794C5.92678 17.4865 5.92678 17.0116 6.21967 16.7187L10.9384 12L6.21967 7.28131Z"
+                                                            fill=""
+                                                        />
+                                                    </svg>
+                                                </button>
+                                            </div>
 
 
-                                        {(notifications.length > 0 && !notificationsLoading) && (
+                                            {(notifications.length > 0 && !notificationsLoading) && (
 
-                                            <>
-                                                <ul className="flex flex-col h-auto overflow-y-auto custom-scrollbar">
+                                                <>
+                                                    <ul className="flex flex-col h-auto overflow-y-auto custom-scrollbar">
 
-                                                    {notifications.map((notification, index) => {
+                                                        {notifications.map((notification, index) => {
 
-                                                        return (
-                                                            <li key={index}>
+                                                            return (
+                                                                <li key={index}>
 
-                                                                <div className="flex items-center justify-between">
-                                                                    <Link
-                                                                        className="flex gap-3 rounded-lg border-b border-gray-100 p-3 px-4.5 py-3 hover:bg-gray-100 dark:border-gray-800 dark:hover:bg-white/5"
-                                                                        href={
+                                                                    <div className="flex items-center justify-between">
+                                                                        <Link
+                                                                            className="flex gap-3 rounded-lg border-b border-gray-100 p-3 px-4.5 py-3 hover:bg-gray-100 dark:border-gray-800 dark:hover:bg-white/5"
+                                                                            href={
 
-                                                                            notification.data.route?.name ?
-                                                                                route(notification.data.route.name, [...notification.data.route.params || []])
-                                                                                : route('notifications.index')
-                                                                        }
-                                                                    >
-                                                                        <span
-                                                                            className="relative block w-full h-10 rounded-full z-1 max-w-10"
+                                                                                notification.data.route?.name ?
+                                                                                    route(notification.data.route.name, [...notification.data.route.params || []])
+                                                                                    : route('notifications.index')
+                                                                            }
                                                                         >
-                                                                            <img
-                                                                                src={Favicon}
-                                                                                alt="User"
-                                                                                className="overflow-hidden rounded-full"
-                                                                            />
-
-                                                                        </span>
-
-                                                                        <span className="block">
                                                                             <span
-                                                                                className="text-theme-sm mb-1.5 block text-gray-500 dark:text-gray-400"
+                                                                                className="relative block w-full h-10 rounded-full z-1 max-w-10"
                                                                             >
-                                                                                <span className="font-medium text-gray-800 dark:text-white/90"
-                                                                                >
-                                                                                    {notification.data.title}
+                                                                                <img
+                                                                                    src={Favicon}
+                                                                                    alt="User"
+                                                                                    className="overflow-hidden rounded-full"
+                                                                                />
 
+                                                                            </span>
+
+                                                                            <span className="block">
+                                                                                <span
+                                                                                    className="text-theme-sm mb-1.5 block text-gray-500 dark:text-gray-400"
+                                                                                >
+                                                                                    <span className="font-medium text-gray-800 dark:text-white/90"
+                                                                                    >
+                                                                                        {notification.data.title}
+
+                                                                                    </span>
+                                                                                </span>
+
+
+                                                                                <span
+                                                                                    className="text-theme-sm mb-1.5 block text-gray-500 dark:text-gray-400"
+                                                                                >
+                                                                                    <span className="font-medium text-gray-800 dark:text-white/90"
+                                                                                    >
+                                                                                        {notification.data.message}
+
+                                                                                    </span>
+                                                                                </span>
+
+                                                                                <span
+                                                                                    className="flex items-center gap-2 text-gray-500 text-theme-xs dark:text-gray-400"
+                                                                                >
+                                                                                    <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
+                                                                                    <span>{notification.added_at}</span>
                                                                                 </span>
                                                                             </span>
+                                                                        </Link>
+
+                                                                        <span className='flex justify-end '>
+                                                                            {notification['read_at'] === null && (
+                                                                                <svg onClick={() => markAsReadNotification(notification.id)} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={"size-6 dark:text-white cursor-pointer"}>
+                                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+                                                                                </svg>
+                                                                            )}
 
 
-                                                                            <span
-                                                                                className="text-theme-sm mb-1.5 block text-gray-500 dark:text-gray-400"
-                                                                            >
-                                                                                <span className="font-medium text-gray-800 dark:text-white/90"
-                                                                                >
-                                                                                    {notification.data.message}
+                                                                            {notification['read_at'] !== null && (
+                                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={"size-6 dark:text-white"}>
+                                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 9v.906a2.25 2.25 0 0 1-1.183 1.981l-6.478 3.488M2.25 9v.906a2.25 2.25 0 0 0 1.183 1.981l6.478 3.488m8.839 2.51-4.66-2.51m0 0-1.023-.55a2.25 2.25 0 0 0-2.134 0l-1.022.55m0 0-4.661 2.51m16.5 1.615a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V8.844a2.25 2.25 0 0 1 1.183-1.981l7.5-4.039a2.25 2.25 0 0 1 2.134 0l7.5 4.039a2.25 2.25 0 0 1 1.183 1.98V19.5Z" />
+                                                                                </svg>
 
-                                                                                </span>
-                                                                            </span>
-
-                                                                            <span
-                                                                                className="flex items-center gap-2 text-gray-500 text-theme-xs dark:text-gray-400"
-                                                                            >
-                                                                                <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
-                                                                                <span>{notification.added_at}</span>
-                                                                            </span>
+                                                                            )}
                                                                         </span>
-                                                                    </Link>
-
-                                                                    <span className='flex justify-end '>
-                                                                        {notification['read_at'] === null && (
-                                                                            <svg onClick={() => markAsReadNotification(notification.id)} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={"size-6 dark:text-white cursor-pointer"}>
-                                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
-                                                                            </svg>
-                                                                        )}
+                                                                    </div>
+                                                                </li>
+                                                            )
+                                                        })}
 
 
-                                                                        {notification['read_at'] !== null && (
-                                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={"size-6 dark:text-white"}>
-                                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 9v.906a2.25 2.25 0 0 1-1.183 1.981l-6.478 3.488M2.25 9v.906a2.25 2.25 0 0 0 1.183 1.981l6.478 3.488m8.839 2.51-4.66-2.51m0 0-1.023-.55a2.25 2.25 0 0 0-2.134 0l-1.022.55m0 0-4.661 2.51m16.5 1.615a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V8.844a2.25 2.25 0 0 1 1.183-1.981l7.5-4.039a2.25 2.25 0 0 1 2.134 0l7.5 4.039a2.25 2.25 0 0 1 1.183 1.98V19.5Z" />
-                                                                            </svg>
+                                                    </ul>
 
-                                                                        )}
-                                                                    </span>
-                                                                </div>
-                                                            </li>
-                                                        )
-                                                    })}
-
-
-                                                </ul>
-
-                                                <Link
-                                                    href={route('notifications.index')}
-                                                    className="text-theme-sm shadow-theme-xs mt-4 flex justify-center rounded-lg border border-gray-300 bg-white p-3 font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
-                                                >
-                                                    View All Notification
-                                                </Link>
-                                            </>
-                                        )}
+                                                    <Link
+                                                        href={route('notifications.index')}
+                                                        className="text-theme-sm shadow-theme-xs mt-4 flex justify-center rounded-lg border border-gray-300 bg-white p-3 font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
+                                                    >
+                                                        View All Notification
+                                                    </Link>
+                                                </>
+                                            )}
 
 
-                                        {(notifications.length === 0 && !notificationsLoading) && (
-                                            <div className="flex flex-col h-auto overflow-y-auto custom-scrollbar">
+                                            {(notifications.length === 0 && !notificationsLoading) && (
                                                 <div className="flex flex-col h-auto overflow-y-auto custom-scrollbar">
-                                                    <span className="text-theme-sm text-center mb-1.5 block text-gray-500 dark:text-gray-400">
-                                                        <span className="font-medium text-gray-800 dark:text-white/90">
-                                                            No Notification
+                                                    <div className="flex flex-col h-auto overflow-y-auto custom-scrollbar">
+                                                        <span className="text-theme-sm text-center mb-1.5 block text-gray-500 dark:text-gray-400">
+                                                            <span className="font-medium text-gray-800 dark:text-white/90">
+                                                                No Notification
+                                                            </span>
                                                         </span>
-                                                    </span>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        )}
+                                            )}
 
-                                        {notificationsLoading && (
-                                            <div className="flex flex-col items-center justify-center gap-5">
-                                                <p className='text-sm text-gray-800 dark:text-white'>Please Wait Your Notifications Are Loading</p>
-                                                <Spinner
-                                                    customSize={'w-10 h-10'}
-                                                />
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
+                                            {notificationsLoading && (
+                                                <div className="flex flex-col items-center justify-center gap-5">
+                                                    <p className='text-sm text-gray-800 dark:text-white'>Please Wait Your Notifications Are Loading</p>
+                                                    <Spinner
+                                                        customSize={'w-10 h-10'}
+                                                    />
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
 
 
-                            </div>
+                                </div>
+                            </Can>
 
                         </div>
 
@@ -626,29 +564,32 @@ export default function Header({
                                                 Edit Profile
                                             </Link>
                                         </li>
-                                        <li>
-                                            <Link
-                                                href={route("settings.general.setting")}
-                                                className="flex items-center gap-3 px-3 py-2 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
-                                            >
-                                                <svg
-                                                    className="fill-gray-500 group-hover:fill-gray-700 dark:fill-gray-400 dark:group-hover:fill-gray-300"
-                                                    width="24"
-                                                    height="24"
-                                                    viewBox="0 0 24 24"
-                                                    fill="none"
-                                                    xmlns="http://www.w3.org/2000/svg"
+
+                                        <Can permission={"Setting View"}>
+                                            <li>
+                                                <Link
+                                                    href={route("settings.general.setting")}
+                                                    className="flex items-center gap-3 px-3 py-2 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
                                                 >
-                                                    <path
-                                                        fillRule="evenodd"
-                                                        clipRule="evenodd"
-                                                        d="M10.4858 3.5L13.5182 3.5C13.9233 3.5 14.2518 3.82851 14.2518 4.23377C14.2518 5.9529 16.1129 7.02795 17.602 6.1682C17.9528 5.96567 18.4014 6.08586 18.6039 6.43667L20.1203 9.0631C20.3229 9.41407 20.2027 9.86286 19.8517 10.0655C18.3625 10.9253 18.3625 13.0747 19.8517 13.9345C20.2026 14.1372 20.3229 14.5859 20.1203 14.9369L18.6039 17.5634C18.4013 17.9142 17.9528 18.0344 17.602 17.8318C16.1129 16.9721 14.2518 18.0471 14.2518 19.7663C14.2518 20.1715 13.9233 20.5 13.5182 20.5H10.4858C10.0804 20.5 9.75182 20.1714 9.75182 19.766C9.75182 18.0461 7.88983 16.9717 6.40067 17.8314C6.04945 18.0342 5.60037 17.9139 5.39767 17.5628L3.88167 14.937C3.67903 14.586 3.79928 14.1372 4.15026 13.9346C5.63949 13.0748 5.63946 10.9253 4.15025 10.0655C3.79926 9.86282 3.67901 9.41401 3.88165 9.06303L5.39764 6.43725C5.60034 6.08617 6.04943 5.96581 6.40065 6.16858C7.88982 7.02836 9.75182 5.9539 9.75182 4.23399C9.75182 3.82862 10.0804 3.5 10.4858 3.5ZM13.5182 2L10.4858 2C9.25201 2 8.25182 3.00019 8.25182 4.23399C8.25182 4.79884 7.64013 5.15215 7.15065 4.86955C6.08213 4.25263 4.71559 4.61859 4.0986 5.68725L2.58261 8.31303C1.96575 9.38146 2.33183 10.7477 3.40025 11.3645C3.88948 11.647 3.88947 12.3531 3.40026 12.6355C2.33184 13.2524 1.96578 14.6186 2.58263 15.687L4.09863 18.3128C4.71562 19.3814 6.08215 19.7474 7.15067 19.1305C7.64015 18.8479 8.25182 19.2012 8.25182 19.766C8.25182 20.9998 9.25201 22 10.4858 22H13.5182C14.7519 22 15.7518 20.9998 15.7518 19.7663C15.7518 19.2015 16.3632 18.8487 16.852 19.1309C17.9202 19.7476 19.2862 19.3816 19.9029 18.3134L21.4193 15.6869C22.0361 14.6185 21.6701 13.2523 20.6017 12.6355C20.1125 12.3531 20.1125 11.647 20.6017 11.3645C21.6701 10.7477 22.0362 9.38152 21.4193 8.3131L19.903 5.68667C19.2862 4.61842 17.9202 4.25241 16.852 4.86917C16.3632 5.15138 15.7518 4.79856 15.7518 4.23377C15.7518 3.00024 14.7519 2 13.5182 2ZM9.6659 11.9999C9.6659 10.7103 10.7113 9.66493 12.0009 9.66493C13.2905 9.66493 14.3359 10.7103 14.3359 11.9999C14.3359 13.2895 13.2905 14.3349 12.0009 14.3349C10.7113 14.3349 9.6659 13.2895 9.6659 11.9999ZM12.0009 8.16493C9.88289 8.16493 8.1659 9.88191 8.1659 11.9999C8.1659 14.1179 9.88289 15.8349 12.0009 15.8349C14.1189 15.8349 15.8359 14.1179 15.8359 11.9999C15.8359 9.88191 14.1189 8.16493 12.0009 8.16493Z"
-                                                        fill=""
-                                                    />
-                                                </svg>
-                                                General Settings
-                                            </Link>
-                                        </li>
+                                                    <svg
+                                                        className="fill-gray-500 group-hover:fill-gray-700 dark:fill-gray-400 dark:group-hover:fill-gray-300"
+                                                        width="24"
+                                                        height="24"
+                                                        viewBox="0 0 24 24"
+                                                        fill="none"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                    >
+                                                        <path
+                                                            fillRule="evenodd"
+                                                            clipRule="evenodd"
+                                                            d="M10.4858 3.5L13.5182 3.5C13.9233 3.5 14.2518 3.82851 14.2518 4.23377C14.2518 5.9529 16.1129 7.02795 17.602 6.1682C17.9528 5.96567 18.4014 6.08586 18.6039 6.43667L20.1203 9.0631C20.3229 9.41407 20.2027 9.86286 19.8517 10.0655C18.3625 10.9253 18.3625 13.0747 19.8517 13.9345C20.2026 14.1372 20.3229 14.5859 20.1203 14.9369L18.6039 17.5634C18.4013 17.9142 17.9528 18.0344 17.602 17.8318C16.1129 16.9721 14.2518 18.0471 14.2518 19.7663C14.2518 20.1715 13.9233 20.5 13.5182 20.5H10.4858C10.0804 20.5 9.75182 20.1714 9.75182 19.766C9.75182 18.0461 7.88983 16.9717 6.40067 17.8314C6.04945 18.0342 5.60037 17.9139 5.39767 17.5628L3.88167 14.937C3.67903 14.586 3.79928 14.1372 4.15026 13.9346C5.63949 13.0748 5.63946 10.9253 4.15025 10.0655C3.79926 9.86282 3.67901 9.41401 3.88165 9.06303L5.39764 6.43725C5.60034 6.08617 6.04943 5.96581 6.40065 6.16858C7.88982 7.02836 9.75182 5.9539 9.75182 4.23399C9.75182 3.82862 10.0804 3.5 10.4858 3.5ZM13.5182 2L10.4858 2C9.25201 2 8.25182 3.00019 8.25182 4.23399C8.25182 4.79884 7.64013 5.15215 7.15065 4.86955C6.08213 4.25263 4.71559 4.61859 4.0986 5.68725L2.58261 8.31303C1.96575 9.38146 2.33183 10.7477 3.40025 11.3645C3.88948 11.647 3.88947 12.3531 3.40026 12.6355C2.33184 13.2524 1.96578 14.6186 2.58263 15.687L4.09863 18.3128C4.71562 19.3814 6.08215 19.7474 7.15067 19.1305C7.64015 18.8479 8.25182 19.2012 8.25182 19.766C8.25182 20.9998 9.25201 22 10.4858 22H13.5182C14.7519 22 15.7518 20.9998 15.7518 19.7663C15.7518 19.2015 16.3632 18.8487 16.852 19.1309C17.9202 19.7476 19.2862 19.3816 19.9029 18.3134L21.4193 15.6869C22.0361 14.6185 21.6701 13.2523 20.6017 12.6355C20.1125 12.3531 20.1125 11.647 20.6017 11.3645C21.6701 10.7477 22.0362 9.38152 21.4193 8.3131L19.903 5.68667C19.2862 4.61842 17.9202 4.25241 16.852 4.86917C16.3632 5.15138 15.7518 4.79856 15.7518 4.23377C15.7518 3.00024 14.7519 2 13.5182 2ZM9.6659 11.9999C9.6659 10.7103 10.7113 9.66493 12.0009 9.66493C13.2905 9.66493 14.3359 10.7103 14.3359 11.9999C14.3359 13.2895 13.2905 14.3349 12.0009 14.3349C10.7113 14.3349 9.6659 13.2895 9.6659 11.9999ZM12.0009 8.16493C9.88289 8.16493 8.1659 9.88191 8.1659 11.9999C8.1659 14.1179 9.88289 15.8349 12.0009 15.8349C14.1189 15.8349 15.8359 14.1179 15.8359 11.9999C15.8359 9.88191 14.1189 8.16493 12.0009 8.16493Z"
+                                                            fill=""
+                                                        />
+                                                    </svg>
+                                                    General Settings
+                                                </Link>
+                                            </li>
+                                        </Can>
 
                                     </ul>
                                     <button

@@ -144,14 +144,30 @@ class SettingController extends Controller
 
     public function rolePermissions(string $id)
     {
-        $permissions = $this->setting->getRolesPermissions($id);
+        $data = $this->setting->getRolesPermissions($id);
 
-        if ($permissions->isEmpty()) {
-            return to_route('settings.roles.index')->with('error', 'Permissions Not Found');
+        if (isset($data['status']) && $data['status'] == false) {
+            return back()->with('error', $data['message']);
         }
 
-        return Inertia::render('Settings/Permissions/rolePermissions', compact('permissions'));
+        $groupedPermissions = $data['groupedPermissions'];
 
+        $role = $data['role'];
+        $role_permissions = $data['role_permissions'];
+
+        return Inertia::render('Settings/Permissions/rolePermissions', compact('groupedPermissions', 'role', 'role_permissions'));
+
+    }
+
+    public function rolePermissionsAssign(Request $request)
+    {
+        $updated = $this->setting->AssignPermissions($request);
+
+        if ($updated['status']) {
+            return back()->with('success', $updated['message']);
+        } else {
+            return back()->with('error', $updated['message']);
+        }
     }
 
     public function permissionIndex(Request $request)

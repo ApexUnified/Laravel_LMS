@@ -4,7 +4,7 @@ namespace App\Repositories\Notifications\Interface;
 
 interface NotificationRepositoryInterface
 {
-    public function getAllNotifications(string $user_id);
+    public function getAllNotifications(string $user_id, ?int $length = null);
 
     public function getNotificationsForDashboard(string $user_id);
 

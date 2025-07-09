@@ -4,10 +4,25 @@ namespace App\Http\Controllers;
 
 use App\Repositories\Courses\Interface\CoursesRepositoryInterface;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Inertia\Inertia;
 
-class CourseController extends Controller
+class CourseController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:Course View', ['only' => 'index']),
+            new Middleware('permission:Course Create', ['only' => 'create']),
+            new Middleware('permission:Course Create', ['only' => 'store']),
+            new Middleware('permission:Course Edit', ['only' => 'edit']),
+            new Middleware('permission:Course Edit', ['only' => 'update']),
+            new Middleware('permission:Course Delete', ['only' => 'destroy']),
+            new Middleware('permission:Course Delete', ['only' => 'destroyBySelection']),
+        ];
+    }
+
     public function __construct(
         private CoursesRepositoryInterface $course,
     ) {}

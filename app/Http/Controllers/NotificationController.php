@@ -4,10 +4,24 @@ namespace App\Http\Controllers;
 
 use App\Repositories\Notifications\Interface\NotificationRepositoryInterface;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Inertia\Inertia;
 
-class NotificationController extends Controller
+class NotificationController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:Notification View', ['only' => 'index']),
+            new Middleware('permission:Notification View', ['only' => 'getNotificationsForDashboard']),
+            new Middleware('permission:Notification View', ['only' => 'notificationMarkAsRead']),
+            new Middleware('permission:Notification View', ['only' => 'destroyNotification']),
+            new Middleware('permission:Notification View', ['only' => 'destroyAllNotifications']),
+
+        ];
+    }
+
     public function __construct(
         private NotificationRepositoryInterface $notification
     ) {}

@@ -4,10 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Repositories\Transactions\Interface\TransactionRepositoryInterface;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Inertia\Inertia;
 
-class TransactionController extends Controller
+class TransactionController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:Transaction View', ['only' => '__invoke']),
+        ];
+    }
+
     public function __construct(
         private TransactionRepositoryInterface $transaction
     ) {}

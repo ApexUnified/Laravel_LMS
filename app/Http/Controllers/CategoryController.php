@@ -4,10 +4,25 @@ namespace App\Http\Controllers;
 
 use App\Repositories\Categories\Interface\CategoryRepositoryInterface;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Inertia\Inertia;
 
-class CategoryController extends Controller
+class CategoryController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:Category View', ['only' => 'index']),
+            new Middleware('permission:Category Create', ['only' => 'create']),
+            new Middleware('permission:Category Create', ['only' => 'store']),
+            new Middleware('permission:Category Edit', ['only' => 'edit']),
+            new Middleware('permission:Category Edit', ['only' => 'update']),
+            new Middleware('permission:Category Delete', ['only' => 'destroy']),
+            new Middleware('permission:Category Delete', ['only' => 'destroyBySelection']),
+        ];
+    }
+
     public function __construct(
         private CategoryRepositoryInterface $category) {}
 

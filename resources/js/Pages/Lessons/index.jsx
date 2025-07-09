@@ -3,6 +3,8 @@ import Card from '@/Components/Card';
 import LinkButton from '@/Components/LinkButton';
 import SelectInput from '@/Components/SelectInput';
 import Table from '@/Components/Table';
+import Can from '@/Hooks/Can';
+import useCan from '@/Hooks/UseCan';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
 import React, { useEffect, useState } from 'react'
@@ -185,18 +187,20 @@ export default function index({ lessons, categories, instructors, courses }) {
                 <Card
                     Content={
                         <>
-                            <div className="flex flex-wrap justify-end my-3">
-                                <LinkButton
-                                    Text={"Create Lesson"}
-                                    URL={route("lessons.create")}
-                                    Icon={
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                                        </svg>
+                            <Can permission={"Lesson Create"}>
+                                <div className="flex flex-wrap justify-end my-3">
+                                    <LinkButton
+                                        Text={"Create Lesson"}
+                                        URL={route("lessons.create")}
+                                        Icon={
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                            </svg>
 
-                                    }
-                                />
-                            </div>
+                                        }
+                                    />
+                                </div>
+                            </Can>
 
                             <Table
                                 setBulkSelectedIds={setBulkSelectedIds}
@@ -204,9 +208,9 @@ export default function index({ lessons, categories, instructors, courses }) {
                                 SingleSelectedId={SingleSelectedId}
                                 resetBulkSelectedIds={resetBulkSelectedIds}
                                 resetSingleSelectedId={resetSingleSelectedId}
-                                BulkDeleteMethod={BulkDelete}
+                                BulkDeleteMethod={useCan("Lesson Delete") ? BulkDelete : null}
                                 SingleDeleteMethod={SingleDelete}
-                                EditRoute={"lessons.edit"}
+                                EditRoute={useCan("Lesson Edit") ? "lessons.edit" : null}
                                 BulkDeleteRoute={"lessons.destroybyselection"}
                                 SearchRoute={"lessons.index"}
                                 SingleDeleteRoute={"lessons.destroy"}
@@ -216,7 +220,8 @@ export default function index({ lessons, categories, instructors, courses }) {
                                 ParentSearched={ParentSearched}
                                 RouteParameterKey={"slug"}
                                 searchProps={{ instructor_id: instructor_id, category_id: category_id, course_id: course_id }}
-                                customActions={customActions}
+                                customActions={useCan("Course Player") ? customActions : []}
+                                DeleteAction={useCan("Lesson Delete")}
                                 customSearch={
                                     <>
                                         <div className="relative mb-2">
